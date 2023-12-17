@@ -9,16 +9,22 @@ from math import exp
 
 from torch.utils.data import DataLoader
 
+from utils.batch import stack_batch_multi, unstack_batch_multi, stack_batch
+
 INFINITY = 1e9
 
-
+from utils.time import time_count
 class MAPPO(nn.Module):
     def __init__(self, config: Dict):
         super().__init__()
         self._config = config.copy()
 
-        self._state_dim = config["resolution"] * config["resolution"] * 3 
-        self._action_dim = 3
+        self._state_dim = int(
+            config["resolution"] * config["resolution"] * 4
+            + self._config["sample_rate"] * self._config["step_time"] * 2
+            + 1
+        )
+        self._action_dim = 4
         self._hid_dim_p = self._config["hid_dim_p"]
         self._hid_dim_v = self._config["hid_dim_v"]
         self._hid_dim_l = self._config["hid_dim_l"]
@@ -34,13 +40,14 @@ class MAPPO(nn.Module):
 
     def _build_model(self):
         # Networks
+        self._net1 = nn.Linear(self._state_dim, self._hid_dim_l).cuda()
         self._pi_net_fc1 = nn.Linear(self._hid_dim_l, self._hid_dim_p).cuda()
         self._pi_net_fc2 = nn.Linear(self._hid_dim_p, self._action_dim).cuda()
 
         self._v_net_fc1 = nn.Linear(self._hid_dim_l, self._hid_dim_v).cuda()
         self._v_net_fc2 = nn.Linear(self._hid_dim_v, 1).cuda()
 
-        self._lstm = nn.LSTM(self._state_dim, self._hid_dim_l, batch_first=True).cuda()
+        self._lstm = nn.LSTM(self._hid_dim_l, self._hid_dim_l, batch_first=True).cuda()
 
     def _init_model(self):
         """Initialize model"""
@@ -58,34 +65,26 @@ class MAPPO(nn.Module):
         nn.init.constant_(self._lstm.bias_ih_l0, 0.0)
         nn.init.constant_(self._lstm.bias_hh_l0, 0.0)
 
+    @time_count
     def forward(self, input_d):
         """Build model that is capable to do forward process"""
         output_d = dict()
 
-        # input_d = {
-        #     "camera": np.array([o["camera"] for o in obs]),
-        #     "audio": np.array([o["audio"] for o in obs]),
-        #     "mask": np.array(mask),
-        #     "lstm_h": a["lstm_h"], # (num_agents, hid_dim_l)
-        #     "lstm_c": a["lstm_c"], # (num_agents, hid_dim_l)
-        # }
-
-        (N, T, A) = input_d["camera"].shape[0], input_d["camera"].shape[1], input_d["camera"].shape[2]
+        N, T = input_d["audio"].shape[0], input_d["audio"].shape[1]
 
         input_d["camera"] = input_d["camera"].reshape(N, T, -1)
         input_d["audio"] = input_d["audio"].reshape(N, T, -1)
-        input_d["mask"] = input_d["mask"].reshape(N, T, -1)
+        input_d["step"] = input_d["step"].reshape(N, T, -1)
 
-        # TODO check sanity
         ht = input_d["lstm_h"][:, 0, :].reshape(1, N, -1).detach().contiguous()
         ct = input_d["lstm_c"][:, 0, :].reshape(1, N, -1).detach().contiguous()
 
-        s = torch.cat((input_d["camera"], input_d["audio"]), dim=3)
-
+        s = torch.cat((input_d["camera"], input_d["audio"], input_d["step"]), dim=-1)
+        # s = torch.cat((input_d["audio"], input_d["step"]), dim=-1)
+        
+        s = F.relu(self._net1(s))
         lstm_out, (hn, cn) = self._lstm(s, (ht, ct))
         pi_logits = self._pi_net_fc2(F.relu(self._pi_net_fc1(lstm_out)))
-        # Mask out invalid actions
-        pi_logits -= INFINITY * input_d["mask"]
 
         v_value = self._v_net_fc2(F.relu(self._v_net_fc1(lstm_out)))
 
@@ -108,7 +107,7 @@ class MAPPO(nn.Module):
         mask = input_d["mask"]  # (B, T+1)
         old_v_value = input_d["rl_value"]  # (B, T+1)
         reward = input_d["reward"]  # (B, T+1)
-        gamma = input_d["gamma"]   # (B, T+1)
+        gamma = self._config["gamma"]
 
         """
         policy gradient
@@ -183,14 +182,15 @@ class MAPPO(nn.Module):
     @staticmethod
     def _gae(reward, value, mask, gamma, lam):
         value = value * mask
-        delta = reward[:, :-1] + gamma[:, :-1] * value[:, 1:] - value[:, :-1]
+        delta = reward[:, :-1] + gamma * value[:, 1:] - value[:, :-1]
         gae_advantage = torch.zeros_like(value)
         gae_value = torch.zeros_like(value)
         for t in reversed(range(value.shape[1] - 1)):
-            gae_advantage[:, t] = delta[:, t] + gamma[:, :-1] * lam * gae_advantage[:, t + 1]
+            gae_advantage[:, t] = delta[:, t] + gamma * lam * gae_advantage[:, t + 1]
             gae_value[:, t] = value[:, t] + gae_advantage[:, t]
         return gae_advantage[:, :-1].detach(), gae_value.detach()
 
+    @time_count
     def learn(self, input_d: Dict):
         """
         Train the model with data
@@ -240,7 +240,6 @@ class MAPPO(nn.Module):
             "explained_variance": loss_dict["explained_variance"].data.cpu().numpy(),
             "ent_loss": loss_dict["ent_loss"].data.cpu().numpy(),
         }
-    
 
     @staticmethod
     def _get_rate(step, lr, warmup):
@@ -250,16 +249,15 @@ class MAPPO(nn.Module):
                 lr_ = lr * exp(-(step - warmup) * 0.0001)
         return lr_
 
-
-    def inf(self, input_d: Dict) -> Dict:
+    def inf(self, input_d: list[Dict]) -> Dict:
         """
-        Forward process of model, input dict, output dict
+        Forward process of model, input list of dict, output list of dict
         input: {key: (B, *)} -> {key: (B, 1, *)}
         output: input -> {key: (B, 1, *)} -> {key: (B, *)}
         """
-
         input_d = {
-            k: torch.from_numpy(v[:, None]).cuda() for k, v in input_d.items()
+            k: torch.from_numpy(v[:, None]).type(torch.float32).cuda()
+            for k, v in input_d.items()
         }  # add seq-length dimension
         output_d = self.forward(input_d)
         output_d = {
@@ -270,3 +268,45 @@ class MAPPO(nn.Module):
     def save(self, path):
         """save model"""
         torch.save(self.state_dict(), path)
+
+
+class BaseModel:
+    def __init__(self, config: Dict):
+        self._config = config
+        self._n_envs = config["num_envs"]
+
+        self._model = MAPPO(copy.deepcopy(config))
+
+    def _build_model(self):
+        self._model._build_model()
+
+    def _build_loss(self):
+        self._model._build_loss()
+
+    def _init_model(self):
+        self._model._init_model()
+
+    def learn(self, data: Dict):
+        """BE CAREFUL !!!"""
+        d = stack_batch(data)
+        return self._model.learn(d)
+
+    def save(self, path):
+        """Save model"""
+        self._model.save(path)
+
+    def load_model(self, path):
+        """Load model"""
+        self._model.load_state_dict(torch.load(path))
+
+    def inf(self, input_d_list: List) -> List:
+        """BE CAREFUL !!!"""
+        n_agents = len(input_d_list[0])
+
+        input_d = stack_batch_multi(input_d_list)  # batch; form a dict
+
+        rl_output = self._model.inf(input_d)
+
+        output_list = unstack_batch_multi(rl_output, n_agents)  # split batch
+
+        return output_list

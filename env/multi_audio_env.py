@@ -7,15 +7,20 @@ import quaternion
 import copy
 
 from utils.angles import angle_diff, quat_to_angle
-from utils.audio import ChunkedAudio
+from quaternion import from_euler_angles, as_float_array
 
+# from utils.audio import ChunkedAudio
+from scipy.io.wavfile import write
 from scipy.signal import fftconvolve
+import librosa
 
+from utils.time import time_count
+import time
 
 class MultiAudioEnv(ParallelEnv):
     metadata = {"name": "multi_audio_nav"}
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, logger):
         # deep copy config
         self._config = config.copy()
         self._num_agents = config["agents_num"]
@@ -25,42 +30,45 @@ class MultiAudioEnv(ParallelEnv):
         self._scuccess_distance = config["success_distance"]
 
         self._step_time = config["step_time"]
-        self._chunked_audios = [
-            ChunkedAudio(
-                config["audio_dir"], config["sample_rate"], self._step_time
-            )  # TODO config for chunked audio to enable multiple sources
-        ] * self._num_sources
-
-        self._max_ir_len = 70000
+        self._sample_rate = config["sample_rate"]
+        self._current_sample_index = 0
+        self._current_source_sound, _ = librosa.load(
+            self._config["audio_dir"], sr=self._sample_rate
+        )
 
         self._sim = self._get_sim()
 
         self._count = 0
+        
+        self._logger = logger
 
         """predefined information"""
         self._data_structure = {
             "camera": (
-                (self._num_agents, 3, config["resolution"], config["resolution"]),
+                (config["resolution"], config["resolution"], 4),
                 np.float32,
             ),
             "audio": (
-                (self._num_agents, 2, self._config["sample_rate"] * self._step_time),
+                (2, int(self._sample_rate * self._step_time)),
                 np.float32,
             ),
-            "step": ((1,), np.int64),
+            "step": ((), np.int64),
             # rl_output
-            "rl_pred": ((self._num_agents, 1), np.int64),
-            "rl_logits": ((self._num_agents, 3), np.float32),
-            "rl_value": ((self._num_agents, 1), np.float32),
+            "rl_pred": ((), np.int64),
+            "rl_logits": ((4,), np.float32),
+            "rl_value": ((1,), np.float32),
             # reward & mask
-            "reward": ((self._num_agents, 1), np.float32),
-            "mask": ((self._num_agents, 3), np.float32),
+            "reward": ((), np.float32),
+            "mask": ((), np.float32),
             # lstm hidden state
-            "lstm_h": ((self._num_agents, self._config["hid_dim_l"]), np.float32),
-            "lstm_c": ((self._num_agents, self._config["hid_dim_l"]), np.float32),
+            "lstm_h": ((self._config["hid_dim_l"],), np.float32),
+            "lstm_c": ((self._config["hid_dim_l"],), np.float32),
         }
 
-        self._data = {k: list() for k in self._data_structure.keys()}
+        self._data = [
+            {k: list() for k in self._data_structure.keys()}
+            for _ in range(self._num_agents)
+        ]
 
     def _get_sim(self):
         """
@@ -74,6 +82,7 @@ class MultiAudioEnv(ParallelEnv):
         backend_cfg.scene_dataset_config_file = self._config["scene_config_file"]
         backend_cfg.load_semantic_mesh = self._config["load_semantic_mesh"]
         backend_cfg.enable_physics = self._config["enable_physics"]
+        backend_cfg.random_seed = self._config["random_seed"]
 
         agent_cfg_list = []
         for _ in range(self._num_agents):
@@ -81,13 +90,19 @@ class MultiAudioEnv(ParallelEnv):
 
             agent_cfg.action_space = {
                 "move_forward": habitat_sim.agent.ActionSpec(
-                    "move_forward", habitat_sim.agent.ActuationSpec(amount=0.1)
+                    "move_forward",
+                    habitat_sim.agent.ActuationSpec(
+                        amount=self._config["forward_amount"]
+                    ),
                 ),
                 "turn_left": habitat_sim.agent.ActionSpec(
                     "turn_left", habitat_sim.agent.ActuationSpec(amount=30.0)
                 ),
                 "turn_right": habitat_sim.agent.ActionSpec(
                     "turn_right", habitat_sim.agent.ActuationSpec(amount=30.0)
+                ),
+                "stop": habitat_sim.agent.ActionSpec(
+                    "move_forward", habitat_sim.agent.ActuationSpec(amount=0.0)
                 ),
             }
 
@@ -134,13 +149,15 @@ class MultiAudioEnv(ParallelEnv):
         Do the following:
             1. generate random navigable source position
             2. set audio source transform for each agent, in the order of audio sensor uuid
-            3. reset the audio chunk to the beginning
+            3. reset the audio sample index to the beginning
 
         """
+
         self._source_poses = [
             self._sim.pathfinder.get_random_navigable_point()
             for _ in range(self._num_sources)
         ]
+        self._logger.info(f"source_poses {self._source_poses}")
         for agent_id in range(self._num_agents):
             for audio_sensor_id in range(self._num_sources):
                 audio_sensor = self._sim.get_agent(agent_id)._sensors[
@@ -150,7 +167,8 @@ class MultiAudioEnv(ParallelEnv):
                     self._source_poses[audio_sensor_id] + np.array([0.0, 1.5, 0.0])
                 )  # add height of 1.5m
 
-        [chunked_audios.reset() for chunked_audios in self._chunked_audios]
+        self._current_sample_index = 0
+        # [chunked_audios.reset() for chunked_audios in self._chunked_audios]
 
     def _reset_agent(self):
         """
@@ -159,43 +177,68 @@ class MultiAudioEnv(ParallelEnv):
         for agent_id in range(self._num_agents):
             agent = self._sim.get_agent(agent_id)
             agent_state = habitat_sim.AgentState()
-            # TODO not valid random
             agent_state.position = self._sim.pathfinder.get_random_navigable_point()
-            # TODO random face direction needed
-            # rand_q = np.random.normal(size=4)
-            # rand_q /= np.linalg.norm(rand_q)
-            # agent_state.rotation = quaternion.as_quat_array(np.array(rand_q))
+            self._logger.info(f"agent_state.position {agent_state.position}")
+            # Generate random yaw angle from -180 to 180
+            # yaw = np.random.uniform(-np.pi, np.pi)
+            # q = from_euler_angles(0, yaw, 0)
+            # # Convert to numpy array
+            # q = as_float_array(q)
+            # agent_state.rotation = quaternion.as_quat_array(q)
             agent.set_state(agent_state)
 
         self._crushed_agents = [False] * self._num_agents
 
-    def _convolve_with_rir(self, rir):
-        sampling_rate = self.config.AUDIO.RIR_SAMPLING_RATE
-        num_sample = int(sampling_rate * self.config.STEP_TIME)
-
+    @time_count
+    def _convolve_with_ir(self, ir):
+        ir = ir.T
+        sampling_rate = self._sample_rate
+        num_sample = int(sampling_rate * self._step_time)
         index = self._current_sample_index
-        if index - rir.shape[0] < 0:
-            sound_segment = self.current_source_sound[: index + num_sample]
-            binaural_convolved = np.array([fftconvolve(sound_segment, rir[:, channel]
-                                                       ) for channel in range(rir.shape[-1])])
-            audiogoal = binaural_convolved[:, index: index + num_sample]
+        if index - ir.shape[0] < 0:
+            sound_segment = self._current_source_sound[: index + num_sample]
+            binaural_convolved = np.array(
+                [
+                    fftconvolve(sound_segment, ir[:, channel])
+                    for channel in range(ir.shape[-1])
+                ]
+            )
+            audiogoal = binaural_convolved[:, index : index + num_sample]
         else:
             # include reverb from previous time step
-            if index + num_sample < self.current_source_sound.shape[0]:
-                sound_segment = self.current_source_sound[index - rir.shape[0] + 1: index + num_sample]
+            if index + num_sample < self._current_source_sound.shape[0]:
+                sound_segment = self._current_source_sound[
+                    index - ir.shape[0] + 1 : index + num_sample
+                ]
             else:
-                wraparound_sample = index + num_sample - self.current_source_sound.shape[0]
-                sound_segment = np.concatenate([self.current_source_sound[index - rir.shape[0] + 1:],
-                                                self.current_source_sound[: wraparound_sample]])
-            # sound_segment = self.current_source_sound[index - rir.shape[0] + 1: index + num_sample]
-            binaural_convolved = np.array([fftconvolve(sound_segment, rir[:, channel], mode='valid',
-                                                       ) for channel in range(rir.shape[-1])])
+                wraparound_sample = (
+                    index + num_sample - self._current_source_sound.shape[0]
+                )
+                sound_segment = np.concatenate(
+                    [
+                        self._current_source_sound[index - ir.shape[0] + 1 :],
+                        self._current_source_sound[:wraparound_sample],
+                    ]
+                )
+
+            # sound_segment = self._current_source_sound[index - ir.shape[0] + 1: index + num_sample]
+            binaural_convolved = np.array(
+                [
+                    fftconvolve(
+                        sound_segment,
+                        ir[:, channel],
+                        mode="valid",
+                    )
+                    for channel in range(ir.shape[-1])
+                ]
+            )
             audiogoal = binaural_convolved
 
-        # audiogoal = np.array([fftconvolve(self.current_source_sound, rir[:, channel], mode='full',
-        #                                   ) for channel in range(rir.shape[-1])])
+        # audiogoal = np.array([fftconvolve(self._current_source_sound, ir[:, channel], mode='full',
+        #                                   ) for channel in range(ir.shape[-1])])
         # audiogoal = audiogoal[:, self._episode_step_count * num_sample: (self._episode_step_count + 1) * num_sample]
-        audiogoal = np.pad(audiogoal, [(0, 0), (0, sampling_rate - audiogoal.shape[1])])
+        # audiogoal = np.pad(audiogoal, [(0, 0), (0, sampling_rate - audiogoal.shape[1])])
+        # print("audiogoal", audiogoal.shape)
 
         return audiogoal
 
@@ -212,67 +255,57 @@ class MultiAudioEnv(ParallelEnv):
 
         self._prev_obs = list()
 
-        shape, dtype = self._data_structure["lstm_h"]
-        self._data["lstm_h"].append(np.zeros(shape, dtype=dtype))
-        self._data["lstm_c"].append(np.zeros(shape, dtype=dtype))
-
-        obs, mask = self._get_observations()
+        obs = self._get_observations()
         self._prev_obs = obs
 
+        shape, dtype = self._data_structure["lstm_h"]
         # get state (including obs, mask, lstm_h, lstm_c)
-        s = {
-            "camera": np.array([o["camera"] for o in obs]),
-            "audio": np.array([o["audio"] for o in obs]),
-            "mask": np.array(mask),
-            "lstm_h": self._data["lstm_h"][-1],  # (num_agents, hid_dim_l)
-            "lstm_c": self._data["lstm_c"][-1],  # (num_agents, hid_dim_l)
-        }
+        s = [
+            {
+                "camera": np.array(obs[i]["camera"]),
+                "audio": np.array(obs[i]["audio"]),
+                "step": np.array(self._count),
+                "lstm_h": np.zeros(shape, dtype=dtype),
+                "lstm_c": np.zeros(shape, dtype=dtype),
+            }
+            for i in range(self._num_agents)
+        ]
 
         # store data for rl-train
-        for k, v in s.items():
-            shape, dtype = self._data_structure[k]
-            self._data[k].append(np.array(v, dtype=dtype))
+        for i in range(self._num_agents):
+            self._data[i]["lstm_h"].append(np.zeros(shape, dtype=dtype))
+            self._data[i]["lstm_c"].append(np.zeros(shape, dtype=dtype))
+
+            for k, v in s[i].items():
+                shape, dtype = self._data_structure[k]
+                self._data[i][k].append(np.array(v, dtype=dtype))
+                
+        self._succeeded_agents = [False] * self._num_agents
 
         return s
 
+    @time_count
     def _get_observations(self):
         """
         get observation for each agent
         Return:
             obs: list of dict, representing observation for each agent
-            mask: list of nd array in shape [action_space, ],
-                representing whether the agent can step forward at current position
-                [0, 0, 0] if can, [1, 0, 0] if cannot
         """
         obs_list = []
-        mask_list = []
+        t = time.time()
         all_obs = self._sim.get_sensor_observations(agent_ids=range(self._num_agents))
-
+        self._logger.info(f"get_sensor_observations time: {time.time()-t}")
         for agent_id in range(self._num_agents):
             obs = all_obs[agent_id]
             # get audio chunk
             irs = [
-                self._ir_reshape(np.array(obs["audio_sensor_{}".format(i)]))
+                np.array(obs["audio_sensor_{}".format(i)])
                 for i in range(self._num_sources)
             ]
-            audio_chunks = [
-                chunked_audio(self._step_time * self._count, self._count)
-                for chunked_audio in self._chunked_audios
-            ]
             # convolve audio chunks with IRs, sum over sources
-            audios = np.array(
-                [
-                    np.array(
-                        [
-                            np.convolve(audio_chunk, ir[n_channel])
-                            for audio_chunk, ir in zip(audio_chunks, irs)
-                        ]
-                    )
-                    for n_channel in range(len(irs[0]))
-                ]
-            )
-            audio = np.sum(audios, axis=1)
-
+            audios = [self._convolve_with_ir(ir) for ir in irs]
+            audios = np.array(audios)  # source, channel, len
+            audio = np.sum(audios, axis=0)  # channel, len
             # append audio and camera sensor to obs
             obs_list.append(
                 {
@@ -281,15 +314,12 @@ class MultiAudioEnv(ParallelEnv):
                 }
             )
 
-            # mask
-            agent = self._sim.get_agent(agent_id)
-            agent_state = self._sim.get_agent(0).get_state()
-            forward_pos = agent_state.position + np.array([2, 0, 0])
-            navigable = self._sim.pathfinder.is_navigable(forward_pos)
-            self._crushed_agents[agent_id] = not navigable
-            mask_list.append(np.array([0, 0, 0]) if navigable else np.array([1, 0, 0]))
+        self._current_sample_index = (
+            int(self._current_sample_index + self._sample_rate * self._step_time)
+            % self._current_source_sound.shape[0]
+        )
 
-        return obs_list, mask_list
+        return obs_list
 
     def _reward(self):
         """
@@ -342,21 +372,25 @@ class MultiAudioEnv(ParallelEnv):
             else False
             for agent_id in range(self._num_agents)
         ]
+        for i in range(len(cond)):
+            if cond[i] == True:
+                self._succeeded_agents[i] = True
 
-        return any(cond)
+        return all(cond)
 
-    def step(self, a):
+    @time_count
+    def step(self, a: list[dict]):
         """
         typical step function for rl
         Return:
-            obs: list of dict, representing observation for each agent
             s: list of dict, representing state for each agent
             r: list of float, representing reward for each agent
             done: bool, whether the episode is done
             info: dict, additional info
         """
-        self._count += 1
 
+        self._count += 1
+        
         self._crushed_agents = [False] * self._num_agents
 
         prev_agent_state_list = list()
@@ -365,18 +399,21 @@ class MultiAudioEnv(ParallelEnv):
             agent = self._sim.get_agent(agent_id)
             prev_agent_state_list.append(copy.deepcopy(agent.get_state()))
 
-            action = a["rl_pred"][agent_id]
+            action = a[agent_id]["rl_pred"]
             if action == 0:
                 action = "move_forward"
             elif action == 1:
                 action = "turn_left"
             elif action == 2:
                 action = "turn_right"
+            elif action == 3:
+                action = "stop"
 
-            agent.act(action)
+            collide = agent.act(action)
+            self._crushed_agents[agent_id] = collide
 
         # get observation
-        obs, mask = self._get_observations()
+        obs = self._get_observations()
 
         for agent_id in range(self._num_agents):
             if self._crushed_agents[agent_id]:
@@ -410,28 +447,39 @@ class MultiAudioEnv(ParallelEnv):
                 )
                 for agent_id in range(self._num_agents)
             ],
+            "success": self._succeeded_agents
         }
 
         # get state (including obs, mask, lstm_h, lstm_c)
-        s = {
-            "camera": np.array([o["camera"] for o in obs]),
-            "audio": np.array([o["audio"] for o in obs]),
-            "mask": np.array(mask),
-            "lstm_h": a["lstm_h"],  # (num_agents, hid_dim_l)
-            "lstm_c": a["lstm_c"],  # (num_agents, hid_dim_l)
-        }
+        s = [
+            {
+                "camera": np.array(obs[i]["camera"]),
+                "audio": np.array(obs[i]["audio"]),
+                "step": np.array(self._count),
+                "lstm_h": a[i]["lstm_h"],
+                "lstm_c": a[i]["lstm_c"],
+            }
+            for i in range(self._num_agents)
+        ]
 
         """store data for rl-train"""
-        # concatenate every agent's data into one batch
-        for k, v in a.items():
-            if k == "lstm_h" or k == "lstm_c":
-                continue
-            shape, dtype = self._data_structure[k]
-            self._data[k].append(np.array(v, dtype=dtype))
+        for i in range(self._num_agents):
+            for k, v in a[i].items():
+                if k == "lstm_h" or k == "lstm_c":
+                    continue
+                _, dtype = self._data_structure[k]
+                self._data[i][k].append(np.array(v, dtype=dtype))
 
-        for k, v in s.items():
-            shape, dtype = self._data_structure[k]
-            self._data[k].append(np.array(v, dtype=dtype))
+            for k, v in s[i].items():
+                _, dtype = self._data_structure[k]
+                self._data[i][k].append(np.array(v, dtype=dtype))
+
+            for k, v in {
+                "reward": r[i],
+                "mask": float(not done),
+            }.items():
+                _, dtype = self._data_structure[k]
+                self._data[i][k].append(np.array(v, dtype=dtype))
 
         return s, r, done, info
 
@@ -444,28 +492,39 @@ class MultiAudioEnv(ParallelEnv):
         pad_length = target_length - len(input_list)
         for _ in range(pad_length):
             input_list.append(np.zeros(shape, dtype=dtype))
+        #     x = np.zeros(shape, dtype=dtype)
+        # print("zero", x.shape)
         return np.array(input_list, dtype=dtype)
 
-    def _ir_reshape(self, ir):
-        # shape ir to max_ir_len, no matter longer or shorter
-        if len(ir) > self._max_ir_len:
-            ir = ir[: self._max_ir_len]
-        else:
-            ir = np.pad(ir, (0, self._max_ir_len - len(ir)), "constant")
+    def shortest_path(self, from_pos, to_pos):
+        path = habitat_sim.ShortestPath()
+        path.requested_start = from_pos
+        path.requested_end = to_pos
+        found_path = self._sim.pathfinder.find_path(path)
+        path_results = (found_path, path.geodesic_distance, path.points)
+
+        return path_results
 
     def get(self):
         """process self._episode into a list of {str: array((T, *))}, so the model can train rl loss"""
-        out = list()
+        res = list()
 
-        while len(self._data["img_feat"]) > 1:  # 1 for bootstrap
-            seq = dict()
-            for k, v in self._data.items():
-                shape, dtype = self._data_structure[k]
-                seq[k] = self._pad(v, shape, dtype, self._sequence_length)
-                self._data[k] = v[
-                    self._sequence_length - 1 :
-                ]  # shift, preserve 1 since bootstrap
-            out.append(seq)
+        for i in range(self._num_agents):
+            out = list()
+            while len(self._data[i]["audio"]) > 1:  # 1 for bootstrap
+                seq = dict()
+                for k, v in self._data[i].items():
+                    # print(k)
+                    # print(len(v), v[0].shape)
+                    shape, dtype = self._data_structure[k]
+                    seq[k] = self._pad(v, shape, dtype, self._sequence_length)
+                    self._data[i][k] = v[
+                        self._sequence_length - 1 :
+                    ]  # shift, preserve 1 since bootstrap
+                out.append(seq)
+
+        res.append(out)
+
         return out
 
     def observation_space(self, agent):
@@ -486,4 +545,4 @@ class MultiAudioEnv(ParallelEnv):
         """
         including 3 actions: forward, turn left, turn right
         """
-        return Discrete(3)
+        return Discrete(4)

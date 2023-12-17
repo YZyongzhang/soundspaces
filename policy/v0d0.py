@@ -1,1 +1,1 @@
-from policy.base_model import MAPPO as Model
+from policy.base_model import BaseModel as Model
