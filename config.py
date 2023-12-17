@@ -3,11 +3,16 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base_dir", type=str, default="experiments/debug/")
+    parser.add_argument("--base_dir", type=str, default="experiments/train_1/")
     parser.add_argument("--num_envs", type=int, default=8)
     parser.add_argument("--model_dir", type=str, default="")
     parser.add_argument("--num_episodes", type=int, default=10000)
     parser.add_argument("--random_seed", type=int, default=42)
+    parser.add_argument("--save_model_every", type=int, default=2)
+
+    # ray args
+    parser.add_argument("--num_actors", type=int, default=4)
+    parser.add_argument("--num_envs_per_actor", type=int, default=2)
 
     # sim args
     parser.add_argument("--agents_num", type=int, default=2)
@@ -29,22 +34,24 @@ def parse_args():
     )
 
     # sensor args
-    parser.add_argument("--resolution", type=int, default=256)
-    parser.add_argument("--sample_rate", type=float, default=48000)
+    parser.add_argument("--resolution", type=int, default=128)
+    parser.add_argument("--sample_rate", type=float, default=24000)
 
     # env args
-    parser.add_argument("--max_episode_steps", type=int, default=5)
-    parser.add_argument("--sequence_length", type=int, default=50)
+    parser.add_argument("--max_episode_steps", type=int, default=100)
+    parser.add_argument("--sequence_length", type=int, default=60)
     parser.add_argument("--step_time", type=float, default=0.75)
     parser.add_argument("--success_distance", type=float, default=1.0)
     parser.add_argument("--audio_dir", type=str, default="../res/singing.wav")
     parser.add_argument("--forward_amount", type=float, default=0.25)
+    
     # architecture args
     parser.add_argument("--hid_dim_l", type=int, default=512)
     parser.add_argument("--hid_dim_p", type=int, default=512)
     parser.add_argument("--hid_dim_v", type=int, default=512)
 
     # train args
+    parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--adam_beta2", type=float, default=0.999)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--warmup", type=int, default=1000)

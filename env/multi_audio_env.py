@@ -17,10 +17,11 @@ import librosa
 from utils.time import time_count
 import time
 
+
 class MultiAudioEnv(ParallelEnv):
     metadata = {"name": "multi_audio_nav"}
 
-    def __init__(self, config: dict, logger):
+    def __init__(self, config: dict):
         # deep copy config
         self._config = config.copy()
         self._num_agents = config["agents_num"]
@@ -39,8 +40,6 @@ class MultiAudioEnv(ParallelEnv):
         self._sim = self._get_sim()
 
         self._count = 0
-        
-        self._logger = logger
 
         """predefined information"""
         self._data_structure = {
@@ -157,7 +156,7 @@ class MultiAudioEnv(ParallelEnv):
             self._sim.pathfinder.get_random_navigable_point()
             for _ in range(self._num_sources)
         ]
-        self._logger.info(f"source_poses {self._source_poses}")
+        print(f"source_poses {self._source_poses}")
         for agent_id in range(self._num_agents):
             for audio_sensor_id in range(self._num_sources):
                 audio_sensor = self._sim.get_agent(agent_id)._sensors[
@@ -178,7 +177,7 @@ class MultiAudioEnv(ParallelEnv):
             agent = self._sim.get_agent(agent_id)
             agent_state = habitat_sim.AgentState()
             agent_state.position = self._sim.pathfinder.get_random_navigable_point()
-            self._logger.info(f"agent_state.position {agent_state.position}")
+            print(f"agent_state.position {agent_state.position}")
             # Generate random yaw angle from -180 to 180
             # yaw = np.random.uniform(-np.pi, np.pi)
             # q = from_euler_angles(0, yaw, 0)
@@ -189,7 +188,6 @@ class MultiAudioEnv(ParallelEnv):
 
         self._crushed_agents = [False] * self._num_agents
 
-    @time_count
     def _convolve_with_ir(self, ir):
         ir = ir.T
         sampling_rate = self._sample_rate
@@ -279,12 +277,11 @@ class MultiAudioEnv(ParallelEnv):
             for k, v in s[i].items():
                 shape, dtype = self._data_structure[k]
                 self._data[i][k].append(np.array(v, dtype=dtype))
-                
+
         self._succeeded_agents = [False] * self._num_agents
 
         return s
 
-    @time_count
     def _get_observations(self):
         """
         get observation for each agent
@@ -294,7 +291,7 @@ class MultiAudioEnv(ParallelEnv):
         obs_list = []
         t = time.time()
         all_obs = self._sim.get_sensor_observations(agent_ids=range(self._num_agents))
-        self._logger.info(f"get_sensor_observations time: {time.time()-t}")
+        print(f"get_sensor_observations time: {time.time()-t}")
         for agent_id in range(self._num_agents):
             obs = all_obs[agent_id]
             # get audio chunk
@@ -378,7 +375,6 @@ class MultiAudioEnv(ParallelEnv):
 
         return all(cond)
 
-    @time_count
     def step(self, a: list[dict]):
         """
         typical step function for rl
@@ -390,7 +386,7 @@ class MultiAudioEnv(ParallelEnv):
         """
 
         self._count += 1
-        
+
         self._crushed_agents = [False] * self._num_agents
 
         prev_agent_state_list = list()
@@ -447,7 +443,7 @@ class MultiAudioEnv(ParallelEnv):
                 )
                 for agent_id in range(self._num_agents)
             ],
-            "success": self._succeeded_agents
+            "success": self._succeeded_agents,
         }
 
         # get state (including obs, mask, lstm_h, lstm_c)

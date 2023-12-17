@@ -9,11 +9,13 @@ from math import exp
 
 from torch.utils.data import DataLoader
 
-from utils.batch import stack_batch_multi, unstack_batch_multi, stack_batch
+from utils.batch import stack_batch_multi, unstack_batch_multi, stack_batch, DictLoader
 
 INFINITY = 1e9
 
 from utils.time import time_count
+
+
 class MAPPO(nn.Module):
     def __init__(self, config: Dict):
         super().__init__()
@@ -81,7 +83,7 @@ class MAPPO(nn.Module):
 
         s = torch.cat((input_d["camera"], input_d["audio"], input_d["step"]), dim=-1)
         # s = torch.cat((input_d["audio"], input_d["step"]), dim=-1)
-        
+
         s = F.relu(self._net1(s))
         lstm_out, (hn, cn) = self._lstm(s, (ht, ct))
         pi_logits = self._pi_net_fc2(F.relu(self._pi_net_fc1(lstm_out)))
@@ -269,6 +271,15 @@ class MAPPO(nn.Module):
         """save model"""
         torch.save(self.state_dict(), path)
 
+    def serializing(self):
+        state_dict = self.state_dict()
+        s = pickle.dumps(state_dict)
+        return s
+
+    def deserializing(self, s):
+        state_dict = pickle.loads(s)
+        self.load_state_dict(state_dict)
+
 
 class BaseModel:
     def __init__(self, config: Dict):
@@ -288,8 +299,20 @@ class BaseModel:
 
     def learn(self, data: Dict):
         """BE CAREFUL !!!"""
-        d = stack_batch(data)
-        return self._model.learn(d)
+        loader = DictLoader(data, self._config["batch_size"])
+        
+        d_list = list()
+        bs_list = list()
+        for data, bs in loader:
+            d = self._model.learn(data)
+            d_list.append(d)
+            bs_list.append(bs)
+
+        res_d = dict()
+        for k in d_list[0].keys():
+            res_d[k] = sum([d_list[i][k]*bs for i in range(len(bs_list)) for bs in bs_list])/sum(bs_list)
+            
+        return res_d
 
     def save(self, path):
         """Save model"""
@@ -310,3 +333,9 @@ class BaseModel:
         output_list = unstack_batch_multi(rl_output, n_agents)  # split batch
 
         return output_list
+
+    def load_model(self, s):
+        self._model.deserializing(s)
+
+    def dump_model(self):
+        return self._model.serializing()

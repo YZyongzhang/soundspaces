@@ -1,5 +1,5 @@
 import numpy as np
-
+import random
 
 def stack_batch(dict_list):
     """
@@ -76,3 +76,20 @@ def unstack_batch(batch_dict):
     for i in range(batch_size):
         out.append({k: v[i] for k, v in batch_dict.items()})
     return out
+
+
+class DictLoader:
+    
+    def __init__(self, data, batch_size=8):
+        self.data = data
+        self.len = len(data)
+        self.batch_size = batch_size
+        self.i = 0
+        random.shuffle(data)
+        
+    def __iter__(self):
+        while self.i < self.len:
+            res = self.data[self.i : self.i + self.batch_size]
+            self.i += self.batch_size
+            bn = self.batch_size if self.i <= self.len else self.len + self.batch_size - self.i
+            yield stack_batch(res), bn
