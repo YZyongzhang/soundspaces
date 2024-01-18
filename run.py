@@ -2,6 +2,8 @@ from config import config
 
 import ray
 
+import random
+random.seed(config["random_seed"])
 
 class Actor:
     def __init__(self, config):

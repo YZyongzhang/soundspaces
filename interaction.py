@@ -8,6 +8,9 @@ import IPython.display as ipd
 from scipy.io.wavfile import write
 import numpy as np
 
+from PIL import Image
+
+
 FORWARD_KEY = "w"
 LEFT_KEY = "a"
 RIGHT_KEY = "d"
@@ -28,7 +31,7 @@ def run():
 
     camera, audio = obs[0]["camera"], obs[0]["audio"]
     # display camera
-    cv2.imshow("RGBA", transform_rgb_bgr(camera))
+    # cv2.imshow("RGBA", transform_rgb_bgr(camera))
 
     _return = 0
     step = 0
@@ -36,30 +39,34 @@ def run():
 
     while True:
         step += 1
-        keystroke = cv2.waitKey(0)
-        # keystroke = ord(input())
+        # keystroke = cv2.waitKey(0)
+        keystroke = ord(input())
 
-        if keystroke == ord(FORWARD_KEY):
-            action = 0
-        elif keystroke == ord(LEFT_KEY):
-            action = 1
-        elif keystroke == ord(RIGHT_KEY):
-            action = 2
-        elif keystroke == ord(STOP_KEY):
-            action = 3
-        else:
-            continue
+        # if keystroke == ord(FORWARD_KEY):
+        #     action = 0
+        # elif keystroke == ord(LEFT_KEY):
+        #     action = 1
+        # elif keystroke == ord(RIGHT_KEY):
+        #     action = 2
+        # elif keystroke == ord(STOP_KEY):
+        #     action = 3
+        # else:
+        #     continue
 
-        a = {
-            "rl_pred": action,
-            "lstm_h": None,
-            "lstm_c": None,
-        }
+        a = env.get_best_action()
 
-        obs, r, done, info = env.step([a]*2)
+        obs, r, done, info = env.step(a)
         _return += r[0]
 
-        action = "forward" if action == 0 else "left" if action == 1 else "stop" if action == 3 else "right"
+        action = (
+            "forward"
+            if action == 0
+            else "left"
+            if action == 1
+            else "stop"
+            if action == 3
+            else "right"
+        )
         print(f"action: {action}")
         print(f"reward: {r[0]}")
         print(f"distance to goal:", info["distance"][0])
@@ -72,7 +79,7 @@ def run():
         print("output:", audio[0].shape)
 
         # display camera
-        cv2.imshow("RGBA", transform_rgb_bgr(camera))
+        # cv2.imshow("RGBA", transform_rgb_bgr(camera))
 
         print(step)
         if done:

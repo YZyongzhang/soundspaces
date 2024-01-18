@@ -6,7 +6,7 @@ import numpy as np
 import quaternion
 import copy
 
-from utils.angles import angle_diff, quat_to_angle
+from utils.angles import *
 from quaternion import from_euler_angles, as_float_array
 
 # from utils.audio import ChunkedAudio
@@ -17,9 +17,42 @@ import librosa
 from utils.time import time_count
 import time
 
+import math
+from collections import deque
+from queue import PriorityQueue
+
+EPS = 1e-3
+
+import attr
+
+
+@attr.s(auto_attribs=True, slots=True)
+class StopSpec:
+    pass
+
+
+@habitat_sim.registry.register_move_fn(body_action=True)
+class Stop(habitat_sim.SceneNodeControl):
+    def __call__(self, scene_node: habitat_sim.SceneNode, actuation_spec: StopSpec):
+        pass
+
 
 class MultiAudioEnv(ParallelEnv):
     metadata = {"name": "multi_audio_nav"}
+
+    id2str = {
+        0: "move_forward",
+        1: "turn_left",
+        2: "turn_right",
+        3: "stop",
+    }
+
+    str2id = {
+        "move_forward": 0,
+        "turn_left": 1,
+        "turn_right": 2,
+        "stop": 3,
+    }
 
     def __init__(self, config: dict):
         # deep copy config
@@ -28,7 +61,7 @@ class MultiAudioEnv(ParallelEnv):
         self._num_sources = config["sources_num"]
         self._max_episode_steps = config["max_episode_steps"]
         self._sequence_length = config["sequence_length"] + 1  # add bootstrap
-        self._scuccess_distance = config["success_distance"]
+        self._success_distance = config["success_distance"]
 
         self._step_time = config["step_time"]
         self._sample_rate = config["sample_rate"]
@@ -37,7 +70,20 @@ class MultiAudioEnv(ParallelEnv):
             self._config["audio_dir"], sr=self._sample_rate
         )
 
+        self._stopped_agents = [False for _ in range(self._num_agents)]
+
         self._sim = self._get_sim()
+        self._greedy_follower = [
+            self._sim.make_greedy_follower(
+                agent_id,
+                self._success_distance,
+                stop_key="stop",
+                forward_key="move_forward",
+                left_key="turn_left",
+                right_key="turn_right",
+            )
+            for agent_id in range(self._num_agents)
+        ]
 
         self._count = 0
 
@@ -68,6 +114,14 @@ class MultiAudioEnv(ParallelEnv):
             {k: list() for k in self._data_structure.keys()}
             for _ in range(self._num_agents)
         ]
+
+    @staticmethod
+    def action_id_2_str(action_id):
+        return MultiAudioEnv.id2str[action_id]
+
+    @staticmethod
+    def action_str_2_id(action_str):
+        return MultiAudioEnv.str2id[action_str]
 
     def _get_sim(self):
         """
@@ -100,16 +154,14 @@ class MultiAudioEnv(ParallelEnv):
                 "turn_right": habitat_sim.agent.ActionSpec(
                     "turn_right", habitat_sim.agent.ActuationSpec(amount=30.0)
                 ),
-                "stop": habitat_sim.agent.ActionSpec(
-                    "move_forward", habitat_sim.agent.ActuationSpec(amount=0.0)
-                ),
+                "stop": habitat_sim.agent.ActionSpec("stop", StopSpec()),
             }
 
             # add camera sensor
             camera_sensor_spec = habitat_sim.CameraSensorSpec()
             camera_sensor_spec.uuid = "color_sensor"
             camera_sensor_spec.resolution = [self._config["resolution"]] * 2
-            camera_sensor_spec.postition = [0.0, 1.5, 0.0]
+            camera_sensor_spec.postition = [0.0, 0.0, 0.0]
             camera_sensor_spec.sensor_type = habitat_sim.SensorType.COLOR
             agent_cfg.sensor_specifications = [camera_sensor_spec]
 
@@ -130,7 +182,7 @@ class MultiAudioEnv(ParallelEnv):
                 )
                 audio_sensor_spec.channelLayout.channelCount = 1
                 # audio sensor location set with respect to the agent
-                audio_sensor_spec.position = [0.0, 1.5, 0.0]  # height of 1.5m
+                audio_sensor_spec.position = [0.0, 0.0, 0.0]  # height of 1.5m
                 audio_sensor_spec.acousticsConfig.sampleRate = 48000
                 # whether indrect (reverberation) is present in the rendered IR
                 audio_sensor_spec.acousticsConfig.indirect = True
@@ -163,7 +215,7 @@ class MultiAudioEnv(ParallelEnv):
                     "audio_sensor_{}".format(audio_sensor_id)
                 ]
                 audio_sensor.setAudioSourceTransform(
-                    self._source_poses[audio_sensor_id] + np.array([0.0, 1.5, 0.0])
+                    self._source_poses[audio_sensor_id] + np.array([0.0, 0.0, 0.0])
                 )  # add height of 1.5m
 
         self._current_sample_index = 0
@@ -173,17 +225,39 @@ class MultiAudioEnv(ParallelEnv):
         """
         randomly reset every agent position and rotation, at least 1m away from any source
         """
+        # create a queue for each agent
+        self._stopped_agents = [False for _ in range(self._num_agents)]
+
         for agent_id in range(self._num_agents):
+            print(f"agent {agent_id} reseting")
             agent = self._sim.get_agent(agent_id)
             agent_state = habitat_sim.AgentState()
-            agent_state.position = self._sim.pathfinder.get_random_navigable_point()
+            while True:
+                rand_pos = self._sim.pathfinder.get_random_navigable_point()
+                if (
+                    (
+                        np.linalg.norm(rand_pos - self._source_poses[0])
+                        > self._success_distance + 0.2
+                    )
+                    and (
+                        np.linalg.norm(rand_pos - self._source_poses[0])
+                        < self._success_distance + 6.0
+                    )
+                    and (
+                        self.shortest_path(rand_pos, self._source_poses[0]) is not None
+                    )
+                    and (self._sim.pathfinder.is_navigable(rand_pos))
+                ):
+                    agent_state.position = rand_pos
+                    break
+                print(f"agent {agent_id} initialization retried.")
             print(f"agent_state.position {agent_state.position}")
+
             # Generate random yaw angle from -180 to 180
-            # yaw = np.random.uniform(-np.pi, np.pi)
-            # q = from_euler_angles(0, yaw, 0)
-            # # Convert to numpy array
-            # q = as_float_array(q)
-            # agent_state.rotation = quaternion.as_quat_array(q)
+            # rand_quat = random_quat()
+            # agent_state.rotation = rand_quat
+            # print(f"agent_state.rotation {agent_state.rotation}")
+
             agent.set_state(agent_state)
 
         self._crushed_agents = [False] * self._num_agents
@@ -280,6 +354,10 @@ class MultiAudioEnv(ParallelEnv):
 
         self._succeeded_agents = [False] * self._num_agents
 
+        self._prev_geo_dist = [
+            self.get_geodesic_distance(agent_id) for agent_id in range(self._num_agents)
+        ]
+
         return s
 
     def _get_observations(self):
@@ -331,23 +409,33 @@ class MultiAudioEnv(ParallelEnv):
             r = [0] * self._num_agents
             return r
 
-        # if agent reaches the goal (< success_distance), return 1
+        geo_dist = [
+            self.get_geodesic_distance(agent_id) for agent_id in range(self._num_agents)
+        ]
+
         r = [
-            100
-            if np.linalg.norm(
-                self._sim.get_agent(agent_id).get_state().position
-                - self._source_poses[0]
-            )
-            < self._scuccess_distance
-            else 0
+            (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10
             for agent_id in range(self._num_agents)
         ]
 
+        self._prev_geo_dist = geo_dist
+
+        # if agent reaches the goal (< success_distance), return 1
+        for agent_id in range(self._num_agents):
+            if (
+                np.linalg.norm(
+                    self._sim.get_agent(agent_id).get_state().position
+                    - self._source_poses[0]
+                )
+                < self._success_distance
+            ):
+                r[agent_id] += 100
+
         for agent_id in range(self._num_agents):
             # if agent is crushed, return -1
-            r[agent_id] -= 10 if self._crushed_agents[agent_id] else 0
+            r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
             # Time
-            r[agent_id] -= 1
+            # r[agent_id] -= 1
 
         return r
 
@@ -365,7 +453,7 @@ class MultiAudioEnv(ParallelEnv):
                 self._sim.get_agent(agent_id).get_state().position
                 - self._source_poses[0]
             )
-            < self._scuccess_distance
+            < self._success_distance
             else False
             for agent_id in range(self._num_agents)
         ]
@@ -395,6 +483,9 @@ class MultiAudioEnv(ParallelEnv):
             agent = self._sim.get_agent(agent_id)
             prev_agent_state_list.append(copy.deepcopy(agent.get_state()))
 
+            if self._stopped_agents[agent_id]:
+                continue
+
             action = a[agent_id]["rl_pred"]
             if action == 0:
                 action = "move_forward"
@@ -404,9 +495,12 @@ class MultiAudioEnv(ParallelEnv):
                 action = "turn_right"
             elif action == 3:
                 action = "stop"
+                self._stopped_agents[agent_id] = True
 
             collide = agent.act(action)
             self._crushed_agents[agent_id] = collide
+            if collide:
+                print(f"agent {agent_id} collide")
 
         # get observation
         obs = self._get_observations()
@@ -425,16 +519,17 @@ class MultiAudioEnv(ParallelEnv):
         # get info
         info = {
             "count": self._count,
-            "distance": [
+            "euclidian_distance": [
                 np.linalg.norm(
                     self._sim.get_agent(agent_id).get_state().position
                     - self._source_poses[0]
                 )
                 for agent_id in range(self._num_agents)
             ],
+            "geodesic_distance": self._prev_geo_dist,
             # the angle between agent's forward direction and the direction to the goal
             "angle": [
-                angle_diff(
+                angle_between_quats(
                     self._sim.get_agent(agent_id).get_state().rotation,
                     quaternion.from_rotation_vector(
                         self._source_poses[0]
@@ -443,7 +538,9 @@ class MultiAudioEnv(ParallelEnv):
                 )
                 for agent_id in range(self._num_agents)
             ],
+            "collode": self._crushed_agents,
             "success": self._succeeded_agents,
+            "actions": [a[i]["rl_pred"] for i in range(self._num_agents)],
         }
 
         # get state (including obs, mask, lstm_h, lstm_c)
@@ -492,14 +589,59 @@ class MultiAudioEnv(ParallelEnv):
         # print("zero", x.shape)
         return np.array(input_list, dtype=dtype)
 
-    def shortest_path(self, from_pos, to_pos):
+    def get_shortest_action_list(self, goal_pos=None):
+        if goal_pos is None:
+            goal_pos = self._source_poses[0]
+
+        path = list()
+        for agent_id in range(self._num_agents):
+            path_ = self._greedy_follower[agent_id].find_path(goal_pos)
+            path.append(path_)
+
+        return path
+
+    def get_geodesic_distance(self, agent_id):
+        from_pos = self._sim.get_agent(agent_id).get_state().position
+        to_pos = self._source_poses[0]
+
         path = habitat_sim.ShortestPath()
         path.requested_start = from_pos
         path.requested_end = to_pos
         found_path = self._sim.pathfinder.find_path(path)
         path_results = (found_path, path.geodesic_distance, path.points)
+        return path_results[1]
 
-        return path_results
+    def shortest_path(self, from_pos, to_pos):
+        """
+        Depreciated, using built-in shortestpath method, granularity is not enough
+        """
+        path = habitat_sim.ShortestPath()
+        path.requested_start = from_pos
+        path.requested_end = to_pos
+        found_path = self._sim.pathfinder.find_path(path)
+        path_results = (found_path, path.geodesic_distance, path.points)
+        if len(path_results[-1]) > 1:
+            return path_results[-1][1]
+        else:
+            return None
+
+    def get_num_agents(self):
+        return self._num_agents
+
+    def get_agent_rotation(self):
+        ret = list()
+        for agent_id in range(self._num_agents):
+            ret.append(self._sim.get_agent(agent_id).get_state().rotation)
+        return ret
+
+    def get_source_pos(self):
+        return self._source_poses
+
+    def get_agent_pos(self):
+        ret = list()
+        for agent_id in range(self._num_agents):
+            ret.append(self._sim.get_agent(agent_id).get_state().position)
+        return ret
 
     def get(self):
         """process self._episode into a list of {str: array((T, *))}, so the model can train rl loss"""
