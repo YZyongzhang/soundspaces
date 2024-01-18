@@ -11,6 +11,8 @@ from torch.utils.data import DataLoader
 
 from utils.batch import stack_batch_multi, unstack_batch_multi, stack_batch, DictLoader
 
+from .transformer import Encoder
+
 INFINITY = 1e9
 
 from utils.time import time_count
@@ -26,6 +28,12 @@ class MAPPO(nn.Module):
             + self._config["sample_rate"] * self._config["step_time"] * 2
             + 1
         )
+
+        self._vision_dim = int(config["resolution"] * config["resolution"] * 4)
+        self._audio_dim = int(
+            self._config["sample_rate"] * self._config["step_time"] * 2
+        )
+
         self._action_dim = 4
         self._hid_dim_p = self._config["hid_dim_p"]
         self._hid_dim_v = self._config["hid_dim_v"]
@@ -42,30 +50,39 @@ class MAPPO(nn.Module):
 
     def _build_model(self):
         # Networks
-        self._net1 = nn.Linear(self._state_dim, self._hid_dim_l).cuda()
-        self._pi_net_fc1 = nn.Linear(self._hid_dim_l, self._hid_dim_p).cuda()
-        self._pi_net_fc2 = nn.Linear(self._hid_dim_p, self._action_dim).cuda()
+        self._vision_net = nn.Sequential(
+            nn.Linear(self._vision_dim, self._hid_dim_l * 3),
+            nn.ReLU(),
+            nn.Linear(self._hid_dim_l * 3, self._hid_dim_l),
+        ).cuda()
+        self._audio_net = nn.Sequential(
+            nn.Linear(self._audio_dim + 1, self._hid_dim_l * 2),
+            nn.ReLU(),
+            nn.Linear(self._hid_dim_l * 2, self._hid_dim_l),
+        ).cuda()
+        self._cross_attn1 = Encoder(self._hid_dim_l, self._hid_dim_l, 64, 4).cuda()
+        self._cross_attn2 = Encoder(self._hid_dim_l, self._hid_dim_l, 64, 4).cuda()
 
-        self._v_net_fc1 = nn.Linear(self._hid_dim_l, self._hid_dim_v).cuda()
-        self._v_net_fc2 = nn.Linear(self._hid_dim_v, 1).cuda()
+        self._policy_net = nn.Sequential(
+            nn.Linear(self._hid_dim_l, self._hid_dim_p),
+            nn.ReLU(),
+            nn.Linear(self._hid_dim_p, self._action_dim),
+        ).cuda()
+
+        self._value_net = nn.Sequential(
+            nn.Linear(self._hid_dim_l, self._hid_dim_v),
+            nn.ReLU(),
+            nn.Linear(self._hid_dim_v, 1),
+        ).cuda()
 
         self._lstm = nn.LSTM(self._hid_dim_l, self._hid_dim_l, batch_first=True).cuda()
 
     def _init_model(self):
         """Initialize model"""
-        nn.init.trunc_normal_(self._pi_net_fc1.weight, std=0.02)
-        nn.init.trunc_normal_(self._pi_net_fc2.weight, std=0.02)
-        nn.init.trunc_normal_(self._v_net_fc1.weight, std=0.02)
-        nn.init.trunc_normal_(self._v_net_fc2.weight, std=0.02)
-        nn.init.constant_(self._pi_net_fc1.bias, 0.0)
-        nn.init.constant_(self._pi_net_fc2.bias, 0.0)
-        nn.init.constant_(self._v_net_fc1.bias, 0.0)
-        nn.init.constant_(self._v_net_fc2.bias, 0.0)
-
-        nn.init.trunc_normal_(self._lstm.weight_ih_l0, std=0.02)
-        nn.init.trunc_normal_(self._lstm.weight_hh_l0, std=0.02)
-        nn.init.constant_(self._lstm.bias_ih_l0, 0.0)
-        nn.init.constant_(self._lstm.bias_hh_l0, 0.0)
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight.data)
+                nn.init.constant_(m.bias.data, 0.0)
 
     @time_count
     def forward(self, input_d):
@@ -81,14 +98,19 @@ class MAPPO(nn.Module):
         ht = input_d["lstm_h"][:, 0, :].reshape(1, N, -1).detach().contiguous()
         ct = input_d["lstm_c"][:, 0, :].reshape(1, N, -1).detach().contiguous()
 
-        s = torch.cat((input_d["camera"], input_d["audio"], input_d["step"]), dim=-1)
-        # s = torch.cat((input_d["audio"], input_d["step"]), dim=-1)
+        v_s = input_d["camera"]
+        a_s = torch.cat((input_d["audio"], input_d["step"]), dim=-1)
 
-        s = F.relu(self._net1(s))
-        lstm_out, (hn, cn) = self._lstm(s, (ht, ct))
-        pi_logits = self._pi_net_fc2(F.relu(self._pi_net_fc1(lstm_out)))
+        v_s = self._vision_net(v_s)
+        a_s = self._audio_net(a_s)
 
-        v_value = self._v_net_fc2(F.relu(self._v_net_fc1(lstm_out)))
+        x, _ = self._cross_attn1(v_s, a_s)
+        x, _ = self._cross_attn2(x, x)
+
+        lstm_out, (hn, cn) = self._lstm(x, (ht, ct))
+
+        pi_logits = self._policy_net(lstm_out)
+        v_value = self._value_net(lstm_out)
 
         output_d["lstm_h"] = hn.permute(1, 0, 2)
         output_d["lstm_c"] = cn.permute(1, 0, 2)
@@ -284,8 +306,6 @@ class MAPPO(nn.Module):
 class BaseModel:
     def __init__(self, config: Dict):
         self._config = config
-        self._n_envs = config["num_envs"]
-
         self._model = MAPPO(copy.deepcopy(config))
 
     def _build_model(self):
@@ -300,7 +320,7 @@ class BaseModel:
     def learn(self, data: Dict):
         """BE CAREFUL !!!"""
         loader = DictLoader(data, self._config["batch_size"])
-        
+
         d_list = list()
         bs_list = list()
         for data, bs in loader:
@@ -310,8 +330,10 @@ class BaseModel:
 
         res_d = dict()
         for k in d_list[0].keys():
-            res_d[k] = sum([d_list[i][k]*bs for i in range(len(bs_list)) for bs in bs_list])/sum(bs_list)
-            
+            res_d[k] = sum(
+                [d_list[i][k] * bs for i in range(len(bs_list)) for bs in bs_list]
+            ) / sum(bs_list)
+
         return res_d
 
     def save(self, path):

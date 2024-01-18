@@ -115,6 +115,8 @@ class MultiAudioEnv(ParallelEnv):
             for _ in range(self._num_agents)
         ]
 
+        self._path_count = [0 for _ in range(self._num_agents)]
+
     @staticmethod
     def action_id_2_str(action_id):
         return MultiAudioEnv.id2str[action_id]
@@ -262,6 +264,8 @@ class MultiAudioEnv(ParallelEnv):
 
         self._crushed_agents = [False] * self._num_agents
 
+        self._path_count = [0 for _ in range(self._num_agents)]
+
     def _convolve_with_ir(self, ir):
         ir = ir.T
         sampling_rate = self._sample_rate
@@ -367,9 +371,9 @@ class MultiAudioEnv(ParallelEnv):
             obs: list of dict, representing observation for each agent
         """
         obs_list = []
-        t = time.time()
+        # t = time.time()
         all_obs = self._sim.get_sensor_observations(agent_ids=range(self._num_agents))
-        print(f"get_sensor_observations time: {time.time()-t}")
+        # print(f"get_sensor_observations time: {time.time()-t}")
         for agent_id in range(self._num_agents):
             obs = all_obs[agent_id]
             # get audio chunk
@@ -499,8 +503,10 @@ class MultiAudioEnv(ParallelEnv):
 
             collide = agent.act(action)
             self._crushed_agents[agent_id] = collide
-            if collide:
-                print(f"agent {agent_id} collide")
+            if action == 0 and not collide:
+                self._path_count[agent_id] += 1.0
+            # if collide:
+            #     print(f"agent {agent_id} collide")
 
         # get observation
         obs = self._get_observations()
@@ -589,7 +595,7 @@ class MultiAudioEnv(ParallelEnv):
         # print("zero", x.shape)
         return np.array(input_list, dtype=dtype)
 
-    def get_shortest_action_list(self, goal_pos=None):
+    def get_shortest_action_list(self, goal_pos=None, return_length=False):
         if goal_pos is None:
             goal_pos = self._source_poses[0]
 
@@ -597,6 +603,12 @@ class MultiAudioEnv(ParallelEnv):
         for agent_id in range(self._num_agents):
             path_ = self._greedy_follower[agent_id].find_path(goal_pos)
             path.append(path_)
+
+        if return_length:
+            return [
+                path[agent_id].count(0) * self._config["forward_amount"]
+                for agent_id in range(self._num_agents)
+            ]
 
         return path
 
@@ -610,6 +622,9 @@ class MultiAudioEnv(ParallelEnv):
         found_path = self._sim.pathfinder.find_path(path)
         path_results = (found_path, path.geodesic_distance, path.points)
         return path_results[1]
+
+    def get_geo_distance_list(self):
+        return [self.get_geodesic_distance(i) for i in range(self._num_agents)]
 
     def shortest_path(self, from_pos, to_pos):
         """
@@ -684,3 +699,18 @@ class MultiAudioEnv(ParallelEnv):
         including 3 actions: forward, turn left, turn right
         """
         return Discrete(4)
+
+    def prepare_spl(self):
+        """
+        Calculate SPL (Success weighted by Path Length).
+        :param successes: List of binary success indicators (1 or 0).
+        :return: SPL value.
+        """
+
+        shortest_distances = self.get_shortest_action_list(return_length=True)
+        path_lengths = [
+            self._path_count[agent_id] * self._config["forward_amount"]
+            for agent_id in range(self._num_agents)
+        ]
+        
+        return shortest_distances, path_lengths

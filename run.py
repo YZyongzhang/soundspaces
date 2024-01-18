@@ -3,7 +3,9 @@ from config import config
 import ray
 
 import random
+
 random.seed(config["random_seed"])
+
 
 class Actor:
     def __init__(self, config):
@@ -56,15 +58,31 @@ class Actor:
         # Test and plot return
         return_ = sum([sum([sum(r) for r in r_list]) for r_list in all_r_list])
 
-        num_success = sum([int(t) for info in info_list for t in info["success"]])
+        success_list = [int(t) for info in info_list for t in info["success"]]
+
+        last_geo_distance = sum(
+            [t for info in info_list for t in info["geodesic_distance"]]
+        )
 
         seq_list = list()
+        shortest_dis_list = list()
+        path_list = list()
         for env in envs:
             seq_list += env.get()
+
+            shortest_distances, path_lengths = env.prepare_spl()
+            shortest_dis_list += shortest_distances
+            path_list += path_lengths
             
         torch.cuda.empty_cache()
 
-        return num_envs, seq_list, return_, num_success
+        for_spl = {
+            "success": success_list,
+            "shortest_distances": shortest_distances,
+            "path_lengths": path_lengths,
+        }
+
+        return num_envs, seq_list, return_, sum(success_list), last_geo_distance, for_spl
 
 
 def train(logger, writer):
@@ -97,26 +115,56 @@ def train(logger, writer):
         num_env_list = list()
         return_list = list()
         num_success_list = list()
+        last_geo_distance_list = list()
+        for_spl_all = {
+            "success": list(),
+            "shortest_distances": list(),
+            "path_lengths": list(),
+        }
 
         for result in result_list:
-            num_envs_, seq_list_, return_, num_success = result
+            num_envs_, seq_list_, return_, num_success, last_geo_distance_, for_spl_ = result
             seq_list += seq_list_
             num_env_list.append(num_envs_)
             return_list.append(return_)
             num_success_list.append(num_success)
+            last_geo_distance_list.append(last_geo_distance_)
+            for_spl_all["success"] += for_spl_["success"]
+            for_spl_all["shortest_distances"] += for_spl_["shortest_distances"]
+            for_spl_all["path_lengths"] += for_spl_["path_lengths"]
 
         num_envs = sum(num_env_list)
         return_ = sum(return_list) / num_envs * config["agents_num"]
         num_success = sum(num_success_list)
-        logger.info(f"--- succeeded agent num: {num_success}")
-
+        last_geo_distance_avg = (
+            sum(last_geo_distance_list) / num_envs * config["agents_num"]
+        )
+        spl = calculate_spl(
+            for_spl_all["success"],
+            for_spl_all["shortest_distances"],
+            for_spl_all["path_lengths"],
+        )
+        soft_spl = calculate_soft_spl(
+            for_spl_all["shortest_distances"],
+            for_spl_all["path_lengths"], 
+        )
 
         writer.add_scalar("rl/return", return_, num_episodes)
-        logger.info(f"--- return: {return_}")
-        
+        writer.add_scalar("test/spl", spl, num_episodes)
+        writer.add_scalar("test/soft_spl", soft_spl, num_episodes)
+        writer.add_scalar("test/succeed_agent_count", num_success, num_episodes)
+        writer.add_scalar(
+            "test/last_geodesic_distance_avg", last_geo_distance_avg, num_episodes
+        )
         writer.add_scalar("train/seq_num", len(seq_list), num_episodes)
+
+        logger.info(f"--- return: {return_}")
+        logger.info(f"--- spl: {spl}")
+        logger.info(f"--- soft_spl: {soft_spl}")
+        logger.info(f"--- succeeded agent num: {num_success}")
+        logger.info(f"--- last geodesic distance avg: {last_geo_distance_avg}")
         logger.info(f"------- seq num: {len(seq_list)}")
-        
+
         # Train rl model
         loss_dict = model.learn(seq_list)
         for k, v in loss_dict.items():
@@ -125,10 +173,9 @@ def train(logger, writer):
         seq_list.clear()
 
         # save model
-        if (num_episodes + 1) % config["save_model_every"] == 0:
-            save_path = config["base_dir"] + f"ckpt/ckpt_{num_episodes}_ret_{return_}"
-            model.save(save_path)
-        
+        save_path = config["base_dir"] + f"ckpt/ckpt_{num_episodes}_ret_{return_}"
+        model.save(save_path)
+
         logger.info(f"Episode {num_episodes} time: {time.time()-t_start}")
 
     writer.close()
@@ -138,6 +185,7 @@ if __name__ == "__main__":
     from env.v0d0 import Env
     from policy.v0d0 import Model
     from utils.batch import *
+    from utils.metrics import *
     import torch
     import time
 
