@@ -210,3 +210,4 @@ if __name__ == "__main__":
     writer = SummaryWriter(log_dir=(config["base_dir"] + "log/"))
 
     train(logger, writer)
+
