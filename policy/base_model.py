@@ -97,7 +97,8 @@ class MAPPO(nn.Module):
 
         ht = input_d["lstm_h"][:, 0, :].reshape(1, N, -1).detach().contiguous()
         ct = input_d["lstm_c"][:, 0, :].reshape(1, N, -1).detach().contiguous()
-
+        print(ht.shape)
+        print(ct.shape)
         v_s = input_d["camera"]
         a_s = torch.cat((input_d["audio"], input_d["step"]), dim=-1)
 
@@ -320,7 +321,6 @@ class BaseModel:
     def learn(self, data: Dict):
         """BE CAREFUL !!!"""
         loader = DictLoader(data, self._config["batch_size"])
-
         d_list = list()
         bs_list = list()
         for data, bs in loader:

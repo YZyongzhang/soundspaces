@@ -50,7 +50,7 @@ def parse_args():
     parser.add_argument("--forward_amount", type=float, default=0.25)
 
     # architecture args
-    parser.add_argument("--hid_dim_l", type=int, default=256)
+    parser.add_argument("--hid_dim_l", type=int, default=256)# 512
     parser.add_argument("--hid_dim_p", type=int, default=128)
     parser.add_argument("--hid_dim_v", type=int, default=128)
 

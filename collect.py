@@ -124,7 +124,7 @@ def collect(logger):
             num_envs_, seq_list_, return_, num_success = result
             seq_list += seq_list_
 
-        path = os.path.join("data", f"offline_episode_{num_episodes}.pkl")
+        path = os.path.join("data/test_sim", f"offline_episode_{num_episodes}.pkl")
         with open(path, "wb") as f:
             pickle.dump(seq_list, f)
 

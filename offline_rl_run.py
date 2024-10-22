@@ -1,30 +1,47 @@
 from config import config
-import train_offline.py as offline_data_function
+
 import ray
-
+import os
+import re
 import random
-
+import pickle
 random.seed(config["random_seed"])
+
+
+class Actor:
+    def __init__(self, config):
+        self._config = config
+        self._num_episodes = 0
+
+        self._num_envs = config["num_envs_per_actor"]
+        self.envs = [Env(config) for _ in range(self._num_envs)]
+
+        self.model = Model(config)
+def extract_number(filename):
+    # 使用正则表达式提取文件名中的数字部分
+    match = re.search(r'(\d+)', filename)
+    return int(match.group(1)) if match else float('inf')
+
 def train(logger, writer):
-    # Train rl model
-    offline_data = offline_data_function.collect_data_list()
-    for i in range(len(offline_data)):
-        seq_list = offline_data[i]
-        loss_dict = model.learn(seq_list)
+    actor = Actor(config)
+    i = 0
+    """Train loop"""
+    directory_path = './data/'
+    # file_list = [
+    #     os.path.join(directory_path, f) for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))
+    #     ]
+    file_list = sorted([
+    os.path.join(directory_path, f) for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))
+    ],key=lambda f: extract_number(os.path.basename(f)))
+    for file in file_list[:400]:
+        i+=1
+        with open(file, mode='rb') as f:
+            print(f"{f}")
+            data = pickle.load(f)
+        loss_dict = actor.model.learn(data)
         for k, v in loss_dict.items():
-            writer.add_scalar("rl/" + k, v, num_episodes + 1)
+            writer.add_scalar("rl/" + k, v, i)
             logger.info(f"------- {k}: {v}")
-        seq_list.clear()
-
-        # save model
-        save_path = config["base_dir"] + f"ckpt/ckpt_{num_episodes}_ret_{return_}"
-        model.save(save_path)
-
-        logger.info(f"Episode {num_episodes} time: {time.time()-t_start}")
-
-    writer.close()
-
-
 if __name__ == "__main__":
     from env.v0d0 import Env
     from policy.v0d0 import Model
@@ -51,7 +68,7 @@ if __name__ == "__main__":
     )
     logger.setLevel(logging.INFO)
 
-    writer = SummaryWriter(log_dir=(config["base_dir"] + "log/"))
+    writer = SummaryWriter(log_dir=(config["base_dir"] + "log/log1"))
 
     train(logger, writer)
 
