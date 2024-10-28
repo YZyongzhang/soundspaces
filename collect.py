@@ -111,7 +111,6 @@ def collect(logger):
     ]
 
     seq_list = list()  # store rl data
-
     """Train loop"""
     for num_episodes in range(config["num_episodes"]):
         t_start = time.time()
@@ -123,11 +122,9 @@ def collect(logger):
         for result in result_list:
             num_envs_, seq_list_, return_, num_success = result
             seq_list += seq_list_
-
-        path = os.path.join("data/test_sim", f"offline_episode_{num_episodes}.pkl")
+        path = os.path.join("data/sim_512", f"offline_episode_512_{num_episodes + 181}.pkl")
         with open(path, "wb") as f:
             pickle.dump(seq_list, f)
-
         seq_list.clear()
 
         # seq num

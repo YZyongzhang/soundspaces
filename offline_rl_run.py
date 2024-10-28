@@ -33,7 +33,10 @@ def train(logger, writer):
     file_list = sorted([
     os.path.join(directory_path, f) for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))
     ],key=lambda f: extract_number(os.path.basename(f)))
-    for file in file_list[:400]:
+    # file_list = sorted([
+    # os.path.join(directory_path, f) for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))
+    # ],key=lambda f: extract_number(os.path.basename(f)))
+    # for file in file_list[:400]:
         i+=1
         with open(file, mode='rb') as f:
             print(f"{f}")

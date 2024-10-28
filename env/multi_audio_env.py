@@ -517,7 +517,6 @@ class MultiAudioEnv(ParallelEnv):
                 obs[agent_id] = self._prev_obs[agent_id]
 
         self._prev_obs = obs
-
         # get reward
         r = self._reward()
         # get done
