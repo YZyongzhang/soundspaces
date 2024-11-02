@@ -21,6 +21,8 @@ import math
 from collections import deque
 from queue import PriorityQueue
 
+from typing import List
+
 EPS = 1e-3
 
 import attr
@@ -467,7 +469,7 @@ class MultiAudioEnv(ParallelEnv):
 
         return all(cond)
 
-    def step(self, a: list[dict]):
+    def step(self, a: List[dict]):
         """
         typical step function for rl
         Return:
