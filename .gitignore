@@ -7,7 +7,6 @@ logs/
 my_script
 .idea
 .vscode/
-res/
 experiments/
 *.ipynb
 SAM/checkpoint

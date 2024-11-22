@@ -10,4 +10,4 @@
 4. if you want to run this project , you should to install `sam` (sagment anything)
     1. you can follow the https://github.com/facebookresearch/segment-anything 
     to install it , and do not forget download the chackpoint.
-5. finally , you finnash all the pro-task , and the most import things is to edit the haibit-sim package and more information you can see the github issue about the error `sensor key error ` ,you can download the `simulator.py` in my github `https://github.com/YZyongzhang/soundspaces.git`
+5. finally , you finnash all the pro-task , and the most import things is to edit the haibit-sim package and more information you can see the github issue about the error `sensor key error ` ,you can download the `simulator.py` in my github `https://github.com/YZyongzhang/soundspaces.git` `res`
