@@ -10,3 +10,4 @@ my_script
 res/
 experiments/
 *.ipynb
+SAM/checkpoint
