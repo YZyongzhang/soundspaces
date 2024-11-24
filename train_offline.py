@@ -14,7 +14,7 @@ def collect_data_list():
     i = 0
     j = 0
     data_512=[]
-    for file in file_list[:70]:
+    for file in file_list[:10]:
         match = re.search(pattern, file)
         if match:
             epi = int(match.group(1))
