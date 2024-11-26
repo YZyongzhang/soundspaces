@@ -1,6 +1,7 @@
 from config import config
 import random
-from torch.utils.data import DataLoadr
+import pickle
+from torch.utils.data import DataLoader
 from data.Data import File , Data
 random.seed(config["random_seed"])
 
@@ -12,15 +13,26 @@ class Actor:
         self.model = Model(config)
 
 def train(logger, writer):
+    i = 0
     actor = Actor(config)
     directory_path = './data/sim_512/'
-    files = File(directory_path).store_file()[15:30]
-    for epoch in range(10):
-        batch = DataLoadr(files , batch_size = 1)
-        loss_dict = actor.model.learn(batch)
-        for k, v in loss_dict.items():
-            writer.add_scalar("rl/" + k, v)
-            logger.info(f"------- {k}: {v}")
+    files = File(directory_path).store_file()[15:]
+    for file in files:
+        with open(file , 'rb') as f:
+            data = pickle.load(f)
+        loss_dic = actor.model.learn(data)
+        for k,v in loss_dic.items():
+            writer.add_scalar("rl/"+k,v,i)
+        i+=1
+    # files = Data(files)
+    # for epoch in range(1):
+    #     batch = DataLoader(files , batch_size = 1)
+    #     for data in batch:
+    #         loss_list = actor.model.learn(data)
+    #         for k,v in loss_list.items():
+    #             writer.add_scalar("rl/" + k, v, i)
+    #             logger.info(f"------- {k}: {v}")
+    #             i+=1
 if __name__ == "__main__":
     from policy.v0d0 import Model
     from utils.batch import *
@@ -46,7 +58,7 @@ if __name__ == "__main__":
     )
     logger.setLevel(logging.INFO)
 
-    writer = SummaryWriter(log_dir=(config["base_dir"] + "log/log8"))
+    writer = SummaryWriter(log_dir=("log/seg1"))
 
     train(logger, writer)
 
