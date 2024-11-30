@@ -238,7 +238,7 @@ class MultiAudioEnv(ParallelEnv):
             agent = self._sim.get_agent(agent_id)
             agent_state = habitat_sim.AgentState()
             while True:
-                rand_pos = self._sim.pathfinder.get_random_navigable_point()
+                rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 3.0)
                 if (
                     (
                         np.linalg.norm(rand_pos - self._source_poses[0])
