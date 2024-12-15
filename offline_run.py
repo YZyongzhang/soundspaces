@@ -24,7 +24,7 @@ def train(logger, writer):
     files = os.listdir(directory_path)
     # files.sort(key= lambda x : get_num(x))
     for e in range(1):
-        for file in files[:200]:
+        for file in files:
             print(file)
             path = os.path.join(directory_path , file)
             with open(path , 'rb') as f:
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     )
     logger.setLevel(logging.INFO)
 
-    writer = SummaryWriter(log_dir=("log/IQL6"))
+    writer = SummaryWriter(log_dir=("log/IQL0"))
 
     train(logger, writer)
 

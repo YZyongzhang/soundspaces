@@ -215,15 +215,14 @@ class MAPPO(nn.Module):
         """
         # TD目标值 (B, T)
         with torch.no_grad():
-            # 不包括最后一时间步（bootstrap 时不要考虑 T+1 的值）
-            #v_value = v_value[:, :-1]
-            # td_target = reward + gamma * v_value[:, 1:] * mask[:, 1:]
             print(old_v_value.shape)
-            td_target = reward + gamma * old_v_value * mask
+            # td_target = reward + gamma * old_v_value * mask
+            td_target = reward[:, :-1] + gamma * old_v_value[:, 1:] * mask[:, 1:]
             td_target = td_target.detach()
 
         # 值函数损失
-        value_loss = nn.MSELoss()(v_value * mask, td_target)
+        # value_loss = nn.MSELoss()(v_value * mask, td_target)
+        value_loss = nn.MSELoss()(v_value[:, :-1] * mask[:, :-1], td_target)
 
         """
         2. 策略损失计算
@@ -234,12 +233,12 @@ class MAPPO(nn.Module):
 
         # 优势计算
         with torch.no_grad():
-            advantage = v_value - td_target  # (B, T)
+            advantage = v_value[:, :-1] - td_target  # (B, T)
             weights = torch.exp(alpha * advantage).clamp(max=10.0)  # 限制权重范围
 
         # 策略损失
-        policy_loss = -(weights * log_pi * mask).mean()
-
+        # policy_loss = -(weights * log_pi * mask).mean()
+        policy_loss = -(weights * log_pi[:, :-1] * mask[:, :-1]).mean()
         """
         3. 熵正则项
         """
