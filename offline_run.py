@@ -13,18 +13,18 @@ class Actor:
         self._config = config
         self._num_episodes = 0
         self.model = Model(config)
-# def get_num(file):
-#     match = re.match(r"offline_episode_audio_(\d+).pkl" , file)
-#     return int(match.group(1))
+def get_num(file):
+    match = re.match(r"offline_episode_audio_(\d+).pkl" , file)
+    return int(match.group(1))
 def train(logger, writer):
     i = 0
     actor = Actor(config)
     directory_path = '/home/getuanhui/project/sound-spaces/yz/data/audio'
     # files = File(directory_path).store_file()[15:]
     files = os.listdir(directory_path)
-    # files.sort(key= lambda x : get_num(x))
+    files.sort(key= lambda x : get_num(x))
     for e in range(1):
-        for file in files:
+        for file in files[:700]:
             print(file)
             path = os.path.join(directory_path , file)
             with open(path , 'rb') as f:
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     )
     logger.setLevel(logging.INFO)
 
-    writer = SummaryWriter(log_dir=("log/IQL0"))
+    writer = SummaryWriter(log_dir=("log/then1"))
 
     train(logger, writer)
 

@@ -301,8 +301,8 @@ class MAPPO(nn.Module):
         """
         calculating loss
         """
-        # total_loss, loss_dict = self.build_loss(output_d, input_d)
-        total_loss, loss_dict = self.build_iql_loss(output_d, input_d)
+        total_loss, loss_dict = self.build_loss(output_d, input_d)
+        # total_loss, loss_dict = self.build_iql_loss(output_d, input_d)
         """
         back propagation
         """
@@ -318,20 +318,20 @@ class MAPPO(nn.Module):
             p["lr"] = rate
         self._optim.step()
 
-        # return {
-        #     "total_loss": total_loss.data.cpu().numpy(),
-        #     "vf_loss": loss_dict["vf_loss"].data.cpu().numpy(),
-        #     "pi_loss": loss_dict["pi_loss"].data.cpu().numpy(),
-        #     "explained_variance": loss_dict["explained_variance"].data.cpu().numpy(),
-        #     "ent_loss": loss_dict["ent_loss"].data.cpu().numpy(),
-        # }
         return {
             "total_loss": total_loss.data.cpu().numpy(),
-            "value_loss": loss_dict["value_loss"].data.cpu().numpy(),
-            "policy_loss": loss_dict["policy_loss"].data.cpu().numpy(),
-            "entropy_loss": loss_dict["entropy_loss"].data.cpu().numpy(),
-            "weights_mean": loss_dict["weights_mean"].data.cpu().numpy(),
+            "vf_loss": loss_dict["vf_loss"].data.cpu().numpy(),
+            "pi_loss": loss_dict["pi_loss"].data.cpu().numpy(),
+            "explained_variance": loss_dict["explained_variance"].data.cpu().numpy(),
+            "ent_loss": loss_dict["ent_loss"].data.cpu().numpy(),
         }
+        # return {
+        #     "total_loss": total_loss.data.cpu().numpy(),
+        #     "value_loss": loss_dict["value_loss"].data.cpu().numpy(),
+        #     "policy_loss": loss_dict["policy_loss"].data.cpu().numpy(),
+        #     "entropy_loss": loss_dict["entropy_loss"].data.cpu().numpy(),
+        #     "weights_mean": loss_dict["weights_mean"].data.cpu().numpy(),
+        # }
     @staticmethod
     def _get_rate(step, lr, warmup):
         lr_ = lr
