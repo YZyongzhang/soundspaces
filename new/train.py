@@ -106,80 +106,94 @@ class Network(nn.Module):
 class MyData(Dataset):
     def __init__(self, data):
         self.data = data
-        if np.where(self.data[0]['rl_pred'] == 3)[0].size == 0:
-            self.index_3 = 61
-        else:
-            self.index_3 = np.where(self.data[0]['rl_pred'] == 3)[0][0].item()
         self.audio = list()
         self.visual = list()
         self.pred_tag = list()
         for data in self.data:
-            self.audio.append(data['audio'][:self.index_3])
-            self.visual.append(data['camera'][:self.index_3])
-            self.pred_tag.append(data['rl_pred'][:self.index_3])
+            self.audio.append(data['audio'])
+            self.visual.append(data['camera'])
+            self.pred_tag.append(data['rl_pred'])
 
         self.audio = torch.from_numpy(np.array(self.audio))
         self.visual = torch.from_numpy(np.array(self.visual))
         self.pred_tag = torch.from_numpy(np.array(self.pred_tag))
-        logging.info(f'audio:{self.audio.shape}')
-        logging.info(f'v:{self.visual.shape}')
-        logging.info(f'p:{self.pred_tag.shape}')
-        # # Flatten the data so that each sample is an individual entry
+
+        # Flatten the data so that each sample is an individual entry
         self.audio = self.audio.view(-1, *self.audio.shape[2:])
         self.visual = self.visual.view(-1, *self.visual.shape[2:])
         self.pred_tag = self.pred_tag.view(-1, *self.pred_tag.shape[2:])
-        logging.info(f'index:{self.index_3}')
-        logging.info(f'audio:{self.audio.shape}')
-        logging.info(f'v:{self.visual.shape}')
-        logging.info(f'p:{self.pred_tag.shape}')
+
     def __len__(self):
         return len(self.audio)
 
     def __getitem__(self, idx):
         # Return a sample from audio, visual and pred_tag
-        
         return self.audio[idx], self.visual[idx], self.pred_tag[idx]
+
+    def collate_fn(self, batch):
+        # Create four lists to store samples for each label (0, 1, 2, 3)
+        batch_0 = []
+        batch_1 = []
+        batch_2 = []
+        batch_3 = []
+
+        # Split batch based on the pred_tag labels
+        for sample in batch:
+            audio, visual, label = sample
+            if label == 0:
+                batch_0.append((audio, visual, label))
+            elif label == 1:
+                batch_1.append((audio, visual, label))
+            elif label == 2:
+                batch_2.append((audio, visual, label))
+            elif label == 3:
+                batch_3.append((audio, visual, label))
+
+        # Ensure all four batches have the same number of samples (get the minimum size)
+        min_size = min(len(batch_0), len(batch_1), len(batch_2), len(batch_3))
+
+        # If any batch is empty, skip this batch
+        if min_size == 0:
+            return None  # Indicate that this batch should be skipped
+
+        # Select samples from each batch to form a balanced batch
+        balanced_batch = []
+        for _ in range(min_size):
+            balanced_batch.append(batch_0.pop())
+            balanced_batch.append(batch_1.pop())
+            balanced_batch.append(batch_2.pop())
+            balanced_batch.append(batch_3.pop())
+
+        # Shuffle the balanced batch
+        np.random.shuffle(balanced_batch)
+
+        # Return the batch with balanced classes
+        return torch.utils.data.dataloader.default_collate(balanced_batch)
+
 def begin():
-    path = "../data/new"
-    files_dir = os.listdir(path)
-    files_ = list()
-    files = list()
-    for file_dir in files_dir:
-        files_.append(os.path.join(path,file_dir))
-    for file_ in files_:
-        for i in os.listdir(file_):
-            files.append(os.path.join(file_ ,i))
-    
+    path = "../data/audio"
+    files = os.listdir(path=path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # 初始化模型
     model = Network().to(device)
     
     
-    num_epochs = 1000
+    num_epochs = 800
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
-
-    # # 将文件分为训练集和验证集，假设验证集占数据的50%
-    # num_files = len(files)
-    # val_split = int(num_files / 2)
-    # train_files = files[:val_split]
-    # val_files = files[val_split:]
-
-    # 训练过程
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
         run_id = 1
         # 训练集
-        logging.info(f'file:{files[epoch]}')
-        with open(files[epoch], 'rb') as f:
+        
+        file_path = os.path.join(path, files[epoch])
+        with open(file_path, 'rb') as f:
             data = pickle.load(f)
-        if  len(data) != 1:
-            continue
         dataset = MyData(data)
         # dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
-        dataloader = DataLoader(dataset=dataset , batch_size=4 , shuffle=True)
+        dataloader = DataLoader(dataset=dataset , batch_size=4 , shuffle=True , collate_fn=dataset.collate_fn)
         
         for batch_idx, batch in enumerate(dataloader):
             if batch is None:
@@ -202,47 +216,16 @@ def begin():
 
         # 在每个epoch结束时记录训练集的loss
         avg_train_loss = running_loss / run_id
-        if avg_train_loss != 0 and epoch/50 == 0:
+        if avg_train_loss != 0:
             writer.add_scalar('Loss/train', avg_train_loss, epoch)
 
-        # # 验证集测试部分
-        # model.eval()  # 设置为评估模式，关闭dropout等
-        # val_loss = 0.0
-        # val_id = 1
-        # with torch.no_grad():  # 不计算梯度，节省内存 
-        #     file_path = os.path.join(path, val_files[epoch])
-        #     with open(file_path, 'rb') as f:
-        #         data = pickle.load(f)
-        #     dataset = MyData(data)
-        #     # dataloader = DataLoader(dataset, batch_size=32, shuffle=False)
-        #     dataloader = DataLoader(dataset=dataset , batch_size=32 , shuffle=True , collate_fn=dataset.collate_fn)
-
-        #     for batch_idx, batch in enumerate(dataloader):
-        #         if batch is None:
-        #             continue  # Skip the batch if it is None
-        #         batch_audio, batch_visual, batch_labels = batch
-        #         logging.info(f'labels:{batch_labels}')
-        #         batch_audio, batch_visual, batch_labels = batch_audio.to(device), batch_visual.to(device), batch_labels.to(device)
-        #         # batch_audio  = torch.zeros([16, 2, 18000])
-        #         # batch_visual = torch.zeros([16, 128, 128, 4]).to(device)
-        #         outputs = model(batch_audio, batch_visual)
-        #         loss = criterion(outputs, batch_labels)
-        #         val_loss += loss.item()
-        #         val_id+=1
-
-        # avg_val_loss = val_loss / val_id
-        # # avg_val_loss = val_loss
-        # if avg_val_loss != 0:
-        #     writer.add_scalar('Loss/val', avg_val_loss, epoch)
-
-        # logging.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}")
         logging.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}")
-        print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}")
-    # torch.save(model.state_dict(), 'model_weights_3.pth')
+
+    torch.save(model.state_dict(), 'model_weights_1.pth')
     writer.close()  # 关闭TensorBoard的SummaryWriter
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/new_data_frist'
+    log_dir = './logs/new_50K_2'
     writer = SummaryWriter(log_dir)
-    logging.basicConfig(filename='output4.log', level=logging.INFO)
+    logging.basicConfig(filename='output_train.log', level=logging.INFO)
     begin()
