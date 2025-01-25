@@ -58,12 +58,13 @@ class MultiAudioEnv(ParallelEnv):
     }
 
     def __init__(self, config: dict):
-        self.ckp = '/home/getuanhui/project/sound-spaces/yz/SAM/checkpoint/sam_vit_b_01ec64.pth'
-        self.sam = sam_model_registry['vit_b'](self.ckp).to("cuda:0")
-        self.mask_generator = SamAutomaticMaskGenerator(self.sam)
+        # self.ckp = '/home/getuanhui/project/sound-spaces/yz/SAM/checkpoint/sam_vit_b_01ec64.pth'
+        # self.sam = sam_model_registry['vit_b'](self.ckp).to("cuda:0")
+        # self.mask_generator = SamAutomaticMaskGenerator(self.sam)
         # deep copy config
         self._config = config.copy()
-        self._num_agents = config["agents_num"]
+        # self._num_agents = config["agents_num"]
+        self._num_agents = 1
         self._num_sources = config["sources_num"]
         self._max_episode_steps = config["max_episode_steps"]
         self._sequence_length = config["sequence_length"] + 1  # add bootstrap
@@ -143,8 +144,8 @@ class MultiAudioEnv(ParallelEnv):
         backend_cfg.scene_dataset_config_file = self._config["scene_config_file"]
         backend_cfg.load_semantic_mesh = self._config["load_semantic_mesh"]
         backend_cfg.enable_physics = self._config["enable_physics"]
-        backend_cfg.random_seed = self._config["random_seed"]
-
+        # backend_cfg.random_seed = self._config["random_seed"]
+        backend_cfg.random_seed = int(time.time() * 1000) % 10000
         agent_cfg_list = []
         for _ in range(self._num_agents):
             agent_cfg = habitat_sim.agent.AgentConfiguration()
@@ -383,37 +384,19 @@ class MultiAudioEnv(ParallelEnv):
         for agent_id in range(self._num_agents):
             obs = all_obs[agent_id]
             # get audio chunk
-            # in there , i use sam model to encode the image agent obtain
-            # image_pre = obs["color_sensor"]
-            
-            # in there , i use a foundation model as AVSM
-            
             irs = [
                 np.array(obs["audio_sensor_{}".format(i)])
                 for i in range(self._num_sources)
             ]
+            
             # convolve audio chunks with IRs, sum over sources
             audios = [self._convolve_with_ir(ir) for ir in irs]
-            
             audios = np.array(audios)  # source, channel, len
             audio = np.sum(audios, axis=0)  # channel, len
-            # au = audioRun.audioRun(audio.squeeze()[0])
-            # result = np.vstack((au,au))
             # append audio and camera sensor to obs
-            print("sagment image!")
-            image = obs["color_sensor"]
-            image = image[:, :, :3]
-            masks = self.mask_generator.generate(image)
-            masks_sorted = sorted(masks, key=(lambda x: x['area']), reverse=True)
-            img = np.ones((masks_sorted[0]['segmentation'].shape[0], masks_sorted[0]['segmentation'].shape[1], 4))
-            img[:,:,3] = 0
-            for ann in masks_sorted:
-                m = ann['segmentation']
-                color_mask = np.concatenate([np.random.random(3), [0.35]])
-                img[m] = color_mask
             obs_list.append(
                 {
-                    "camera": img,
+                    "camera": obs["color_sensor"],
                     "audio": audio,
                 }
             )
