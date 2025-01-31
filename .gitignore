@@ -8,7 +8,7 @@ my_script
 .idea
 .vscode/
 experiments/
-*.ipynb
+# *.ipynb
 SAM/checkpoint
 *.path
 *.pth
