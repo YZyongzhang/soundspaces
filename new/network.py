@@ -6,6 +6,7 @@ import numpy as np
 import librosa
 import torch.optim as optim
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import Dataset , DataLoader
 class Network(nn.Module):
     def __init__(self):
@@ -54,7 +55,6 @@ class Network(nn.Module):
         
         self.fc1 = nn.Linear(2 * self.hidden_dim, self.hidden_dim)
         self.fc2 = nn.Linear(self.hidden_dim, self.output_dim)
-        
         self.initialize_weights_uniform()
     
     def forward(self, audio, visual_input):
@@ -156,7 +156,7 @@ def begin():
     model = Network().to(device)
     
     
-    num_epochs = 1000
+    num_epochs = len(files)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
@@ -202,7 +202,7 @@ def begin():
 
         # 在每个epoch结束时记录训练集的loss
         avg_train_loss = running_loss / run_id
-        if avg_train_loss != 0 and epoch/50 == 0:
+        if avg_train_loss != 0 and epoch%50 == 0:
             writer.add_scalar('Loss/train', avg_train_loss, epoch)
 
         # # 验证集测试部分
@@ -238,11 +238,11 @@ def begin():
         # logging.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}, Validation Loss: {avg_val_loss:.4f}")
         logging.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}")
         print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}")
-    # torch.save(model.state_dict(), 'model_weights_3.pth')
+    # torch.save(model.state_dict(), 'model_weights_release.pth')
     writer.close()  # 关闭TensorBoard的SummaryWriter
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/new_data_frist'
+    log_dir = './logs/new_data'
     writer = SummaryWriter(log_dir)
-    logging.basicConfig(filename='output4.log', level=logging.INFO)
+    logging.basicConfig(filename='./logs/output.log', level=logging.INFO)
     begin()
