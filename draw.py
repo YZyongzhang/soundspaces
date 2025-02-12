@@ -32,7 +32,24 @@ class Draw:
             points_topdown.append(np.array([px, py]))
         return points_topdown
 
+    def display_path_map(self , topdown_map, key_points=None , path = None ,image_filename = None):
+        output_dir = './output_images'
+        plt.figure(figsize=(12, 8))
+        ax = plt.subplot(1, 1, 1)
+        ax.axis("off")
+        plt.imshow(topdown_map)
+        if path is not None:
+            path_x = [point[0] for point in path]  # 获取所有 x 坐标
+            path_y = [point[1] for point in path]  # 获取所有 y 坐标
+            plt.plot(path_x, path_y, marker="o", markersize=5, color="blue", alpha=0.7, label="Path")
 
+        # 绘制关键点（如果有）
+        if key_points is not None:
+            for point in key_points:
+                plt.plot(point[0], point[1], marker="o", markersize=10, alpha=0.8, color="red", label="Key Point")
+        plt.gcf().savefig(image_filename)
+        # 显示图像
+        plt.show(block=False)
     # display a topdown map with matplotlib
     def display_map(self , topdown_map, key_points=None):
         plt.figure(figsize=(12, 8))
@@ -90,11 +107,19 @@ class Draw:
         x, y = self.get_td_map(env._sim.pathfinder, vis_points=vis_points)
         agent_r = env.get_agent_rotation()
 
-        for agent_id in range(2):
+        for agent_id in range(env._num_agents):
             x = self.add_agent_pos_angle(env._sim.pathfinder, x, agent_pos[agent_id], agent_r[agent_id])
 
         self.display_map(x,y)
-    def draw(self, sim , path):
+    def show_path_graph(self , env , sound , agent ,image_filename):
+        source_pos = sound
+        agent_point = agent
+        vis_points = source_pos
+        x, s = self.get_td_map(env._sim.pathfinder, vis_points=source_pos)
+        x, a = self.get_td_map(env._sim.pathfinder, vis_points=agent_point)
+
+        self.display_path_map(x,s,a,image_filename)
+    def draw(self, sim ,path):
         meters_per_pixel = 0.025
         scene_bb = sim.get_active_scene_graph().get_root_node().cumulative_bb
         height = scene_bb.y().min

@@ -105,6 +105,38 @@ class Net(nn.Module):
 #         return len(self.data)
 #     def __getitem__(self ,idx):
 #         return self.data['audio'][idx] , self.data[idx]['camera'][idx]  , self.data['rl_pred'] [idx] , self.data['reward'][idx] 
+# class MyData(Dataset):
+#     def __init__(self,data):
+#         self.audio_ = data[0]['audio']
+#         self.tag_ = data[0]['rl_pred']
+#         self.visual_ = data[0]['camera']
+#         self.reward_ = data[0]['reward']
+#         self.audio = list()
+#         self.tag = list()
+#         self.visual = list()
+#         self.reward = list()
+#         num = 0
+#         for index,tag in enumerate(self.tag_):
+#             if tag !=3 and tag !=0:
+                
+#                 self.audio.append(self.audio_[index])
+#                 self.visual.append(self.visual_[index])
+#                 self.reward.append(self.reward_[index])
+#                 self.tag.append(tag)
+#             if tag == 0 and num <=4:
+#                     num +=1
+#                     self.audio.append(self.audio_[index])
+#                     self.visual.append(self.visual_[index])
+#                     self.reward.append(self.reward_[index])
+#                     self.tag.append(tag)
+#         # self.audio.pop(0)
+#         # self.tag.pop(0)
+#         # self.visual.pop(0)
+#         logging.info(self.tag)
+#     def __len__(self):
+#         return len(self.audio)
+#     def __getitem__(self,index):
+#         return self.audio[index] ,self.visual[index] ,self.tag[index] ,self.reward[index] 
 class MyData(Dataset):
     def __init__(self,data):
         self.audio_ = data[0]['audio']
@@ -115,28 +147,18 @@ class MyData(Dataset):
         self.tag = list()
         self.visual = list()
         self.reward = list()
-        num = 0
         for index,tag in enumerate(self.tag_):
-            if tag !=3 and tag !=0:
-                
-                self.audio.append(self.audio_[index])
-                self.visual.append(self.visual_[index])
-                self.reward.append(self.reward_[index])
-                self.tag.append(tag)
-            if tag == 0 and num <=4:
-                    num +=1
-                    self.audio.append(self.audio_[index])
-                    self.visual.append(self.visual_[index])
-                    self.reward.append(self.reward_[index])
-                    self.tag.append(tag)
-        # self.audio.pop(0)
-        # self.tag.pop(0)
-        # self.visual.pop(0)
-        logging.info(self.tag)
+            if tag == 3:
+                self.audio_ = self.audio_[:index]
+                self.visual_ = self.visual_[:index]
+                self.reward_ = self.reward_[:index]
+                self.tag_ = self.tag_[:index]
+                break
+        logging.info(self.tag_)
     def __len__(self):
-        return len(self.audio)
+        return len(self.audio_)
     def __getitem__(self,index):
-        return self.audio[index] ,self.visual[index] ,self.tag[index] ,self.reward[index]            
+        return self.audio_[index] ,self.visual_[index] ,self.tag_[index] ,self.reward_[index]            
 class IQL:
     def __init__(self, model, learning_rate=1e-5):
         self.model = model
@@ -144,68 +166,62 @@ class IQL:
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
     
     def compute_loss(self, Q, V, P, target_Q, labels):
-        print(target_Q.shape)
-        print(P.shape)
         target_Q = target_Q.unsqueeze(1)
-        # 计算 Q 函数的损失，这里简化处理为均方误差（MSE）
         q_loss = F.mse_loss(Q, target_Q)
-
-        # 计算 value 网络的损失，可以通过贝尔曼方程进行设计
         v_loss = F.mse_loss(V, target_Q)
-
-        # 策略网络损失
-        # 我们需要通过 Q 函数来更新策略，因此可以考虑采用某种基于 Q 的策略优化
         log_probs = F.log_softmax(P, dim=1)
-        action_loss = -torch.mean(torch.sum(log_probs * target_Q, dim=1))  # 使用Q值作为权重进行策略优化
-        
+        action_loss = -torch.mean(torch.sum(log_probs * target_Q, dim=1))  
         total_loss = q_loss + v_loss + action_loss
         return total_loss , q_loss ,v_loss ,action_loss
 
     def train_step(self, audio, visual_input, labels, target_Q):
-        # 进行一次前向传播
         Q, V, P = self.model(audio, visual_input, labels)
-
-        # 计算损失
         total_loss , q_loss ,v_loss ,action_loss = self.compute_loss(Q, V, P, target_Q, labels)
-
-        # 更新模型
         self.optimizer.zero_grad()
         total_loss.backward()
         self.optimizer.step()
 
         return total_loss.item() ,q_loss.item(),v_loss.item() ,action_loss.item()
 def train(writer):
-    path = "../data/audio"
+    path = "../data/RL"
     files = os.listdir(path=path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net().to(device)
     iql = IQL(model)
     num_epochs = len(files)
+    s_q_loss , s_v_loss , s_action_loss , s_total_loss = (0, 0, 0, 0)
     for epoch in range(num_epochs):
         model.train()
         file_path = os.path.join(path, files[epoch])
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
         dataset = MyData(data)
-        dataloader = DataLoader(dataset=dataset , batch_size=4 , shuffle=True )
+        dataloader = DataLoader(dataset=dataset , batch_size=16 )
         
         for batch_idx, batch in enumerate(dataloader):
             batch_audio, batch_visual, batch_labels  ,batch_reward = batch
             batch_audio, batch_visual, batch_labels  ,batch_reward= batch_audio.to(device), batch_visual.to(device), batch_labels.to(device) ,batch_reward.to(device)
 
-            total_loss , q_loss ,v_loss ,action_loss = iql.train_step(batch_audio,batch_visual, batch_labels, batch_reward)
+            total_loss , q_loss ,v_loss , action_loss = iql.train_step(batch_audio,batch_visual, batch_labels, batch_reward)
             print(f'Episode {epoch}, total_loss: {total_loss} ,q_loss {q_loss} ,v_loss {v_loss} ,action_loss {action_loss }')
-            if epoch % 50 == 0:
-                 # 记录每个损失到TensorBoard
-                writer.add_scalar('Loss/q_loss', q_loss, epoch)
-                writer.add_scalar('Loss/v_loss', v_loss, epoch)
-                writer.add_scalar('Loss/p_loss', action_loss, epoch)
+            if epoch % 5 == 0:
+                # 记录每个损失到TensorBoard
+                writer.add_scalar('Loss/q_loss', s_q_loss/5, epoch)
+                writer.add_scalar('Loss/v_loss', s_v_loss/5,   epoch)
+                writer.add_scalar('Loss/p_loss', s_action_loss/5, epoch)
 
                 # 记录平均训练损失
-                writer.add_scalar('Loss/train', total_loss, epoch)
+                writer.add_scalar('Loss/train', s_total_loss/5, epoch)
+                s_q_loss , s_v_loss , s_action_loss , s_total_loss = (0, 0, 0, 0)
+            else:
+                s_q_loss+=q_loss
+                s_v_loss+=v_loss
+                s_action_loss+=action_loss
+                s_total_loss+=total_loss
+                
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/rl'
+    log_dir = './logs/rl_8'
     writer = SummaryWriter(log_dir)
     logging.basicConfig(filename='output_rl.log', level=logging.INFO)
     train(writer)

@@ -529,7 +529,8 @@ class MultiAudioEnv(ParallelEnv):
         # get reward
         r = self._reward()
         # get done
-        done = self._count >= self._max_episode_steps or self._success()
+        # done = self._count >= self._max_episode_steps or self._success()
+        done = self._count >= self._max_episode_steps or self._stopped_agents[agent_id]
         # get info
         info = {
             "count": self._count,

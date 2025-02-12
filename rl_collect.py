@@ -20,14 +20,22 @@ class Actor:
         self._idx = 0
         self.num = 0
         self.action_list = ["move_forward", "turn_left", "turn_right"]
+        self.path_point = [{
+            'sound':[],
+            'agent':[]
+        }]
 
     def reset(self):
         self._idx = 0
 
     def act(self, env, env_id):
+        if self.num == 0:
+            self.path_point[0]['sound'].append(env.get_source_pos()[0])
         ret = list()
         num_agents = env.get_num_agents()
         for agent_id in range(num_agents):
+            self.path_point[agent_id]['agent'].append(env.get_agent_pos()[0])
+            logging.info(env.get_agent_pos())
             # 随机take action
             if self._idx >= len(self.paths[env_id][agent_id]):
                 logging.info('here stop')
@@ -126,11 +134,18 @@ def collect():
         path = os.path.join("data/RL", f"offline_episode_RL_{num_episodes}.pkl")
         with open(path, "wb") as f:
             pickle.dump(seq_list, f)
+        path_point = os.path.join('data/RL/path' ,f"path_RL_{num_episodes+1}.pkl")
+        with open(path_point , 'wb') as f:
+            pickle.dump(actors[0].path_point, f)
+        actors[0].path_point = [{
+            'sound':[],
+            'agent':[]
+        }]
         seq_list.clear()
         logging.info(f"offline_episode_RL_{num_episodes}.pkl")
         logging.info(f"Episode {num_episodes} seq num: {len(seq_list_)}")
         logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='./data/RL/RLDATA.log', level=logging.INFO)
+    logging.basicConfig(filename='./data/RL/path/RLDATA.log', level=logging.INFO)
     collect()
