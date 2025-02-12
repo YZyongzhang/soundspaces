@@ -8,7 +8,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset , DataLoader
-from network import Network
+from audio_visual import visual , audio
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -18,7 +18,14 @@ class Net(nn.Module):
         self.x_dim = 36
         self.y_dim = 128
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        
+        self.visualnet = visual.VisualNet(64 , 4 ,width_dim=128 , height_dim=128).to(self.device)
+        v_model_path = "./audio_visual/visual_weights_1.pth"
+        self.visualnet.load_state_dict(torch.load(v_model_path))
+        self.visualnet.eval()
+        a_model_path = "./checkpoint/audio_weights_fine_tune.pth"
+        self.audio_net = audio.AudioNet(64 , 4 ,width_dim=128 , height_dim=36).to(self.device)
+        self.audio_net.load_state_dict(torch.load(a_model_path))
+        self.audio_net.eval()
         self.q_net = nn.Sequential(
             nn.Linear(self.hidden_dim + 1, self.hidden_dim),
             nn.ReLU(),
@@ -40,43 +47,48 @@ class Net(nn.Module):
             nn.ReLU(),
             nn.Linear(self.hidden_dim, self.action_dim)
         )
-        
-        self.fc1 = nn.Linear(2 * self.hidden_dim, self.hidden_dim)
-        self.fc2 = nn.Linear(self.hidden_dim, self.output_dim)
         self.initialize_weights_uniform()
-    
-    def forward(self, audio, visual_input):
-        mel_features = []
-        # audio = np.array(audio)
-        audio = audio.cpu().numpy()
-        for i in range(audio.shape[0]):
-            left_channel = audio[i, 0, :]
-            right_channel = audio[i, 1, :]
-            
-            mel_left = librosa.feature.melspectrogram(y=left_channel, sr=18000, n_fft=1024, hop_length=512, n_mels=128)
-            mel_right = librosa.feature.melspectrogram(y=right_channel, sr=18000, n_fft=1024, hop_length=512, n_mels=128)
-            
-            combined_mel = np.stack([mel_left, mel_right], axis=0)  # (2, 128, 时间帧数)
-            mel_features.append(combined_mel)
-
-        audio_input= np.array(mel_features)
-        audio_input = torch.from_numpy(audio_input).to(self.device)
-        visual_input = visual_input.permute(0, 3, 1, 2)
-        audio_mask = self.audiomask(audio_input)
-        audio_mask = audio_mask.view(audio_input.size(0), 2, self.y_dim, self.x_dim)
-        masked_audio = audio_mask * audio_input
-        
-        audio_encode = self.audio_encoder(masked_audio)
-        visual_encode = self.visual_encoder(visual_input)
-        
-        combined_encode = torch.cat((audio_encode, visual_encode), dim=1)
-        combined_encode = self.fc1(combined_encode)
-        # q_input_dim = torch.cat((combined_encode , labes) , dim=1)
-        # Q = self.q_net(q_input_dim)
-        # V = self.value_net(combined_encode)
-        # P = self.policy_net(combined_encode)
-        
-        return combined_encode
+    def forward(self, audio, visual_input,labes):
+        labes = labes.unsqueeze(1)
+        batch ,height , width , _ = visual_input.shape
+        result = self.audio_net(audio)
+        x = torch.max(result,dim=1).indices
+        mask = list()
+        for i in x:
+            mask_ = np.ones((height, width),dtype=np.uint8)
+            height , width = mask_.shape
+            if i.item() == 1:
+                for h_i in range(height):
+                    for w_i in range(width):
+                    # left
+                        if h_i + 2* w_i < 128:
+                            mask_[h_i][w_i] = 0
+            if i.item() == 2:
+                for h_i in range(height):
+                    for w_i in range(width):
+                        # right
+                        if h_i - 2* w_i < -128:
+                            mask_[h_i][w_i] = 0
+            if  i.item() == 0:
+                   for h_i in range(height):
+                    for w_i in range(width):
+                        # mid
+                        if h_i - 2* w_i > -128 and h_i + 2* w_i > 128:
+                            mask_[h_i][w_i] = 0
+            mask_ = mask_[:, :, np.newaxis]
+            mask.append(mask_)
+        mask = torch.from_numpy(np.array(mask)).to(self.device)
+        red_overlay = np.array([255.0, 0.0, 0.0 , 1], dtype=np.float32)
+        overlay = torch.from_numpy(red_overlay).to(self.device)
+        # visual = overlay*(1-mask)*visual + mask*visual
+        visual = visual_input*mask
+        visual = visual.permute(0,3,2,1)
+        combined_encode = self.visualnet.visual_net(visual)
+        q_input_dim = torch.cat((combined_encode , labes) , dim=1)
+        Q = self.q_net(q_input_dim)
+        V = self.value_net(combined_encode)
+        P = self.policy_net(combined_encode)
+        return Q,V,P
     def initialize_weights_uniform(self, weight_range=(-0.1, 0.1), bias_range=(-0.1, 0.1)):
         for name, module in self.named_modules():
             if isinstance(module, (nn.Linear, nn.Conv2d)):
@@ -86,125 +98,114 @@ class Net(nn.Module):
                 # 初始化偏置为均匀分布
                 if hasattr(module, 'bias') and module.bias is not None:
                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
+# class MyData(Dataset):
+#     def __init__(self,data):
+#         self.data = data[0]
+#     def __len__(self):
+#         return len(self.data)
+#     def __getitem__(self ,idx):
+#         return self.data['audio'][idx] , self.data[idx]['camera'][idx]  , self.data['rl_pred'] [idx] , self.data['reward'][idx] 
 class MyData(Dataset):
     def __init__(self,data):
-        self.data = data
+        self.audio_ = data[0]['audio']
+        self.tag_ = data[0]['rl_pred']
+        self.visual_ = data[0]['camera']
+        self.reward_ = data[0]['reward']
+        self.audio = list()
+        self.tag = list()
+        self.visual = list()
+        self.reward = list()
+        num = 0
+        for index,tag in enumerate(self.tag_):
+            if tag !=3 and tag !=0:
+                
+                self.audio.append(self.audio_[index])
+                self.visual.append(self.visual_[index])
+                self.reward.append(self.reward_[index])
+                self.tag.append(tag)
+            if tag == 0 and num <=4:
+                    num +=1
+                    self.audio.append(self.audio_[index])
+                    self.visual.append(self.visual_[index])
+                    self.reward.append(self.reward_[index])
+                    self.tag.append(tag)
+        # self.audio.pop(0)
+        # self.tag.pop(0)
+        # self.visual.pop(0)
+        logging.info(self.tag)
     def __len__(self):
-        return len(self.data)
-    def __getitem__(self ,idx):
-        return self.data[idx]['audio'] , self.data[idx]['camera'] , self.data[idx]['rl_pred'] , self.data[idx]['reward']
-class Train():
-    def __init__(self):
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.gamma =0.99
-        self.expectile = 0.5
-        self.net = Net().to(device)
-        self.state_net = Network().to(device)
-        self.lr = 1e-3
-        self.q_optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
-        self.policy_optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
-        self.value_optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
-        pass
-    def rl_state(self,audio ,visual_input):
-        audio  = audio.squeeze(0)
-        visual_input  = visual_input.squeeze(0)
-        state  = self.state_net.forward(audio , visual_input)
-        next_state = torch.zeros_like(state)
-        next_state[:-1] = state[1:]
-        return state ,next_state
-    def updata_q_net(self,state , next_state, rewards , label):
-        label = label.squeeze(0)
-        label = label.unsqueeze(1)
-        rewards = rewards.squeeze(0)
-        rewards = rewards.unsqueeze(1)
-        with torch.no_grad():
-            target_v = self.net.value_net(next_state)  # 目标价值网络预测的 V(s')
-            q_target = rewards + self.gamma * target_v
-        q_values = self.net.q_net(torch.cat([state, label], dim=1))
-        loss_q = F.mse_loss(q_values, q_target)
-        self.q_optimizer.zero_grad()
-        loss_q.backward()
-        self.q_optimizer.step()
+        return len(self.audio)
+    def __getitem__(self,index):
+        return self.audio[index] ,self.visual[index] ,self.tag[index] ,self.reward[index]            
+class IQL:
+    def __init__(self, model, learning_rate=1e-5):
+        self.model = model
+        self.device = model.device
+        self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+    
+    def compute_loss(self, Q, V, P, target_Q, labels):
+        print(target_Q.shape)
+        print(P.shape)
+        target_Q = target_Q.unsqueeze(1)
+        # 计算 Q 函数的损失，这里简化处理为均方误差（MSE）
+        q_loss = F.mse_loss(Q, target_Q)
 
-        return loss_q.item()
-    def updata_p_net(self , state , action):
-        """
-        更新策略网络
-        """
-        action = action.squeeze(0)
-        action = action.unsqueeze(1)
-        with torch.no_grad():
-            q_values = self.net.q_net(torch.cat([state, action], dim=1))
-            v_values = self.net.value_net(state)
-            advantages = q_values - v_values  # 计算优势函数
+        # 计算 value 网络的损失，可以通过贝尔曼方程进行设计
+        v_loss = F.mse_loss(V, target_Q)
 
-        # 策略网络的损失，最大化优势函数
-        log_probs = -self.net.policy_net(state)  # 假设策略输出为概率分布的对数值
-        loss_policy = -(log_probs * advantages).mean()
+        # 策略网络损失
+        # 我们需要通过 Q 函数来更新策略，因此可以考虑采用某种基于 Q 的策略优化
+        log_probs = F.log_softmax(P, dim=1)
+        action_loss = -torch.mean(torch.sum(log_probs * target_Q, dim=1))  # 使用Q值作为权重进行策略优化
+        
+        total_loss = q_loss + v_loss + action_loss
+        return total_loss , q_loss ,v_loss ,action_loss
 
-        # 更新策略网络
-        self.policy_optimizer.zero_grad()
-        loss_policy.backward()
-        self.policy_optimizer.step()
+    def train_step(self, audio, visual_input, labels, target_Q):
+        # 进行一次前向传播
+        Q, V, P = self.model(audio, visual_input, labels)
 
-        return loss_policy.item()
-    def update_v_net(self,state,action):
-        action = action.squeeze(0)
-        action = action.unsqueeze(1)
-        with torch.no_grad():
-            q_values = self.net.q_net(torch.cat([state, action], dim=1))
+        # 计算损失
+        total_loss , q_loss ,v_loss ,action_loss = self.compute_loss(Q, V, P, target_Q, labels)
 
-        # 计算 expectile regression 损失
-        v_values = self.net.value_net(state)
-        diff = q_values - v_values
-        weight = torch.where(diff > 0, self.expectile, 1 - self.expectile)  # 使用 expectile 权重
-        loss_v = (weight * (diff ** 2)).mean()
+        # 更新模型
+        self.optimizer.zero_grad()
+        total_loss.backward()
+        self.optimizer.step()
 
-        # 更新价值网络
-        self.value_optimizer.zero_grad()
-        loss_v.backward()
-        self.value_optimizer.step()
-
-        return loss_v.item()
-def begin():
+        return total_loss.item() ,q_loss.item(),v_loss.item() ,action_loss.item()
+def train(writer):
     path = "../data/audio"
     files = os.listdir(path=path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # 初始化模型
-    train = Train()
-    num_epochs = 800
+    model = Net().to(device)
+    iql = IQL(model)
+    num_epochs = len(files)
     for epoch in range(num_epochs):
-        train.net.train()
+        model.train()
         file_path = os.path.join(path, files[epoch])
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
         dataset = MyData(data)
-        dataloader = DataLoader(dataset=dataset , batch_size=1 , shuffle=True )
+        dataloader = DataLoader(dataset=dataset , batch_size=4 , shuffle=True )
         
         for batch_idx, batch in enumerate(dataloader):
             batch_audio, batch_visual, batch_labels  ,batch_reward = batch
             batch_audio, batch_visual, batch_labels  ,batch_reward= batch_audio.to(device), batch_visual.to(device), batch_labels.to(device) ,batch_reward.to(device)
-            state , next_state = train.rl_state(batch_audio , batch_visual)
-            q_loss = train.updata_q_net(state.detach() , next_state.detach(),batch_reward , batch_labels.detach())
-            v_loss = train.update_v_net(state.detach() , batch_labels.detach())
-            p_loss = train.updata_p_net(state.detach(), batch_labels.detach())
-            # 计算平均训练损失
-            avg_train_loss = (q_loss + v_loss + p_loss) / 3
 
-            # 记录每个损失到TensorBoard
-            writer.add_scalar('Loss/q_loss', q_loss, epoch)
-            writer.add_scalar('Loss/v_loss', v_loss, epoch)
-            writer.add_scalar('Loss/p_loss', p_loss, epoch)
+            total_loss , q_loss ,v_loss ,action_loss = iql.train_step(batch_audio,batch_visual, batch_labels, batch_reward)
+            print(f'Episode {epoch}, total_loss: {total_loss} ,q_loss {q_loss} ,v_loss {v_loss} ,action_loss {action_loss }')
+            if epoch % 50 == 0:
+                 # 记录每个损失到TensorBoard
+                writer.add_scalar('Loss/q_loss', q_loss, epoch)
+                writer.add_scalar('Loss/v_loss', v_loss, epoch)
+                writer.add_scalar('Loss/p_loss', action_loss, epoch)
 
-            # 记录平均训练损失
-            writer.add_scalar('Loss/train', avg_train_loss, epoch)
-        logging.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f} , q_loss:{q_loss:.4f}, v_loss:{v_loss:.4f},p_loss:{p_loss:.4f}")
-        # print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f} , q_loss:{q_loss:.4f}, v_loss:{v_loss:.4f},p_loss:{p_loss:.4f}")
-    torch.save(train.net.state_dict(), 'model_weights_rl.pth')
-    writer.close()  # 关闭TensorBoard的SummaryWriter
+                # 记录平均训练损失
+                writer.add_scalar('Loss/train', total_loss, epoch)
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
     log_dir = './logs/rl'
     writer = SummaryWriter(log_dir)
     logging.basicConfig(filename='output_rl.log', level=logging.INFO)
-    begin()
+    train(writer)

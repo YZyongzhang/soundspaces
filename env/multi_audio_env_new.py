@@ -499,6 +499,7 @@ class MultiAudioEnv(ParallelEnv):
                 continue
 
             action = a[agent_id]["rl_pred"]
+            print(f"agent action is {action}")
             if action == 0:
                 action = "move_forward"
             elif action == 1:
