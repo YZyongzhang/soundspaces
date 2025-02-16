@@ -164,7 +164,7 @@ def collect():
             num_envs_, seq_list_, return_, num_success = result
             seq_list += seq_list_
 
-        path = os.path.join("data/RL/random", f"offline_episode_RL_{num_episodes}.pkl")
+        path = os.path.join("data/RL/random",  f"offline_episode_RL_{num_episodes}.pkl")
         with open(path, "wb") as f:
             pickle.dump(seq_list, f)
         path_point = os.path.join('data/RL/path' ,f"path_RL_{num_episodes}.pkl")
