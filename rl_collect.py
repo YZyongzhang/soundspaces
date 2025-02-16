@@ -4,6 +4,7 @@ import os
 import time
 import random
 import ray
+import habitat_sim
 import pickle
 from config import config
 from env.v0d0 import Env
@@ -19,7 +20,9 @@ class Actor:
         self.envs = [Env(config) for _ in range(self._num_envs)]
         self._idx = 0
         self.num = 0
-        self.action_list = ["move_forward", "turn_left", "turn_right"]
+        self.path_id = 0
+        self.action_list = ["move_forward", "move_forward","turn_left", "turn_right"]
+        self._sim = self.envs[0]._sim
         self.path_point = [{
             'sound':[],
             'agent':[]
@@ -27,7 +30,20 @@ class Actor:
 
     def reset(self):
         self._idx = 0
-
+        
+    def shortest_path(self, from_pos, to_pos):
+        """
+        Depreciated, using built-in shortestpath method, granularity is not enough
+        """
+        path = habitat_sim.ShortestPath()
+        path.requested_start = from_pos
+        path.requested_end = to_pos
+        found_path = self._sim.pathfinder.find_path(path)
+        path_results = (found_path, path.geodesic_distance, path.points)
+        if len(path_results[-1]) > 1:
+            return path_results[-1][1]
+        else:
+            return None
     def act(self, env, env_id):
         if self.num == 0:
             self.path_point[0]['sound'].append(env.get_source_pos()[0])
@@ -36,24 +52,22 @@ class Actor:
         for agent_id in range(num_agents):
             self.path_point[agent_id]['agent'].append(env.get_agent_pos()[0])
             logging.info(env.get_agent_pos())
-            # 随机take action
-            if self._idx >= len(self.paths[env_id][agent_id]):
-                logging.info('here stop')
-                action = "stop"
-            else:
-                if random.random() < self.eps:
-                    action = random.sample(self.action_list, 1)[0]
-                    self.paths = [env.get_shortest_action_list() for env in self.envs]
-                    logging.info(self.paths)
-                    self.reset()
+            if self._idx >= len(self.paths[env_id][agent_id])-1:
+                logging.info(self.paths)
+                if self.path_id == 5:
+                    action = 'stop'
                 else:
-                    action = self.paths[env_id][agent_id][self._idx]
-            
+                    self.path_id+=1
+                    self.reset()
+                    self._idx -=1
+                    self.paths = [env.get_shortest_action_list(goal_pos=self.mid_point[self.path_id]) for env in self.envs]
+                    action = 'move_forward'
+            else:
+                action = self.paths[env_id][agent_id][self._idx]
             # 记录动作
             print(f"agent {agent_id} action: {action}")
-            logging.info(f"agent {agent_id} action: {action} idx :{self._idx} num : {self.num}")
-            act_id = env.action_str_2_id(action)
-
+            logging.info(f"agent {agent_id} action: {action} idx :{self._idx} num : {self.num} pathid {self.path_id}")
+            act_id = env.action_str_2_id(action) 
             ret.append({
                 "rl_pred": act_id,
                 "lstm_h": np.zeros((self._config["hid_dim_l"],), np.float32),
@@ -67,16 +81,35 @@ class Actor:
     def rollout(self):
         self.reset()
         self.num = 0
+        self.path_id = 0
         self._num_episodes += 1
 
         all_r_list = list()
         envs = self.envs
         config = self._config
         num_envs = self._num_envs
-
+        self.paths = list()
         input_d_list = [envs[idx].reset() for idx in range(num_envs)]
-        self.paths = [env.get_shortest_action_list() for env in self.envs]
-        logging.info(self.paths)
+        # self.mid_point = [envs[0]._sim.pathfinder.get_random_navigable_point() for i in range(5)]
+        
+        self.mid_point = []
+        temp = envs[0].get_agent_pos()[0]
+        while True:
+            rand_pos = envs[0]._sim.pathfinder.get_random_navigable_point()
+            if (
+                np.linalg.norm(rand_pos - temp) > 1.2
+                and np.linalg.norm(rand_pos - temp) < 7.0
+                and self.shortest_path(rand_pos, temp) is not None
+                and self._sim.pathfinder.is_navigable(rand_pos)
+            ):
+                self.mid_point.append(rand_pos)
+                temp = rand_pos
+            if len(self.mid_point) == 5:
+                self.mid_point.append(envs[0].get_source_pos()[0])
+                logging.info(self.mid_point)
+                break
+        self.paths = [env.get_shortest_action_list(goal_pos=self.mid_point[0]) for env in self.envs]
+        # logging.info(self.paths)
 
         # Generate RL training data
         while True:
@@ -119,10 +152,10 @@ def collect():
     # actors = [ray.remote(num_gpus=num_gpus)(Actor).remote(config) for _ in range(num_actors)]
     actors = [Actor(config)]
     seq_list = list()  # store rl data
-    for num_episodes in range(10000):
+    for num_episodes in range(10):
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
-
+        
         # token_ids = [actor.rollout.remote() for actor in actors]
         result_list = [actor.rollout() for actor in actors]
         # result_list = ray.get(token_ids)
@@ -131,10 +164,10 @@ def collect():
             num_envs_, seq_list_, return_, num_success = result
             seq_list += seq_list_
 
-        path = os.path.join("data/RL", f"offline_episode_RL_{num_episodes}.pkl")
+        path = os.path.join("data/RL/random", f"offline_episode_RL_{num_episodes}.pkl")
         with open(path, "wb") as f:
             pickle.dump(seq_list, f)
-        path_point = os.path.join('data/RL/path' ,f"path_RL_{num_episodes+1}.pkl")
+        path_point = os.path.join('data/RL/path' ,f"path_RL_{num_episodes}.pkl")
         with open(path_point , 'wb') as f:
             pickle.dump(actors[0].path_point, f)
         actors[0].path_point = [{
@@ -146,6 +179,6 @@ def collect():
         logging.info(f"Episode {num_episodes} seq num: {len(seq_list_)}")
         logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
 
-if __name__ == "__main__":
+if  __name__== "__main__":
     logging.basicConfig(filename='./data/RL/path/RLDATA.log', level=logging.INFO)
     collect()

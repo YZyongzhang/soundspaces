@@ -98,45 +98,6 @@ class Net(nn.Module):
                 # 初始化偏置为均匀分布
                 if hasattr(module, 'bias') and module.bias is not None:
                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
-# class MyData(Dataset):
-#     def __init__(self,data):
-#         self.data = data[0]
-#     def __len__(self):
-#         return len(self.data)
-#     def __getitem__(self ,idx):
-#         return self.data['audio'][idx] , self.data[idx]['camera'][idx]  , self.data['rl_pred'] [idx] , self.data['reward'][idx] 
-# class MyData(Dataset):
-#     def __init__(self,data):
-#         self.audio_ = data[0]['audio']
-#         self.tag_ = data[0]['rl_pred']
-#         self.visual_ = data[0]['camera']
-#         self.reward_ = data[0]['reward']
-#         self.audio = list()
-#         self.tag = list()
-#         self.visual = list()
-#         self.reward = list()
-#         num = 0
-#         for index,tag in enumerate(self.tag_):
-#             if tag !=3 and tag !=0:
-                
-#                 self.audio.append(self.audio_[index])
-#                 self.visual.append(self.visual_[index])
-#                 self.reward.append(self.reward_[index])
-#                 self.tag.append(tag)
-#             if tag == 0 and num <=4:
-#                     num +=1
-#                     self.audio.append(self.audio_[index])
-#                     self.visual.append(self.visual_[index])
-#                     self.reward.append(self.reward_[index])
-#                     self.tag.append(tag)
-#         # self.audio.pop(0)
-#         # self.tag.pop(0)
-#         # self.visual.pop(0)
-#         logging.info(self.tag)
-#     def __len__(self):
-#         return len(self.audio)
-#     def __getitem__(self,index):
-#         return self.audio[index] ,self.visual[index] ,self.tag[index] ,self.reward[index] 
 class MyData(Dataset):
     def __init__(self,data):
         self.audio_ = data[0]['audio']

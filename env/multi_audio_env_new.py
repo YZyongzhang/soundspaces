@@ -66,7 +66,8 @@ class MultiAudioEnv(ParallelEnv):
         # self._num_agents = config["agents_num"]
         self._num_agents = 1
         self._num_sources = config["sources_num"]
-        self._max_episode_steps = config["max_episode_steps"]
+        # self._max_episode_steps = config["max_episode_steps"]
+        self._max_episode_steps = 200
         self._sequence_length = config["sequence_length"] + 1  # add bootstrap
         self._success_distance = config["success_distance"]
 
