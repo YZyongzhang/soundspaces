@@ -33,6 +33,7 @@ class AudioNet(nn.Module):
     def forward(self,audio):
         mel_features = []
         audio = audio.cpu().numpy()
+        print(audio.shape)
         for i in range(audio.shape[0]):
             left_channel = audio[i, 0, :]
             right_channel = audio[i, 1, :]

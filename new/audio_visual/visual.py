@@ -14,12 +14,13 @@ class VisualNet(nn.Module):
     def __init__(self,hid_dim , out_put , width_dim,height_dim):
         super().__init__()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        # self.model_path = "./new/checkpoint/audio_weights_fine_tune.pth"
         self.model_path = "./checkpoint/audio_weights_fine_tune.pth"
         self.hid_dim = hid_dim
         self.out_put = out_put
         self.width_dim = width_dim
         self.height_dim = height_dim
-        self.audio_net = audio.AudioNet(64 , 4 ,width_dim=128 , height_dim=36)
+        self.audio_net = audio.AudioNet(64 , 4 ,width_dim=128 , height_dim=36).to(self.device)
         self.audio_net.load_state_dict(torch.load(self.model_path))
         self.audio_net.eval()
         self.visual_net = nn.Sequential(

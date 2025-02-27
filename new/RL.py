@@ -100,10 +100,10 @@ class Net(nn.Module):
                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
 class MyData(Dataset):
     def __init__(self,data):
-        self.audio_ = data[0]['audio']
-        self.tag_ = data[0]['rl_pred']
-        self.visual_ = data[0]['camera']
-        self.reward_ = data[0]['reward']
+        self.audio_ = self.get_data(data,'audio')
+        self.tag_ = self.get_data(data,'rl_pred')
+        self.visual_ = self.get_data(data,'camera')
+        self.reward_ = self.get_data(data,'reward')
         self.audio = list()
         self.tag = list()
         self.visual = list()
@@ -116,6 +116,11 @@ class MyData(Dataset):
                 self.tag_ = self.tag_[:index]
                 break
         logging.info(self.tag_)
+    def get_data(self , data , name):
+        d = list()
+        for i in range(len(data)):
+            d.extend(data[i][name])
+        return d
     def __len__(self):
         return len(self.audio_)
     def __getitem__(self,index):
@@ -144,7 +149,7 @@ class IQL:
 
         return total_loss.item() ,q_loss.item(),v_loss.item() ,action_loss.item()
 def train(writer):
-    path = "../data/RL"
+    path = "../data/RL/random"
     files = os.listdir(path=path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net().to(device)
@@ -157,7 +162,7 @@ def train(writer):
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
         dataset = MyData(data)
-        dataloader = DataLoader(dataset=dataset , batch_size=16 )
+        dataloader = DataLoader(dataset=dataset , batch_size=dataset.__len__())
         
         for batch_idx, batch in enumerate(dataloader):
             batch_audio, batch_visual, batch_labels  ,batch_reward = batch
@@ -165,24 +170,18 @@ def train(writer):
 
             total_loss , q_loss ,v_loss , action_loss = iql.train_step(batch_audio,batch_visual, batch_labels, batch_reward)
             print(f'Episode {epoch}, total_loss: {total_loss} ,q_loss {q_loss} ,v_loss {v_loss} ,action_loss {action_loss }')
-            if epoch % 5 == 0:
+            if epoch % 1 == 0:
                 # 记录每个损失到TensorBoard
-                writer.add_scalar('Loss/q_loss', s_q_loss/5, epoch)
-                writer.add_scalar('Loss/v_loss', s_v_loss/5,   epoch)
-                writer.add_scalar('Loss/p_loss', s_action_loss/5, epoch)
+                writer.add_scalar('Loss/q_loss', q_loss, epoch)
+                writer.add_scalar('Loss/v_loss', v_loss,   epoch)
+                writer.add_scalar('Loss/p_loss', action_loss, epoch)
 
                 # 记录平均训练损失
-                writer.add_scalar('Loss/train', s_total_loss/5, epoch)
-                s_q_loss , s_v_loss , s_action_loss , s_total_loss = (0, 0, 0, 0)
-            else:
-                s_q_loss+=q_loss
-                s_v_loss+=v_loss
-                s_action_loss+=action_loss
-                s_total_loss+=total_loss
+                writer.add_scalar('Loss/train', total_loss, epoch)
                 
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/rl_8'
+    log_dir = './logs/rl_10'
     writer = SummaryWriter(log_dir)
     logging.basicConfig(filename='output_rl.log', level=logging.INFO)
     train(writer)

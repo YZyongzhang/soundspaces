@@ -1,0 +1,1 @@
+from new.CQL import Net as model

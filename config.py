@@ -30,6 +30,7 @@ def parse_args():
         "--scene_config_file",
         type=str,
         default="../data/scene_datasets/mp3d/mp3d.scene_dataset_config.json",
+        # default='./data/scene_datasets/Replica-Dataset/replica/replica.scene_dataset_config.json'
     )
     parser.add_argument("--load_semantic_mesh", type=bool, default=True)
     parser.add_argument("--enable_physics", type=bool, default=False)

@@ -8,8 +8,8 @@ class Draw:
     def display_obs(self,obs):
         from habitat_sim.utils.common import d3_40_colors_rgb
         rgb_obs1, rgb_obs2 = obs[0]["camera"], obs[1]["camera"]
-        rgb_img1 = Image.fromarray(rgb_obs1, mode="RGBA")
-        rgb_img2 = Image.fromarray(rgb_obs2, mode="RGBA")
+        # rgb_img1 = Image.fromarray(rgb_obs1, mode="RGBA")
+        # rgb_img2 = Image.fromarray(rgb_obs2, mode="RGBA")
 
         arr = [rgb_img1, rgb_img2]
         titles = ["rgb1", "rgb2"]

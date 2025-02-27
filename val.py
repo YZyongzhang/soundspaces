@@ -9,10 +9,14 @@ import pickle
 from config import config
 from env.v0d0 import Env
 from utils.batch import *
+from new import model
 random.seed(config["random_seed"])
-
 class Actor:
     def __init__(self, config):
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model_path = './new/rl_model.pth'
+        self.agent = model().to(self.device)
+        self.agent.load_state_dict(torch.load(self.model_path))
         self._config = config
         self._num_episodes = 0
         self.eps = 0.1
@@ -26,12 +30,20 @@ class Actor:
             'sound':[],
             'agent':[]
         }
-        self.level = {
-            'level1':1.0,
-            'level2':5.0,
-            'level3':10.0
-        }
-        self.if_get_random_point = True
+    def get_action(self , visual , audio):
+        visual = torch.from_numpy(visual)
+        audio = torch.from_numpy(audio)
+        visual = visual.unsqueeze(0)
+        audio = audio.unsqueeze(0)
+        visual = visual.float()
+        audio = audio.float()
+        print(visual.dtype)
+        print(audio.dtype)
+        action_list  = self.agent(audio , visual)
+        action = torch.max(action_list,dim=1)[1].tolist()
+        print(action)
+        return action[0]
+        
 
     def reset(self):
         self._idx = 0
@@ -52,32 +64,19 @@ class Actor:
     def act(self, env):
         if self.num == 0:
             logging.info(f"agent sound source_pos is {env.get_source_pos()[0]}")
-            # self.path_point['sound'].append(env.get_source_pos()[0])
+            self.path_point['sound'].append(env.get_source_pos()[0])
         ret = list()
-        # self.path_point['agent'].append(env.get_agent_pos()[0])
+        self.path_point['agent'].append(env.get_agent_pos()[0])
         logging.info(f"agent pos is {env.get_agent_pos()}")
-        if self._idx % 10 == 0  and self.if_get_random_point and self._idx != 0: # 每五步进行一次随机点选取
-            self.if_get_random_point = False
-            self.path_id+=1
-            self.mid_point() # 找到一个随机点
-            self.reset() # 重置self._idx = 0 ， 由于path_id不是0，因此之后不执行重新选点
-            logging.info(self.paths)
-        action = self.paths[self._idx]
-        if action == "stop" and self.path_id != 10:
-            self.paths = self.env.get_shortest_action_list(goal_pos=self.env.get_source_pos()[0])[0]
-            self.reset()
-            action = self.paths[self._idx]
-            self.if_get_random_point = True
-            # 记录动作
-        if action == "stop" and self.path_id == 10:
-            self.paths = self.env.get_shortest_action_list(goal_pos=self.env.get_source_pos()[0])[0]
-            self.reset()
-            action = self.paths[self._idx]
+        obs = env._get_observations()
+        visual = obs[0]['camera']
+        audio = obs[0]['audio']
+        action = self.get_action(visual , audio)
         print(f"agent action: {action}")
         logging.info(f"agent action: {action} idx :{self._idx} num : {self.num} pathid {self.path_id}") 
-        act_id = env.action_str_2_id(action) 
+        # act_id = env.action_str_2_id(action) 
         ret.append({
-            "rl_pred": act_id,
+            "rl_pred": action,
             "lstm_h": np.zeros((self._config["hid_dim_l"],), np.float32),
             "lstm_c": np.zeros((self._config["hid_dim_l"],), np.float32),
         })
@@ -113,8 +112,6 @@ class Actor:
         config = self._config
         self.paths = list()
         input_d_list = [env.reset()]
-        self.paths = self.env.get_shortest_action_list()[0]
-        logging.info(f"frist path action is {self.paths}")
         while True:
             rl_output_list = self.act(env)
             all_list = [self.env.step(rl_output_list)]
@@ -136,32 +133,30 @@ class Actor:
 
         torch.cuda.empty_cache()
         return  seq_list, return_, num_success
-
 def collect():
     actor = Actor(config)
     seq_list = list()
-    for num_episodes in range(1000):
+    for num_episodes in range(10):
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
         result_list = [actor.rollout()]
         for result in result_list:
             seq_list_, return_, num_success = result
             seq_list += seq_list_
-        path = os.path.join("data/RL/new_random",  f"offline_episode_RL_{num_episodes}.pkl")
-        with open(path, "wb") as f:
-            pickle.dump(seq_list, f)
-        path_point = os.path.join('data/RL/new_path' ,f"path_RL_{num_episodes}.pkl")
+        # path = os.path.join("data/RL/new_random",  f"offline_episode_RL_{num_episodes}.pkl")
+        # with open(path, "wb") as f:
+        #     pickle.dump(seq_list, f)
+        path_point = os.path.join('data/RL/val' ,f"path_RL_{num_episodes}.pkl")
         with open(path_point , 'wb') as f:
             pickle.dump(actor.path_point, f)
-        actor.path_point = [{
+        actor.path_point = {
             'sound':[],
             'agent':[]
-        }]
+        }
         seq_list.clear()
         logging.info(f"offline_episode_RL_{num_episodes}.pkl")
         logging.info(f"Episode {num_episodes} seq num: {len(seq_list_)}")
         logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
-
-if  __name__== "__main__":
-    logging.basicConfig(filename='./data/RL/new_path/RLDATA.log', level=logging.INFO)
+if __name__ == "__main__":
+    logging.basicConfig(filename='./data/RL/val/RLDATA.log', level=logging.INFO)
     collect()

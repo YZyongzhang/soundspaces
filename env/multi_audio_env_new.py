@@ -62,6 +62,9 @@ class MultiAudioEnv(ParallelEnv):
         # self.sam = sam_model_registry['vit_b'](self.ckp).to("cuda:0")
         # self.mask_generator = SamAutomaticMaskGenerator(self.sam)
         # deep copy config
+        # config['scene_dir'] = './data/scene_datasets/Replica-Dataset/replica/apartment_0/mesh.ply'
+        # config['scene_config_file'] = './data/scene_datasets/Replica-Dataset/replica/replica.scene_dataset_config.json'
+        
         self._config = config.copy()
         # self._num_agents = config["agents_num"]
         self._num_agents = 1
