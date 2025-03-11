@@ -60,7 +60,8 @@ class MultiAudioEnv(ParallelEnv):
     def __init__(self, config: dict):
         # deep copy config
         self._config = config.copy()
-        self._num_agents = config["agents_num"]
+        # self._num_agents = config["agents_num"]
+        self._num_agents = 1
         self._num_sources = config["sources_num"]
         self._max_episode_steps = config["max_episode_steps"]
         self._sequence_length = config["sequence_length"] + 1  # add bootstrap
@@ -238,7 +239,7 @@ class MultiAudioEnv(ParallelEnv):
             agent = self._sim.get_agent(agent_id)
             agent_state = habitat_sim.AgentState()
             while True:
-                rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 3.0)
+                rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 2.5)
                 if (
                     (
                         np.linalg.norm(rand_pos - self._source_poses[0])
@@ -425,7 +426,10 @@ class MultiAudioEnv(ParallelEnv):
             (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10
             for agent_id in range(self._num_agents)
         ]
-
+        for agent_id in range(self._num_agents):
+            if self._prev_geo_dist[agent_id] - geo_dist[agent_id] == 0:
+                r[agent_id] = 10
+        
         self._prev_geo_dist = geo_dist
 
         # if agent reaches the goal (< success_distance), return 1
@@ -437,11 +441,13 @@ class MultiAudioEnv(ParallelEnv):
                 )
                 < self._success_distance
             ):
-                r[agent_id] += 100
+                r[agent_id] = 100
 
         for agent_id in range(self._num_agents):
             # if agent is crushed, return -1
-            r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
+            # r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
+            if self._crushed_agents[agent_id]:
+                r[agent_id] = -50
             # Time
             # r[agent_id] -= 1
 
@@ -524,7 +530,8 @@ class MultiAudioEnv(ParallelEnv):
         # get reward
         r = self._reward()
         # get done
-        done = self._count >= self._max_episode_steps or self._success()
+        # done = self._count >= self._max_episode_steps or self._success()
+        done = self._count >= self._max_episode_steps or self._stopped_agents[agent_id]
         # get info
         info = {
             "count": self._count,

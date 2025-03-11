@@ -41,7 +41,11 @@ class Draw:
         if path is not None:
             path_x = [point[0] for point in path]  # 获取所有 x 坐标
             path_y = [point[1] for point in path]  # 获取所有 y 坐标
-            plt.plot(path_x, path_y, marker="o", markersize=5, color="blue", alpha=0.7, label="Path")
+        print(path_x)
+        plt.plot(path_x, path_y , color="blue", alpha=0.7, label="Path" ,linewidth = 2)
+        plt.plot(path_x[-1] , path_y[-1] , marker = 'o' , markersize = 5 , color='blue' , alpha=0.7, label="finnal_point")
+        # plt.plot(path[:-1][0],path[:-1][0] , marker = 'o' , markersize = 5 ,color="blue", alpha=0.7, label="finnal_point")
+            
 
         # 绘制关键点（如果有）
         if key_points is not None:
@@ -114,7 +118,6 @@ class Draw:
     def show_path_graph(self , env , sound , agent ,image_filename):
         source_pos = sound
         agent_point = agent
-        vis_points = source_pos
         x, s = self.get_td_map(env._sim.pathfinder, vis_points=source_pos)
         x, a = self.get_td_map(env._sim.pathfinder, vis_points=agent_point)
 

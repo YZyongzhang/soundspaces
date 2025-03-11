@@ -14,7 +14,7 @@ random.seed(config["random_seed"])
 class Actor:
     def __init__(self, config):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model_path = './new/rl_model.pth'
+        self.model_path = './data/checkpoint/rl_model_5.pth'
         self.agent = model().to(self.device)
         self.agent.load_state_dict(torch.load(self.model_path))
         self._config = config
@@ -143,9 +143,6 @@ def collect():
         for result in result_list:
             seq_list_, return_, num_success = result
             seq_list += seq_list_
-        # path = os.path.join("data/RL/new_random",  f"offline_episode_RL_{num_episodes}.pkl")
-        # with open(path, "wb") as f:
-        #     pickle.dump(seq_list, f)
         path_point = os.path.join('data/RL/val' ,f"path_RL_{num_episodes}.pkl")
         with open(path_point , 'wb') as f:
             pickle.dump(actor.path_point, f)
@@ -160,3 +157,33 @@ def collect():
 if __name__ == "__main__":
     logging.basicConfig(filename='./data/RL/val/RLDATA.log', level=logging.INFO)
     collect()
+###########################
+# 在验证集上运行
+###########################
+# from config import config
+# from env.v0d0 import Env
+# import habitat_sim
+# import pickle
+# import torch
+# import os
+# from new import model
+# class val():
+#     def __init__(self):
+#         model_path = './data/checkpoint/rl_model_5.pth'
+#         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#         self.agent = model().to(self.device)
+#         self.agent.load_state_dict(torch.load(model_path))
+#     def take_action(self , visual , audio):
+#         action = torch.max(self.agent(audio , visual) , dim = 1)
+#         return action[1].tolist()
+# def val():
+#     env = Env(config)
+#     env.reset()
+#     path = './data/RL/random'
+#     files = os.listdir(path)
+#     files = files[0:10]
+#     files_path = list()
+#     for file in files :
+#         files_path.append(os.path.join(path, file))
+    
+        

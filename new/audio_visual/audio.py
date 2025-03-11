@@ -33,7 +33,7 @@ class AudioNet(nn.Module):
     def forward(self,audio):
         mel_features = []
         audio = audio.cpu().numpy()
-        print(audio.shape)
+        # print(audio.shape)
         for i in range(audio.shape[0]):
             left_channel = audio[i, 0, :]
             right_channel = audio[i, 1, :]
@@ -52,6 +52,57 @@ class AudioNet(nn.Module):
                     nn.init.uniform_(module.weight, a=weight_range[0], b=weight_range[1])
                 if hasattr(module, 'bias') and module.bias is not None:
                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
+# 为了提取特征特意重写的model，这个是全部用于做转向任务的
+# class AudioNet(nn.Module):
+#     def __init__(self,hid_dim , out_put , width_dim,height_dim):
+#         super().__init__()
+#         self.hid_dim = hid_dim
+#         self.out_put = out_put
+#         self.width_dim = width_dim
+#         self.height_dim = height_dim
+#         self.audio = nn.Sequential(
+#             nn.Conv2d(2 , 32 , kernel_size = 3,stride = 1,padding = 1),
+#             nn.ReLU(),
+#             nn.Conv2d(32 ,64 , kernel_size = 3,stride = 1,padding = 1),
+#             nn.ReLU(),
+#             nn.Flatten(),
+#             nn.Linear(64*self.width_dim*self.height_dim , self.hid_dim),
+#             nn.ReLU(),
+#             nn.Linear(self.hid_dim , self.hid_dim),
+#             nn.ReLU(),
+#             nn.Linear(self.hid_dim , 64)
+#         )
+#         self.action = nn.Sequential(
+#             nn.Linear(64,32),
+#             nn.Linear(32,self.out_put)
+#         )
+#         self.initialize_weights_uniform()
+#     def forward(self,audio):
+#         mel_features = self.deal_audio(audio)
+#         audio_feature = torch.from_numpy(np.array(mel_features)).to('cuda')
+#         fea = self.audio(audio_feature)
+#         return self.action(fea)
+#     def deal_audio(self,audio):
+#         mel_features = []
+#         audio = audio.cpu().numpy()
+#         # print(audio.shape)
+#         for i in range(audio.shape[0]):
+#             left_channel = audio[i, 0, :]
+#             right_channel = audio[i, 1, :]
+            
+#             mel_left = librosa.feature.melspectrogram(y=left_channel, sr=18000, n_fft=1024, hop_length=512, n_mels=128)
+#             mel_right = librosa.feature.melspectrogram(y=right_channel, sr=18000, n_fft=1024, hop_length=512, n_mels=128)
+            
+#             combined_mel = np.stack([mel_left, mel_right], axis=0)  # (2, 128, 时间帧数)
+#             mel_features.append(combined_mel)
+#         return mel_features
+#     def initialize_weights_uniform(self, weight_range=(-0.1, 0.1), bias_range=(-0.1, 0.1)):
+#         for name, module in self.named_modules():
+#             if isinstance(module, (nn.Linear, nn.Conv2d)):
+#                 if hasattr(module, 'weight') and module.weight is not None:
+#                     nn.init.uniform_(module.weight, a=weight_range[0], b=weight_range[1])
+#                 if hasattr(module, 'bias') and module.bias is not None:
+#                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
 class MyData(Dataset):
     def __init__(self,data):
         self.audio_ = data[0]['audio']
@@ -95,7 +146,7 @@ def train(logging):
             logging.info(f"not tag {data[0]['rl_pred']}")
             continue
         dataset = MyData(data)
-        dataloader = DataLoader(dataset=dataset , batch_size=4 , shuffle=True)
+        dataloader = DataLoader(dataset=dataset , batch_size=1 , shuffle=True)
         
         for batch_idx, batch in enumerate(dataloader):
             if batch is None:
@@ -107,6 +158,7 @@ def train(logging):
             outputs = model(batch_audio)
 
             loss = criterion(outputs, batch_tag)
+            # print(loss.item())
             loss.backward()
             optimizer.step()
 
@@ -120,7 +172,7 @@ def train(logging):
         logging.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}")
         print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {avg_train_loss:.4f}")
         
-    torch.save(model.state_dict(), 'audio_weights_release.pth')
+    torch.save(model.state_dict(), 'audio_weights_release_1.pth')
     writer.close()
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter

@@ -208,7 +208,7 @@ class MultiAudioEnv(ParallelEnv):
 
         return sim
 
-    def _reset_audio(self):
+    def _reset_audio(self , audio_pos = None):
         """
         Do the following:
             1. generate random navigable source position
@@ -216,62 +216,88 @@ class MultiAudioEnv(ParallelEnv):
             3. reset the audio sample index to the beginning
 
         """
+        if audio_pos == None:
+            self._source_poses = [
+                self._sim.pathfinder.get_random_navigable_point()
+                for _ in range(self._num_sources)
+            ]
+            print(f"source_poses {self._source_poses}")
+            for agent_id in range(self._num_agents):
+                for audio_sensor_id in range(self._num_sources):
+                    audio_sensor = self._sim.get_agent(agent_id)._sensors[
+                        "audio_sensor_{}".format(audio_sensor_id)
+                    ]
+                    audio_sensor.setAudioSourceTransform(
+                        self._source_poses[audio_sensor_id] + np.array([0.0, 0.0, 0.0])
+                    )  # add height of 1.5m
 
-        self._source_poses = [
-            self._sim.pathfinder.get_random_navigable_point()
-            for _ in range(self._num_sources)
-        ]
-        print(f"source_poses {self._source_poses}")
-        for agent_id in range(self._num_agents):
-            for audio_sensor_id in range(self._num_sources):
-                audio_sensor = self._sim.get_agent(agent_id)._sensors[
-                    "audio_sensor_{}".format(audio_sensor_id)
-                ]
-                audio_sensor.setAudioSourceTransform(
-                    self._source_poses[audio_sensor_id] + np.array([0.0, 0.0, 0.0])
-                )  # add height of 1.5m
+            self._current_sample_index = 0
+            # [chunked_audios.reset() for chunked_audios in self._chunked_audios]
+        else:
+            self._source_poses = [
+                audio_pos[0]
+                for _ in range(self._num_sources)
+            ]
+            print(self._source_poses)
+            for agent_id in range(self._num_agents):
+                for audio_sensor_id in range(self._num_sources):
+                    audio_sensor = self._sim.get_agent(agent_id)._sensors[
+                        "audio_sensor_{}".format(audio_sensor_id)
+                    ]
+                    audio_sensor.setAudioSourceTransform(
+                        self._source_poses[audio_sensor_id] + np.array([0.0, 0.0, 0.0])
+                    )  # add height of 1.5m
 
-        self._current_sample_index = 0
-        # [chunked_audios.reset() for chunked_audios in self._chunked_audios]
+            self._current_sample_index = 0
 
-    def _reset_agent(self):
+    def _reset_agent(self  , agent_pos = None):
         """
         randomly reset every agent position and rotation, at least 1m away from any source
         """
         # create a queue for each agent
         self._stopped_agents = [False for _ in range(self._num_agents)]
+        if agent_pos == None: 
+            for agent_id in range(self._num_agents):
+                print(f"agent {agent_id} reseting")
+                agent = self._sim.get_agent(agent_id)
+                agent_state = habitat_sim.AgentState()
+                while True:
+                    rand_pos = self._sim.pathfinder.get_random_navigable_point()
+                    if (
+                        (
+                            np.linalg.norm(rand_pos - self._source_poses[0])
+                            > self._success_distance + 0.2
+                        )
+                        and (
+                            np.linalg.norm(rand_pos - self._source_poses[0])
+                            < self._success_distance + 9.0
+                        )
+                        and (
+                            self.shortest_path(rand_pos, self._source_poses[0]) is not None
+                        )
+                        and (self._sim.pathfinder.is_navigable(rand_pos))
+                    ):
+                        agent_state.position = rand_pos
+                        break
+                    print(f"agent {agent_id} initialization retried.")
+                    print(f"agentpos is {rand_pos}")
+                print(f"agent_state.position {agent_state.position}")
 
-        for agent_id in range(self._num_agents):
-            print(f"agent {agent_id} reseting")
-            agent = self._sim.get_agent(agent_id)
-            agent_state = habitat_sim.AgentState()
-            while True:
-                rand_pos = self._sim.pathfinder.get_random_navigable_point()
-                if (
-                    (
-                        np.linalg.norm(rand_pos - self._source_poses[0])
-                        > self._success_distance + 0.2
-                    )
-                    and (
-                        np.linalg.norm(rand_pos - self._source_poses[0])
-                        < self._success_distance + 6.0
-                    )
-                    and (
-                        self.shortest_path(rand_pos, self._source_poses[0]) is not None
-                    )
-                    and (self._sim.pathfinder.is_navigable(rand_pos))
-                ):
-                    agent_state.position = rand_pos
-                    break
+                # Generate random yaw angle from -180 to 180
+                # rand_quat = random_quat()
+                # agent_state.rotation = rand_quat
+                # print(f"agent_state.rotation {agent_state.rotation}")
+
+                agent.set_state(agent_state)
+        else:
+            for agent_id in range(self._num_agents):
+                agent = self._sim.get_agent(agent_id)
+                agent_state = habitat_sim.AgentState()
+                agent_state.position = agent_pos[0]
                 print(f"agent {agent_id} initialization retried.")
-            print(f"agent_state.position {agent_state.position}")
+                print(f"agent_state.position {agent_state.position}")
 
-            # Generate random yaw angle from -180 to 180
-            # rand_quat = random_quat()
-            # agent_state.rotation = rand_quat
-            # print(f"agent_state.rotation {agent_state.rotation}")
-
-            agent.set_state(agent_state)
+                agent.set_state(agent_state)
 
         self._crushed_agents = [False] * self._num_agents
 
@@ -329,7 +355,7 @@ class MultiAudioEnv(ParallelEnv):
 
         return audiogoal
 
-    def reset(self):
+    def reset(self , audio_pos = None , agent_pos = None):
         """
         reset the environment
         Return:
@@ -337,8 +363,8 @@ class MultiAudioEnv(ParallelEnv):
         """
         self._count = 0
 
-        self._reset_audio()
-        self._reset_agent()
+        self._reset_audio(audio_pos)
+        self._reset_agent(agent_pos)
 
         self._prev_obs = list()
 
@@ -428,11 +454,17 @@ class MultiAudioEnv(ParallelEnv):
         geo_dist = [
             self.get_geodesic_distance(agent_id) for agent_id in range(self._num_agents)
         ]
-
+        # 乘以2 / 5 / 20
+        # 
         r = [
+            
             (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10
             for agent_id in range(self._num_agents)
         ]
+        # for agent_id in range(self._num_agents):
+        #     if self._prev_geo_dist[agent_id] - geo_dist[agent_id] == 0:
+        #         r[agent_id] = 10
+        
 
         self._prev_geo_dist = geo_dist
 
@@ -445,13 +477,15 @@ class MultiAudioEnv(ParallelEnv):
                 )
                 < self._success_distance
             ):
-                r[agent_id] += 100
+                r[agent_id] = 100
 
         for agent_id in range(self._num_agents):
             # if agent is crushed, return -1
-            r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
+            # r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
             # Time
             # r[agent_id] -= 1
+            if self._crushed_agents[agent_id]:
+                r[agent_id] = -5
 
         return r
 

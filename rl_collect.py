@@ -27,10 +27,11 @@ class Actor:
             'agent':[]
         }
         self.level = {
-            'level1':1.0,
+            'level1':2.0,
             'level2':5.0,
             'level3':10.0
         }
+        self.le = self.level['level1']
         self.if_get_random_point = True
 
     def reset(self):
@@ -51,17 +52,17 @@ class Actor:
             return None
     def act(self, env):
         if self.num == 0:
-            logging.info(f"agent sound source_pos is {env.get_source_pos()[0]}")
-            # self.path_point['sound'].append(env.get_source_pos()[0])
+            # logging.info(f"agent sound source_pos is {env.get_source_pos()[0]}")
+            self.path_point['sound'].append(env.get_source_pos()[0])
         ret = list()
-        # self.path_point['agent'].append(env.get_agent_pos()[0])
-        logging.info(f"agent pos is {env.get_agent_pos()}")
+        self.path_point['agent'].append(env.get_agent_pos()[0])
+        # logging.info(f"agent pos is {env.get_agent_pos()}")
         if self._idx % 10 == 0  and self.if_get_random_point and self._idx != 0: # 每五步进行一次随机点选取
             self.if_get_random_point = False
             self.path_id+=1
             self.mid_point() # 找到一个随机点
             self.reset() # 重置self._idx = 0 ， 由于path_id不是0，因此之后不执行重新选点
-            logging.info(self.paths)
+            # logging.info(self.paths)
         action = self.paths[self._idx]
         if action == "stop" and self.path_id != 10:
             self.paths = self.env.get_shortest_action_list(goal_pos=self.env.get_source_pos()[0])[0]
@@ -87,14 +88,14 @@ class Actor:
         return ret
     def mid_point(self,agent_pos = None , level = None):
         if level == None:
-            level = 'level2'
+            level = self.le
         if agent_pos == None:
             agent_pos = self.env.get_agent_pos()[0]
         while True:
-            rand_pos = self._sim.pathfinder.get_random_navigable_point_near(agent_pos , radius = self.level[level])
+            rand_pos = self._sim.pathfinder.get_random_navigable_point_near(agent_pos , radius = self.le)
             if (
                 np.linalg.norm(rand_pos - agent_pos) > 1.0
-                and np.linalg.norm(rand_pos - agent_pos) < 3.0
+                and np.linalg.norm(rand_pos - agent_pos) < 10.0
                 and self.shortest_path(rand_pos, agent_pos) is not None
                 and self._sim.pathfinder.is_navigable(rand_pos)
             ):
@@ -140,28 +141,30 @@ class Actor:
 def collect():
     actor = Actor(config)
     seq_list = list()
-    for num_episodes in range(1000):
+    for num_episodes in range(300):
+        s = f'level{(num_episodes//100) + 1 }'
+        actor.le = actor.level[s]
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
         result_list = [actor.rollout()]
         for result in result_list:
             seq_list_, return_, num_success = result
             seq_list += seq_list_
-        path = os.path.join("data/RL/new_random",  f"offline_episode_RL_{num_episodes}.pkl")
+        path = os.path.join(f"data/RL/level_rate/{s}/level",  f"{s}_episode_{num_episodes}.pkl")
         with open(path, "wb") as f:
             pickle.dump(seq_list, f)
-        path_point = os.path.join('data/RL/new_path' ,f"path_RL_{num_episodes}.pkl")
+        path_point = os.path.join(f"data/RL/level_rate/{s}/path" ,f"{s}_eposode_path_{num_episodes}.pkl")
         with open(path_point , 'wb') as f:
             pickle.dump(actor.path_point, f)
-        actor.path_point = [{
+        actor.path_point = {
             'sound':[],
             'agent':[]
-        }]
+        }
         seq_list.clear()
         logging.info(f"offline_episode_RL_{num_episodes}.pkl")
         logging.info(f"Episode {num_episodes} seq num: {len(seq_list_)}")
         logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
 
 if  __name__== "__main__":
-    logging.basicConfig(filename='./data/RL/new_path/RLDATA.log', level=logging.INFO)
+    logging.basicConfig(filename='./data/RL/level_rate/RLDATA.log', level=logging.INFO)
     collect()

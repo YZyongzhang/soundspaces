@@ -1,0 +1,1597 @@
+INFO:root:epoch 0, Episode 0, total_loss: 123.37069702148438, q_loss 123.37068939208984, v_loss 6.427671451092465e-06 ,lr 0.01
+INFO:root:val_loss 9.69476318359375
+INFO:root:val_loss 10.970392227172852
+INFO:root:epoch 0, Episode 1, total_loss: 44600.09375, q_loss 26991.75390625, v_loss 17608.341796875 ,lr 0.01
+INFO:root:epoch 0, Episode 2, total_loss: 7981.78271484375, q_loss 5539.63525390625, v_loss 2442.1474609375 ,lr 0.01
+INFO:root:epoch 0, Episode 3, total_loss: 22139.3125, q_loss 20646.548828125, v_loss 1492.7630615234375 ,lr 0.01
+INFO:root:epoch 0, Episode 4, total_loss: 1161.368408203125, q_loss 1126.1483154296875, v_loss 35.22007369995117 ,lr 0.01
+INFO:root:epoch 0, Episode 5, total_loss: 1390.85693359375, q_loss 1354.83984375, v_loss 36.01714324951172 ,lr 0.01
+INFO:root:epoch 0, Episode 6, total_loss: 1807.0369873046875, q_loss 1773.07763671875, v_loss 33.95940399169922 ,lr 0.01
+INFO:root:epoch 0, Episode 7, total_loss: 1011.412841796875, q_loss 334.2550964355469, v_loss 677.1577758789062 ,lr 0.01
+INFO:root:epoch 0, Episode 8, total_loss: 267.15728759765625, q_loss 234.6167449951172, v_loss 32.54054260253906 ,lr 0.01
+INFO:root:epoch 0, Episode 9, total_loss: 5.628415584564209, q_loss 5.213953495025635, v_loss 0.414462149143219 ,lr 0.01
+INFO:root:epoch 0, Episode 10, total_loss: 8280.03515625, q_loss 3970.13525390625, v_loss 4309.900390625 ,lr 0.01
+INFO:root:val_loss 1.8105665445327759
+INFO:root:val_loss 2.1769275665283203
+INFO:root:val_loss 1.4116450548171997
+INFO:root:val_loss 1.784144639968872
+INFO:root:val_loss 1.5178992748260498
+INFO:root:val_loss 1.3742045164108276
+INFO:root:val_loss 1.353004813194275
+INFO:root:epoch 0, Episode 11, total_loss: 43.51311492919922, q_loss 23.179706573486328, v_loss 20.33340835571289 ,lr 0.01
+INFO:root:epoch 0, Episode 12, total_loss: 144.09970092773438, q_loss 133.14199829101562, v_loss 10.957697868347168 ,lr 0.01
+INFO:root:epoch 0, Episode 13, total_loss: 2.0448153018951416, q_loss 2.0272881984710693, v_loss 0.017527148127555847 ,lr 0.01
+INFO:root:epoch 0, Episode 14, total_loss: 284.2233581542969, q_loss 280.59222412109375, v_loss 3.631124258041382 ,lr 0.01
+INFO:root:epoch 0, Episode 15, total_loss: 19.53197479248047, q_loss 9.57873821258545, v_loss 9.953237533569336 ,lr 0.01
+INFO:root:epoch 0, Episode 16, total_loss: 447.4403991699219, q_loss 439.6521301269531, v_loss 7.788262367248535 ,lr 0.01
+INFO:root:epoch 0, Episode 17, total_loss: 769.625732421875, q_loss 423.4434509277344, v_loss 346.1822814941406 ,lr 0.01
+INFO:root:epoch 0, Episode 18, total_loss: 142.76004028320312, q_loss 129.64833068847656, v_loss 13.111702919006348 ,lr 0.01
+INFO:root:epoch 0, Episode 19, total_loss: 723.7404174804688, q_loss 709.9696044921875, v_loss 13.770832061767578 ,lr 0.01
+INFO:root:epoch 0, Episode 20, total_loss: 2271.9658203125, q_loss 1468.519775390625, v_loss 803.4461059570312 ,lr 0.01
+INFO:root:val_loss 1.3165112733840942
+INFO:root:val_loss 1.245197057723999
+INFO:root:epoch 0, Episode 21, total_loss: 256.2408142089844, q_loss 87.6854476928711, v_loss 168.5553741455078 ,lr 0.01
+INFO:root:epoch 0, Episode 22, total_loss: 7.045647144317627, q_loss 7.045401573181152, v_loss 0.00024579386808909476 ,lr 0.01
+INFO:root:epoch 0, Episode 23, total_loss: 845.1769409179688, q_loss 842.0305786132812, v_loss 3.1463379859924316 ,lr 0.01
+INFO:root:epoch 0, Episode 24, total_loss: 172.16064453125, q_loss 171.5383758544922, v_loss 0.622262179851532 ,lr 0.01
+INFO:root:epoch 0, Episode 25, total_loss: 64.98307800292969, q_loss 50.21441650390625, v_loss 14.768664360046387 ,lr 0.01
+INFO:root:epoch 0, Episode 26, total_loss: 614.3192138671875, q_loss 581.19384765625, v_loss 33.12538146972656 ,lr 0.01
+INFO:root:epoch 0, Episode 27, total_loss: 731.9652709960938, q_loss 657.1431274414062, v_loss 74.82212829589844 ,lr 0.01
+INFO:root:epoch 0, Episode 28, total_loss: 932.4415283203125, q_loss 835.8645629882812, v_loss 96.57699584960938 ,lr 0.01
+INFO:root:epoch 0, Episode 29, total_loss: 645.2601318359375, q_loss 622.8670654296875, v_loss 22.39307975769043 ,lr 0.01
+INFO:root:epoch 0, Episode 30, total_loss: 119.86833190917969, q_loss 115.42797088623047, v_loss 4.440359115600586 ,lr 0.01
+INFO:root:val_loss 1.5226120948791504
+INFO:root:val_loss 1.1729300022125244
+INFO:root:val_loss 1.0559464693069458
+INFO:root:epoch 0, Episode 31, total_loss: 103.89668273925781, q_loss 103.70991516113281, v_loss 0.1867690086364746 ,lr 0.01
+INFO:root:epoch 0, Episode 32, total_loss: 1240.2462158203125, q_loss 1237.9173583984375, v_loss 2.3287971019744873 ,lr 0.01
+INFO:root:epoch 0, Episode 33, total_loss: 150.2001190185547, q_loss 148.92935180664062, v_loss 1.2707734107971191 ,lr 0.01
+INFO:root:epoch 0, Episode 34, total_loss: 1189.2281494140625, q_loss 1185.7850341796875, v_loss 3.4431424140930176 ,lr 0.01
+INFO:root:epoch 0, Episode 35, total_loss: 338.365234375, q_loss 337.279052734375, v_loss 1.0861821174621582 ,lr 0.01
+INFO:root:epoch 0, Episode 36, total_loss: 384.11273193359375, q_loss 383.133056640625, v_loss 0.9796874523162842 ,lr 0.01
+INFO:root:epoch 0, Episode 37, total_loss: 226.20396423339844, q_loss 225.82896423339844, v_loss 0.37499943375587463 ,lr 0.01
+INFO:root:epoch 0, Episode 38, total_loss: 75.32352447509766, q_loss 74.87505340576172, v_loss 0.44847118854522705 ,lr 0.01
+INFO:root:epoch 0, Episode 39, total_loss: 1776.63134765625, q_loss 1765.9608154296875, v_loss 10.670554161071777 ,lr 0.01
+INFO:root:epoch 0, Episode 40, total_loss: 650.9384155273438, q_loss 650.1822509765625, v_loss 0.7561899423599243 ,lr 0.01
+INFO:root:val_loss 1.1911383867263794
+INFO:root:val_loss 1.1380910873413086
+INFO:root:val_loss 1.145703673362732
+INFO:root:val_loss 1.160696029663086
+INFO:root:val_loss 1.1362805366516113
+INFO:root:val_loss 1.8308496475219727
+INFO:root:val_loss 2.1192917823791504
+INFO:root:val_loss 1.1788959503173828
+INFO:root:val_loss 1.0988882780075073
+INFO:root:val_loss 1.0419847965240479
+INFO:root:epoch 0, Episode 41, total_loss: 1180.099853515625, q_loss 1170.18359375, v_loss 9.916213989257812 ,lr 0.01
+INFO:root:epoch 0, Episode 42, total_loss: 5885.93505859375, q_loss 5786.09228515625, v_loss 99.84271240234375 ,lr 0.01
+INFO:root:epoch 0, Episode 43, total_loss: 548.691162109375, q_loss 548.5852661132812, v_loss 0.10591190308332443 ,lr 0.01
+INFO:root:epoch 0, Episode 44, total_loss: 241.5201416015625, q_loss 241.1370391845703, v_loss 0.38310718536376953 ,lr 0.01
+INFO:root:epoch 0, Episode 45, total_loss: 2.4542510509490967, q_loss 2.454197406768799, v_loss 5.372690793592483e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 46, total_loss: 4306.52880859375, q_loss 4306.20166015625, v_loss 0.327048122882843 ,lr 0.01
+INFO:root:epoch 0, Episode 47, total_loss: 181.14401245117188, q_loss 180.5598907470703, v_loss 0.5841211080551147 ,lr 0.01
+INFO:root:epoch 0, Episode 48, total_loss: 694.2977905273438, q_loss 694.247802734375, v_loss 0.0499703623354435 ,lr 0.01
+INFO:root:epoch 0, Episode 49, total_loss: 115.82392883300781, q_loss 111.89491271972656, v_loss 3.9290127754211426 ,lr 0.01
+INFO:root:epoch 0, Episode 50, total_loss: 71.3165512084961, q_loss 71.29825592041016, v_loss 0.01829889789223671 ,lr 0.01
+INFO:root:val_loss 1.4320002794265747
+INFO:root:val_loss 1.3061243295669556
+INFO:root:epoch 0, Episode 51, total_loss: 321.9566345214844, q_loss 321.8812561035156, v_loss 0.07537641376256943 ,lr 0.01
+INFO:root:epoch 0, Episode 52, total_loss: 243.15969848632812, q_loss 242.77679443359375, v_loss 0.38290831446647644 ,lr 0.01
+INFO:root:epoch 0, Episode 53, total_loss: 214.3184051513672, q_loss 214.24481201171875, v_loss 0.07358738780021667 ,lr 0.01
+INFO:root:epoch 0, Episode 54, total_loss: 6898.66796875, q_loss 6891.33740234375, v_loss 7.330602645874023 ,lr 0.01
+INFO:root:epoch 0, Episode 55, total_loss: 141.47731018066406, q_loss 141.47390747070312, v_loss 0.0034052522387355566 ,lr 0.01
+INFO:root:epoch 0, Episode 56, total_loss: 106.28861999511719, q_loss 106.26800537109375, v_loss 0.020617226138710976 ,lr 0.01
+INFO:root:epoch 0, Episode 57, total_loss: 3796.2119140625, q_loss 3793.927001953125, v_loss 2.2848026752471924 ,lr 0.01
+INFO:root:epoch 0, Episode 58, total_loss: 66.96246337890625, q_loss 66.9515151977539, v_loss 0.010945974849164486 ,lr 0.01
+INFO:root:epoch 0, Episode 59, total_loss: 2.3484556674957275, q_loss 2.0593245029449463, v_loss 0.289131224155426 ,lr 0.01
+INFO:root:epoch 0, Episode 60, total_loss: 322.0321960449219, q_loss 322.02972412109375, v_loss 0.0024666241370141506 ,lr 0.01
+INFO:root:val_loss 1.3203173875808716
+INFO:root:val_loss 1.2618927955627441
+INFO:root:val_loss 1.2931458950042725
+INFO:root:val_loss 1.2768524885177612
+INFO:root:epoch 0, Episode 61, total_loss: 729.5498046875, q_loss 729.5347900390625, v_loss 0.015005352906882763 ,lr 0.01
+INFO:root:epoch 0, Episode 62, total_loss: 1751.46533203125, q_loss 1751.4647216796875, v_loss 0.0006612815777771175 ,lr 0.01
+INFO:root:epoch 0, Episode 63, total_loss: 76.06575012207031, q_loss 76.0620346069336, v_loss 0.003712959121912718 ,lr 0.01
+INFO:root:epoch 0, Episode 64, total_loss: 303.69451904296875, q_loss 303.6941223144531, v_loss 0.0004066403489559889 ,lr 0.01
+INFO:root:epoch 0, Episode 65, total_loss: 1.9700120687484741, q_loss 1.9652384519577026, v_loss 0.004773653578013182 ,lr 0.01
+INFO:root:epoch 0, Episode 66, total_loss: 587.8402099609375, q_loss 587.8341674804688, v_loss 0.00606274651363492 ,lr 0.01
+INFO:root:epoch 0, Episode 67, total_loss: 3.0920982360839844, q_loss 3.0920979976654053, v_loss 2.017335987147817e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 68, total_loss: 342.0445556640625, q_loss 342.0439147949219, v_loss 0.0006467102793976665 ,lr 0.01
+INFO:root:epoch 0, Episode 69, total_loss: 3595.97265625, q_loss 3595.595703125, v_loss 0.3770044445991516 ,lr 0.01
+INFO:root:epoch 0, Episode 70, total_loss: 3.4998695850372314, q_loss 3.4982717037200928, v_loss 0.0015978100709617138 ,lr 0.01
+INFO:root:val_loss 1.286208152770996
+INFO:root:epoch 0, Episode 71, total_loss: 222.3729705810547, q_loss 222.3715057373047, v_loss 0.0014584268210455775 ,lr 0.01
+INFO:root:epoch 0, Episode 72, total_loss: 476.58673095703125, q_loss 476.58123779296875, v_loss 0.005479766521602869 ,lr 0.01
+INFO:root:epoch 0, Episode 73, total_loss: 1838.3271484375, q_loss 1838.2440185546875, v_loss 0.08313729614019394 ,lr 0.01
+INFO:root:epoch 0, Episode 74, total_loss: 475.68212890625, q_loss 475.6757507324219, v_loss 0.006375285796821117 ,lr 0.01
+INFO:root:epoch 0, Episode 75, total_loss: 2.262850522994995, q_loss 2.254622459411621, v_loss 0.008228172548115253 ,lr 0.01
+INFO:root:epoch 0, Episode 76, total_loss: 256.0338439941406, q_loss 256.01947021484375, v_loss 0.014379051513969898 ,lr 0.01
+INFO:root:epoch 0, Episode 77, total_loss: 190.10284423828125, q_loss 190.08604431152344, v_loss 0.016804564744234085 ,lr 0.01
+INFO:root:epoch 0, Episode 78, total_loss: 1939.781005859375, q_loss 1939.6583251953125, v_loss 0.12273585796356201 ,lr 0.01
+INFO:root:epoch 0, Episode 79, total_loss: 2.468733787536621, q_loss 2.468733787536621, v_loss 6.720138768373518e-12 ,lr 0.01
+INFO:root:epoch 0, Episode 80, total_loss: 588.4486694335938, q_loss 588.4463500976562, v_loss 0.0023177408147603273 ,lr 0.01
+INFO:root:val_loss 1.2655730247497559
+INFO:root:val_loss 1.2837507724761963
+INFO:root:val_loss 1.3424805402755737
+INFO:root:val_loss 1.306836485862732
+INFO:root:val_loss 1.2970374822616577
+INFO:root:val_loss 1.3264341354370117
+INFO:root:val_loss 1.2751277685165405
+INFO:root:val_loss 1.2857246398925781
+INFO:root:val_loss 1.3394864797592163
+INFO:root:epoch 0, Episode 81, total_loss: 66.14166259765625, q_loss 66.09468841552734, v_loss 0.04697737842798233 ,lr 0.01
+INFO:root:epoch 0, Episode 82, total_loss: 624.3692016601562, q_loss 624.3638305664062, v_loss 0.005393850617110729 ,lr 0.01
+INFO:root:epoch 0, Episode 83, total_loss: 2.7973132133483887, q_loss 2.790635347366333, v_loss 0.006677977740764618 ,lr 0.01
+INFO:root:epoch 0, Episode 84, total_loss: 2.7722079753875732, q_loss 2.7721645832061768, v_loss 4.348440415924415e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 85, total_loss: 443.43646240234375, q_loss 443.4338073730469, v_loss 0.0026687090285122395 ,lr 0.01
+INFO:root:epoch 0, Episode 86, total_loss: 373.1251220703125, q_loss 373.09307861328125, v_loss 0.032049477100372314 ,lr 0.01
+INFO:root:epoch 0, Episode 87, total_loss: 320.3678894042969, q_loss 320.3678894042969, v_loss 3.150287284370279e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 88, total_loss: 720.5341796875, q_loss 720.513671875, v_loss 0.020528074353933334 ,lr 0.01
+INFO:root:epoch 0, Episode 89, total_loss: 2533.04931640625, q_loss 2533.0458984375, v_loss 0.003481632098555565 ,lr 0.01
+INFO:root:epoch 0, Episode 90, total_loss: 390.94427490234375, q_loss 390.942138671875, v_loss 0.0021256848704069853 ,lr 0.01
+INFO:root:val_loss 1.2885408401489258
+INFO:root:val_loss 1.3136987686157227
+INFO:root:val_loss 1.3361690044403076
+INFO:root:val_loss 1.2917811870574951
+INFO:root:val_loss 1.291897177696228
+INFO:root:val_loss 1.3206418752670288
+INFO:root:val_loss 1.3025602102279663
+INFO:root:epoch 0, Episode 91, total_loss: 2.216947555541992, q_loss 2.2138803005218506, v_loss 0.0030672976281493902 ,lr 0.01
+INFO:root:epoch 0, Episode 92, total_loss: 331.3447265625, q_loss 331.34454345703125, v_loss 0.00018034227832686156 ,lr 0.01
+INFO:root:epoch 0, Episode 93, total_loss: 1697.5673828125, q_loss 1697.5635986328125, v_loss 0.0037943890783935785 ,lr 0.01
+INFO:root:epoch 0, Episode 94, total_loss: 1.8617939949035645, q_loss 1.8615036010742188, v_loss 0.0002903426066040993 ,lr 0.01
+INFO:root:epoch 0, Episode 95, total_loss: 4272.87548828125, q_loss 4272.87548828125, v_loss 1.0249955550989398e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 96, total_loss: 2.100680351257324, q_loss 2.100308656692505, v_loss 0.00037177602644078434 ,lr 0.01
+INFO:root:epoch 0, Episode 97, total_loss: 295.1797790527344, q_loss 295.1797180175781, v_loss 7.005722727626562e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 98, total_loss: 288.526611328125, q_loss 288.526611328125, v_loss 8.999648343888111e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 99, total_loss: 407.0537109375, q_loss 407.0537109375, v_loss 1.2625953331735218e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 100, total_loss: 279.544677734375, q_loss 279.54290771484375, v_loss 0.001758724800311029 ,lr 0.01
+INFO:root:val_loss 1.3303825855255127
+INFO:root:val_loss 1.3391579389572144
+INFO:root:val_loss 1.3305379152297974
+INFO:root:val_loss 1.3215222358703613
+INFO:root:val_loss 1.345247507095337
+INFO:root:val_loss 1.321096420288086
+INFO:root:val_loss 1.3144265413284302
+INFO:root:epoch 0, Episode 101, total_loss: 198.4282989501953, q_loss 198.42681884765625, v_loss 0.0014742121566087008 ,lr 0.01
+INFO:root:epoch 0, Episode 102, total_loss: 112.49285125732422, q_loss 112.49279022216797, v_loss 6.364276487147436e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 103, total_loss: 731.6939086914062, q_loss 731.6709594726562, v_loss 0.022923070937395096 ,lr 0.01
+INFO:root:epoch 0, Episode 104, total_loss: 89.8868637084961, q_loss 89.8868408203125, v_loss 2.161614247597754e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 105, total_loss: 2.7581348419189453, q_loss 2.7581348419189453, v_loss 3.1001873290747994e-10 ,lr 0.01
+INFO:root:epoch 0, Episode 106, total_loss: 163.979736328125, q_loss 163.86114501953125, v_loss 0.11858830600976944 ,lr 0.01
+INFO:root:epoch 0, Episode 107, total_loss: 252.68026733398438, q_loss 252.67706298828125, v_loss 0.0031979007180780172 ,lr 0.01
+INFO:root:epoch 0, Episode 108, total_loss: 294.1918640136719, q_loss 294.1885070800781, v_loss 0.0033491116482764482 ,lr 0.01
+INFO:root:epoch 0, Episode 109, total_loss: 2.495213270187378, q_loss 2.495213031768799, v_loss 1.9520983585152862e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 110, total_loss: 958.0721435546875, q_loss 958.072021484375, v_loss 0.00012129217793699354 ,lr 0.01
+INFO:root:val_loss 1.2965418100357056
+INFO:root:val_loss 1.3484597206115723
+INFO:root:val_loss 1.3247060775756836
+INFO:root:val_loss 1.374082088470459
+INFO:root:val_loss 1.3365339040756226
+INFO:root:val_loss 1.3262827396392822
+INFO:root:val_loss 1.3247019052505493
+INFO:root:val_loss 1.3087773323059082
+INFO:root:val_loss 1.303072452545166
+INFO:root:val_loss 1.3206123113632202
+INFO:root:val_loss 1.3642903566360474
+INFO:root:val_loss 1.3046907186508179
+INFO:root:val_loss 1.3087774515151978
+INFO:root:val_loss 1.3169506788253784
+INFO:root:val_loss 1.3740801811218262
+INFO:root:val_loss 1.290046215057373
+INFO:root:val_loss 1.3060325384140015
+INFO:root:val_loss 1.2908068895339966
+INFO:root:val_loss 1.2908124923706055
+INFO:root:val_loss 1.2908124923706055
+INFO:root:val_loss 1.2908124923706055
+INFO:root:epoch 0, Episode 111, total_loss: 119.4618911743164, q_loss 119.46188354492188, v_loss 5.8791247283807024e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 112, total_loss: 658.650146484375, q_loss 658.650146484375, v_loss 7.322567398659885e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 113, total_loss: 1187.362060546875, q_loss 1187.3577880859375, v_loss 0.004216983914375305 ,lr 0.01
+INFO:root:epoch 0, Episode 114, total_loss: 129.26437377929688, q_loss 129.2630615234375, v_loss 0.0013127215206623077 ,lr 0.01
+INFO:root:epoch 0, Episode 115, total_loss: 301.88885498046875, q_loss 301.8867492675781, v_loss 0.0021013275254517794 ,lr 0.01
+INFO:root:epoch 0, Episode 116, total_loss: 2.3347482681274414, q_loss 2.334747314453125, v_loss 1.0200614042332745e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 117, total_loss: 358.47625732421875, q_loss 358.4607849121094, v_loss 0.015473595820367336 ,lr 0.01
+INFO:root:epoch 0, Episode 118, total_loss: 1045.778076171875, q_loss 1045.757080078125, v_loss 0.02101876400411129 ,lr 0.01
+INFO:root:epoch 0, Episode 119, total_loss: 364.12469482421875, q_loss 364.1246032714844, v_loss 0.00010358862346038222 ,lr 0.01
+INFO:root:epoch 0, Episode 120, total_loss: 59.34842300415039, q_loss 59.348331451416016, v_loss 9.00763479876332e-05 ,lr 0.01
+INFO:root:val_loss 1.3189120292663574
+INFO:root:val_loss 1.296327829360962
+INFO:root:epoch 0, Episode 121, total_loss: 86.46401977539062, q_loss 86.4639892578125, v_loss 2.9117865778971463e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 122, total_loss: 5255.50830078125, q_loss 5255.4775390625, v_loss 0.03088962659239769 ,lr 0.01
+INFO:root:epoch 0, Episode 123, total_loss: 1503.3023681640625, q_loss 1503.3023681640625, v_loss 5.426167717814678e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 124, total_loss: 2100.840087890625, q_loss 2100.673828125, v_loss 0.16624172031879425 ,lr 0.01
+INFO:root:epoch 0, Episode 125, total_loss: 313.2384338378906, q_loss 313.23516845703125, v_loss 0.0032731685787439346 ,lr 0.01
+INFO:root:epoch 0, Episode 126, total_loss: 81.78534698486328, q_loss 81.78118133544922, v_loss 0.0041658529080450535 ,lr 0.01
+INFO:root:epoch 0, Episode 127, total_loss: 3528.907958984375, q_loss 3527.2841796875, v_loss 1.6237001419067383 ,lr 0.01
+INFO:root:epoch 0, Episode 128, total_loss: 220.8177947998047, q_loss 220.8114013671875, v_loss 0.006387745961546898 ,lr 0.01
+INFO:root:epoch 0, Episode 129, total_loss: 293.6473083496094, q_loss 293.6180419921875, v_loss 0.029251329600811005 ,lr 0.01
+INFO:root:epoch 0, Episode 130, total_loss: 3642.50146484375, q_loss 3641.033935546875, v_loss 1.467473030090332 ,lr 0.01
+INFO:root:val_loss 1.3073647022247314
+INFO:root:val_loss 1.2903542518615723
+INFO:root:val_loss 1.3142837285995483
+INFO:root:val_loss 1.3312941789627075
+INFO:root:val_loss 1.3312941789627075
+INFO:root:val_loss 1.3722339868545532
+INFO:root:val_loss 1.3961634635925293
+INFO:root:val_loss 1.3142971992492676
+INFO:root:val_loss 1.2733433246612549
+INFO:root:val_loss 1.2733433246612549
+INFO:root:val_loss 1.2733426094055176
+INFO:root:val_loss 1.2733433246612549
+INFO:root:val_loss 1.2903499603271484
+INFO:root:val_loss 1.3143343925476074
+INFO:root:val_loss 1.2733428478240967
+INFO:root:val_loss 1.3715252876281738
+INFO:root:val_loss 1.3552241325378418
+INFO:root:val_loss 1.3249996900558472
+INFO:root:val_loss 1.619844913482666
+INFO:root:val_loss 1.3261150121688843
+INFO:root:val_loss 1.2439666986465454
+INFO:root:val_loss 1.2826898097991943
+INFO:root:val_loss 1.3409641981124878
+INFO:root:val_loss 1.3195533752441406
+INFO:root:val_loss 1.3310017585754395
+INFO:root:val_loss 1.2820152044296265
+INFO:root:val_loss 1.3247079849243164
+INFO:root:val_loss 1.3025059700012207
+INFO:root:val_loss 1.2732977867126465
+INFO:root:val_loss 1.290120005607605
+INFO:root:val_loss 1.3141541481018066
+INFO:root:val_loss 1.3319752216339111
+INFO:root:val_loss 1.331139326095581
+INFO:root:val_loss 1.3302106857299805
+INFO:root:val_loss 1.2732526063919067
+INFO:root:val_loss 1.2733330726623535
+INFO:root:val_loss 1.2733408212661743
+INFO:root:val_loss 1.2733418941497803
+INFO:root:val_loss 1.2733573913574219
+INFO:root:val_loss 1.314283847808838
+INFO:root:val_loss 1.2729929685592651
+INFO:root:val_loss 1.355224609375
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.331294059753418
+INFO:root:val_loss 1.2903542518615723
+INFO:root:val_loss 1.3413857221603394
+INFO:root:val_loss 1.3243751525878906
+INFO:root:val_loss 1.3142836093902588
+INFO:root:val_loss 1.2903542518615723
+INFO:root:val_loss 1.3483047485351562
+INFO:root:val_loss 1.2903542518615723
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:val_loss 1.273343801498413
+INFO:root:epoch 0, Episode 131, total_loss: 2743.163330078125, q_loss 2741.653076171875, v_loss 1.5102438926696777 ,lr 0.01
+INFO:root:epoch 0, Episode 132, total_loss: 157.0458526611328, q_loss 157.0446319580078, v_loss 0.001214773626998067 ,lr 0.01
+INFO:root:epoch 0, Episode 133, total_loss: 101.98583984375, q_loss 101.9708251953125, v_loss 0.015017607249319553 ,lr 0.01
+INFO:root:epoch 0, Episode 134, total_loss: 3.617967128753662, q_loss 3.617967128753662, v_loss 3.1203042372141e-09 ,lr 0.01
+INFO:root:epoch 0, Episode 135, total_loss: 91.90638732910156, q_loss 91.90508270263672, v_loss 0.0013009499525651336 ,lr 0.01
+INFO:root:epoch 0, Episode 136, total_loss: 3893.44873046875, q_loss 3893.281005859375, v_loss 0.1677781045436859 ,lr 0.01
+INFO:root:epoch 0, Episode 137, total_loss: 1502.959228515625, q_loss 1502.959228515625, v_loss 3.923869735444896e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 138, total_loss: 1.8785420656204224, q_loss 1.878502607345581, v_loss 3.949545862269588e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 139, total_loss: 958.6307373046875, q_loss 958.62890625, v_loss 0.0018537752330303192 ,lr 0.01
+INFO:root:epoch 0, Episode 140, total_loss: 360.7966613769531, q_loss 360.73687744140625, v_loss 0.059773385524749756 ,lr 0.01
+INFO:root:val_loss 1.2946668863296509
+INFO:root:val_loss 1.30910325050354
+INFO:root:val_loss 1.287448763847351
+INFO:root:val_loss 1.3069589138031006
+INFO:root:val_loss 1.2935947179794312
+INFO:root:val_loss 1.2857979536056519
+INFO:root:val_loss 1.7030889987945557
+INFO:root:epoch 0, Episode 141, total_loss: 2.31752610206604, q_loss 2.317512035369873, v_loss 1.4009851838636678e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 142, total_loss: 1754.1669921875, q_loss 1754.1322021484375, v_loss 0.03476578742265701 ,lr 0.01
+INFO:root:epoch 0, Episode 143, total_loss: 409.5459899902344, q_loss 409.5420227050781, v_loss 0.003977743908762932 ,lr 0.01
+INFO:root:epoch 0, Episode 144, total_loss: 1314.1719970703125, q_loss 1314.0419921875, v_loss 0.13004449009895325 ,lr 0.01
+INFO:root:epoch 0, Episode 145, total_loss: 1696.2342529296875, q_loss 1695.7410888671875, v_loss 0.49321088194847107 ,lr 0.01
+INFO:root:epoch 0, Episode 146, total_loss: 2107.130615234375, q_loss 2107.12939453125, v_loss 0.0013155434280633926 ,lr 0.01
+INFO:root:epoch 0, Episode 147, total_loss: 1501.1832275390625, q_loss 1501.1568603515625, v_loss 0.02631302922964096 ,lr 0.01
+INFO:root:epoch 0, Episode 148, total_loss: 1171.6436767578125, q_loss 1171.6431884765625, v_loss 0.0004729311913251877 ,lr 0.01
+INFO:root:epoch 0, Episode 149, total_loss: 461.50689697265625, q_loss 461.5033264160156, v_loss 0.0035563944838941097 ,lr 0.01
+INFO:root:epoch 0, Episode 150, total_loss: 1503.36572265625, q_loss 1503.2205810546875, v_loss 0.14508593082427979 ,lr 0.01
+INFO:root:val_loss 1.2892674207687378
+INFO:root:val_loss 1.2489346265792847
+INFO:root:val_loss 1.2489346265792847
+INFO:root:val_loss 1.305472731590271
+INFO:root:val_loss 1.3296000957489014
+INFO:root:val_loss 1.2973699569702148
+INFO:root:val_loss 1.3108141422271729
+INFO:root:val_loss 1.292028546333313
+INFO:root:val_loss 1.2489346265792847
+INFO:root:val_loss 1.2489346265792847
+INFO:root:val_loss 1.2839257717132568
+INFO:root:val_loss 1.2838587760925293
+INFO:root:val_loss 1.283964991569519
+INFO:root:val_loss 1.533399224281311
+INFO:root:val_loss 1.3382759094238281
+INFO:root:val_loss 1.1945618391036987
+INFO:root:epoch 0, Episode 151, total_loss: 2242.565673828125, q_loss 2242.563720703125, v_loss 0.0018839753465726972 ,lr 0.01
+INFO:root:epoch 0, Episode 152, total_loss: 1095.4063720703125, q_loss 1095.370849609375, v_loss 0.03549841791391373 ,lr 0.01
+INFO:root:epoch 0, Episode 153, total_loss: 1.9261646270751953, q_loss 1.9061405658721924, v_loss 0.020024044439196587 ,lr 0.01
+INFO:root:epoch 0, Episode 154, total_loss: 74.6739273071289, q_loss 74.67387390136719, v_loss 5.15059546160046e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 155, total_loss: 81.4402847290039, q_loss 81.43687438964844, v_loss 0.0034066515509039164 ,lr 0.01
+INFO:root:epoch 0, Episode 156, total_loss: 514.7180786132812, q_loss 514.5325317382812, v_loss 0.18553520739078522 ,lr 0.01
+INFO:root:epoch 0, Episode 157, total_loss: 1167.969970703125, q_loss 1167.95458984375, v_loss 0.015364107675850391 ,lr 0.01
+INFO:root:epoch 0, Episode 158, total_loss: 138.55718994140625, q_loss 138.54623413085938, v_loss 0.010959197767078876 ,lr 0.01
+INFO:root:epoch 0, Episode 159, total_loss: 310.66827392578125, q_loss 310.6633605957031, v_loss 0.004898139741271734 ,lr 0.01
+INFO:root:epoch 0, Episode 160, total_loss: 252.51910400390625, q_loss 252.4537811279297, v_loss 0.06533020734786987 ,lr 0.01
+INFO:root:val_loss 1.3002896308898926
+INFO:root:epoch 0, Episode 161, total_loss: 2.65130615234375, q_loss 2.647782802581787, v_loss 0.003523309715092182 ,lr 0.01
+INFO:root:epoch 0, Episode 162, total_loss: 436.95947265625, q_loss 436.7799987792969, v_loss 0.17947547137737274 ,lr 0.01
+INFO:root:epoch 0, Episode 163, total_loss: 356.906982421875, q_loss 356.9021301269531, v_loss 0.0048651196993887424 ,lr 0.01
+INFO:root:epoch 0, Episode 164, total_loss: 2.1061601638793945, q_loss 2.1061599254608154, v_loss 1.344756839216643e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 165, total_loss: 273.7588806152344, q_loss 273.7568664550781, v_loss 0.0020086532458662987 ,lr 0.01
+INFO:root:epoch 0, Episode 166, total_loss: 784.2724609375, q_loss 784.2669067382812, v_loss 0.005566089414060116 ,lr 0.01
+INFO:root:epoch 0, Episode 167, total_loss: 85.4684829711914, q_loss 85.4658203125, v_loss 0.0026632738299667835 ,lr 0.01
+INFO:root:epoch 0, Episode 168, total_loss: 1313.9598388671875, q_loss 1313.9530029296875, v_loss 0.006890806369483471 ,lr 0.01
+INFO:root:epoch 0, Episode 169, total_loss: 73.274658203125, q_loss 73.20845794677734, v_loss 0.0662008747458458 ,lr 0.01
+INFO:root:epoch 0, Episode 170, total_loss: 2.542431354522705, q_loss 2.540381669998169, v_loss 0.0020495771896094084 ,lr 0.01
+INFO:root:val_loss 1.303116798400879
+INFO:root:epoch 0, Episode 171, total_loss: 271.69744873046875, q_loss 271.6957702636719, v_loss 0.001676427898928523 ,lr 0.01
+INFO:root:epoch 0, Episode 172, total_loss: 2785.060546875, q_loss 2784.305419921875, v_loss 0.7551124095916748 ,lr 0.01
+INFO:root:epoch 0, Episode 173, total_loss: 1927.59375, q_loss 1927.5843505859375, v_loss 0.009375905618071556 ,lr 0.01
+INFO:root:epoch 0, Episode 174, total_loss: 2.335810661315918, q_loss 2.319998264312744, v_loss 0.015812356024980545 ,lr 0.01
+INFO:root:epoch 0, Episode 175, total_loss: 1503.9486083984375, q_loss 1503.9459228515625, v_loss 0.002634095959365368 ,lr 0.01
+INFO:root:epoch 0, Episode 176, total_loss: 67.22986602783203, q_loss 67.22264099121094, v_loss 0.007223527878522873 ,lr 0.01
+INFO:root:epoch 0, Episode 177, total_loss: 1449.8465576171875, q_loss 1449.1436767578125, v_loss 0.7028486132621765 ,lr 0.01
+INFO:root:epoch 0, Episode 178, total_loss: 3381.13232421875, q_loss 3380.982177734375, v_loss 0.15016210079193115 ,lr 0.01
+INFO:root:epoch 0, Episode 179, total_loss: 2539.445068359375, q_loss 2539.40673828125, v_loss 0.038385726511478424 ,lr 0.01
+INFO:root:epoch 0, Episode 180, total_loss: 2.1686904430389404, q_loss 2.168424129486084, v_loss 0.0002663739724084735 ,lr 0.01
+INFO:root:val_loss 1.3099502325057983
+INFO:root:epoch 0, Episode 181, total_loss: 554.69873046875, q_loss 554.6928100585938, v_loss 0.005920597817748785 ,lr 0.01
+INFO:root:epoch 0, Episode 182, total_loss: 2.166717767715454, q_loss 2.166707754135132, v_loss 1.0125233529834077e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 183, total_loss: 490.2738037109375, q_loss 490.2546081542969, v_loss 0.01920793391764164 ,lr 0.01
+INFO:root:epoch 0, Episode 184, total_loss: 525.5217895507812, q_loss 525.4844360351562, v_loss 0.03734901174902916 ,lr 0.01
+INFO:root:epoch 0, Episode 185, total_loss: 78.32755279541016, q_loss 78.3191909790039, v_loss 0.008365015499293804 ,lr 0.01
+INFO:root:epoch 0, Episode 186, total_loss: 3094.0419921875, q_loss 3090.373291015625, v_loss 3.668600559234619 ,lr 0.01
+INFO:root:epoch 0, Episode 187, total_loss: 425.8292236328125, q_loss 425.755859375, v_loss 0.07335790246725082 ,lr 0.01
+INFO:root:epoch 0, Episode 188, total_loss: 73.55877685546875, q_loss 73.27875518798828, v_loss 0.2800217270851135 ,lr 0.01
+INFO:root:epoch 0, Episode 189, total_loss: 2.249950408935547, q_loss 2.2498738765716553, v_loss 7.648371683899313e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 190, total_loss: 69.804931640625, q_loss 69.78596496582031, v_loss 0.018969701603055 ,lr 0.01
+INFO:root:val_loss 1.3212025165557861
+INFO:root:val_loss 1.3254207372665405
+INFO:root:epoch 0, Episode 191, total_loss: 582.8427124023438, q_loss 582.836181640625, v_loss 0.006553689017891884 ,lr 0.01
+INFO:root:epoch 0, Episode 192, total_loss: 497.20318603515625, q_loss 497.1915588378906, v_loss 0.011618789285421371 ,lr 0.01
+INFO:root:epoch 0, Episode 193, total_loss: 2.2737789154052734, q_loss 2.273714780807495, v_loss 6.413729715859517e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 194, total_loss: 1499.828369140625, q_loss 1499.8167724609375, v_loss 0.011549195274710655 ,lr 0.01
+INFO:root:epoch 0, Episode 195, total_loss: 97.57371520996094, q_loss 97.56376647949219, v_loss 0.009945697151124477 ,lr 0.01
+INFO:root:epoch 0, Episode 196, total_loss: 2.024376392364502, q_loss 2.0233054161071777, v_loss 0.0010709995403885841 ,lr 0.01
+INFO:root:epoch 0, Episode 197, total_loss: 265.6313171386719, q_loss 265.6304626464844, v_loss 0.0008572609513066709 ,lr 0.01
+INFO:root:epoch 0, Episode 198, total_loss: 514.6529541015625, q_loss 514.65087890625, v_loss 0.0020852619782090187 ,lr 0.01
+INFO:root:epoch 0, Episode 199, total_loss: 3102.6669921875, q_loss 3102.63671875, v_loss 0.03024439513683319 ,lr 0.01
+INFO:root:epoch 0, Episode 200, total_loss: 303.55517578125, q_loss 303.55194091796875, v_loss 0.0032211244106292725 ,lr 0.01
+INFO:root:val_loss 1.317150592803955
+INFO:root:val_loss 1.2628769874572754
+INFO:root:val_loss 1.321008324623108
+INFO:root:val_loss 1.317147135734558
+INFO:root:val_loss 1.3213698863983154
+INFO:root:epoch 0, Episode 201, total_loss: 1697.1788330078125, q_loss 1695.41552734375, v_loss 1.7633620500564575 ,lr 0.01
+INFO:root:epoch 0, Episode 202, total_loss: 114.20596313476562, q_loss 114.17973327636719, v_loss 0.026231659576296806 ,lr 0.01
+INFO:root:epoch 0, Episode 203, total_loss: 129.02529907226562, q_loss 129.00338745117188, v_loss 0.021917223930358887 ,lr 0.01
+INFO:root:epoch 0, Episode 204, total_loss: 4119.0283203125, q_loss 4119.025390625, v_loss 0.0027319821529090405 ,lr 0.01
+INFO:root:epoch 0, Episode 205, total_loss: 670.464111328125, q_loss 670.4551391601562, v_loss 0.008988730609416962 ,lr 0.01
+INFO:root:epoch 0, Episode 206, total_loss: 269.0085754394531, q_loss 268.89501953125, v_loss 0.11356297880411148 ,lr 0.01
+INFO:root:epoch 0, Episode 207, total_loss: 3884.803955078125, q_loss 3884.741455078125, v_loss 0.06245310232043266 ,lr 0.01
+INFO:root:epoch 0, Episode 208, total_loss: 1172.6549072265625, q_loss 1172.646728515625, v_loss 0.008137172088027 ,lr 0.01
+INFO:root:epoch 0, Episode 209, total_loss: 78.3905029296875, q_loss 78.39045715332031, v_loss 4.8264966608257964e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 210, total_loss: 2103.902099609375, q_loss 2103.88330078125, v_loss 0.018869951367378235 ,lr 0.01
+INFO:root:val_loss 1.3239613771438599
+INFO:root:val_loss 1.2941703796386719
+INFO:root:val_loss 1.2941703796386719
+INFO:root:val_loss 1.2941703796386719
+INFO:root:val_loss 1.3132246732711792
+INFO:root:val_loss 1.3138655424118042
+INFO:root:val_loss 1.313156247138977
+INFO:root:val_loss 1.3132246732711792
+INFO:root:val_loss 1.3537524938583374
+INFO:root:val_loss 1.304099440574646
+INFO:root:val_loss 1.3033828735351562
+INFO:root:val_loss 1.3132246732711792
+INFO:root:val_loss 1.3132247924804688
+INFO:root:val_loss 1.323155164718628
+INFO:root:val_loss 1.304100751876831
+INFO:root:val_loss 1.323155164718628
+INFO:root:val_loss 1.3438221216201782
+INFO:root:val_loss 1.3132247924804688
+INFO:root:val_loss 1.3223488330841064
+INFO:root:val_loss 1.3132247924804688
+INFO:root:val_loss 1.3239614963531494
+INFO:root:val_loss 1.322348713874817
+INFO:root:val_loss 1.3124183416366577
+INFO:root:val_loss 1.3132247924804688
+INFO:root:val_loss 1.30329430103302
+INFO:root:val_loss 1.3239614963531494
+INFO:root:val_loss 1.3140311241149902
+INFO:root:val_loss 1.3132247924804688
+INFO:root:val_loss 1.2941703796386719
+INFO:root:val_loss 1.2941703796386719
+INFO:root:epoch 0, Episode 211, total_loss: 3540.7802734375, q_loss 3540.769287109375, v_loss 0.010967709124088287 ,lr 0.01
+INFO:root:epoch 0, Episode 212, total_loss: 196.5951690673828, q_loss 196.5823516845703, v_loss 0.012814236804842949 ,lr 0.01
+INFO:root:epoch 0, Episode 213, total_loss: 3438.10009765625, q_loss 3438.029052734375, v_loss 0.07108709216117859 ,lr 0.01
+INFO:root:epoch 0, Episode 214, total_loss: 2.645078659057617, q_loss 2.6450657844543457, v_loss 1.2902060007036198e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 215, total_loss: 366.0880126953125, q_loss 366.0880126953125, v_loss 8.195657756004948e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 216, total_loss: 259.3970947265625, q_loss 259.39703369140625, v_loss 4.956878910888918e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 217, total_loss: 890.3836059570312, q_loss 890.37158203125, v_loss 0.012049570679664612 ,lr 0.01
+INFO:root:epoch 0, Episode 218, total_loss: 2101.971435546875, q_loss 2101.970947265625, v_loss 0.0005069680046290159 ,lr 0.01
+INFO:root:epoch 0, Episode 219, total_loss: 1751.1280517578125, q_loss 1751.123779296875, v_loss 0.004314907360821962 ,lr 0.01
+INFO:root:epoch 0, Episode 220, total_loss: 66.53047943115234, q_loss 66.53047943115234, v_loss 2.565967861301033e-06 ,lr 0.01
+INFO:root:val_loss 1.3042608499526978
+INFO:root:val_loss 1.3114920854568481
+INFO:root:epoch 0, Episode 221, total_loss: 2.852982759475708, q_loss 2.852937936782837, v_loss 4.481110954657197e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 222, total_loss: 303.53802490234375, q_loss 303.5379333496094, v_loss 8.206162601709366e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 223, total_loss: 1314.214111328125, q_loss 1314.2139892578125, v_loss 9.16185526875779e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 224, total_loss: 1481.3043212890625, q_loss 1481.3033447265625, v_loss 0.0010337994899600744 ,lr 0.01
+INFO:root:epoch 0, Episode 225, total_loss: 151.26583862304688, q_loss 151.26580810546875, v_loss 2.3390819478663616e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 226, total_loss: 347.12860107421875, q_loss 347.1280822753906, v_loss 0.0005197135033085942 ,lr 0.01
+INFO:root:epoch 0, Episode 227, total_loss: 292.751708984375, q_loss 292.7503967285156, v_loss 0.0013126098783686757 ,lr 0.01
+INFO:root:epoch 0, Episode 228, total_loss: 342.6252136230469, q_loss 342.553955078125, v_loss 0.07125300168991089 ,lr 0.01
+INFO:root:epoch 0, Episode 229, total_loss: 100.0333251953125, q_loss 100.03329467773438, v_loss 2.7968097128905356e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 230, total_loss: 62.26193618774414, q_loss 62.25904083251953, v_loss 0.0028937889728695154 ,lr 0.01
+INFO:root:val_loss 1.3029301166534424
+INFO:root:val_loss 1.2904566526412964
+INFO:root:epoch 0, Episode 231, total_loss: 161.7757110595703, q_loss 161.7757110595703, v_loss 3.845191542950488e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 232, total_loss: 157.6603546142578, q_loss 157.66033935546875, v_loss 2.2484971850644797e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 233, total_loss: 1841.6402587890625, q_loss 1841.6317138671875, v_loss 0.008539712056517601 ,lr 0.01
+INFO:root:epoch 0, Episode 234, total_loss: 2.0890376567840576, q_loss 2.0868213176727295, v_loss 0.002216310938820243 ,lr 0.01
+INFO:root:epoch 0, Episode 235, total_loss: 994.2720336914062, q_loss 994.2719116210938, v_loss 9.50330140767619e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 236, total_loss: 278.710693359375, q_loss 278.710693359375, v_loss 5.335675723472377e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 237, total_loss: 167.0040740966797, q_loss 167.0040283203125, v_loss 4.47529528173618e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 238, total_loss: 132.216064453125, q_loss 132.216064453125, v_loss 5.099601821711985e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 239, total_loss: 664.0841674804688, q_loss 664.0817260742188, v_loss 0.002470232779160142 ,lr 0.01
+INFO:root:epoch 0, Episode 240, total_loss: 217.25238037109375, q_loss 217.25234985351562, v_loss 3.5555462090997025e-05 ,lr 0.01
+INFO:root:val_loss 1.3127175569534302
+INFO:root:val_loss 1.3195255994796753
+INFO:root:val_loss 1.3136439323425293
+INFO:root:val_loss 1.3178130388259888
+INFO:root:epoch 0, Episode 241, total_loss: 133.1800994873047, q_loss 133.18006896972656, v_loss 3.050873965548817e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 242, total_loss: 2.0766937732696533, q_loss 2.0657663345336914, v_loss 0.0109274135902524 ,lr 0.01
+INFO:root:epoch 0, Episode 243, total_loss: 1569.275390625, q_loss 1569.274658203125, v_loss 0.0007754585240036249 ,lr 0.01
+INFO:root:epoch 0, Episode 244, total_loss: 259.6130676269531, q_loss 259.6130676269531, v_loss 3.300484195278841e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 245, total_loss: 181.9239959716797, q_loss 181.92398071289062, v_loss 8.088491085800342e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 246, total_loss: 331.18377685546875, q_loss 331.1837463378906, v_loss 2.692534872039687e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 247, total_loss: 2.4537625312805176, q_loss 2.4536709785461426, v_loss 9.1536421678029e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 248, total_loss: 341.7259826660156, q_loss 341.7232666015625, v_loss 0.0027267991099506617 ,lr 0.01
+INFO:root:epoch 0, Episode 249, total_loss: 258.89410400390625, q_loss 258.8938903808594, v_loss 0.00020365664386190474 ,lr 0.01
+INFO:root:epoch 0, Episode 250, total_loss: 2.0011723041534424, q_loss 2.001171588897705, v_loss 6.684250024591165e-07 ,lr 0.01
+INFO:root:val_loss 1.3236247301101685
+INFO:root:epoch 0, Episode 251, total_loss: 2200.051513671875, q_loss 2200.051513671875, v_loss 1.6977486438918277e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 252, total_loss: 430.6498718261719, q_loss 430.6495666503906, v_loss 0.00029019740759395063 ,lr 0.01
+INFO:root:epoch 0, Episode 253, total_loss: 2308.295166015625, q_loss 2308.29052734375, v_loss 0.004678616765886545 ,lr 0.01
+INFO:root:epoch 0, Episode 254, total_loss: 63.97494125366211, q_loss 63.97493362426758, v_loss 7.336096132348757e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 255, total_loss: 421.3509826660156, q_loss 421.34991455078125, v_loss 0.0010591143509373069 ,lr 0.01
+INFO:root:epoch 0, Episode 256, total_loss: 251.4998016357422, q_loss 251.4995574951172, v_loss 0.0002483665884938091 ,lr 0.01
+INFO:root:epoch 0, Episode 257, total_loss: 594.7334594726562, q_loss 594.7316284179688, v_loss 0.0018152062548324466 ,lr 0.01
+INFO:root:epoch 0, Episode 258, total_loss: 246.81036376953125, q_loss 246.8103485107422, v_loss 1.16614455691888e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 259, total_loss: 4648.44873046875, q_loss 4648.404296875, v_loss 0.044518113136291504 ,lr 0.01
+INFO:root:epoch 0, Episode 260, total_loss: 62.137725830078125, q_loss 62.137657165527344, v_loss 6.792998465243727e-05 ,lr 0.01
+INFO:root:val_loss 1.3280912637710571
+INFO:root:epoch 0, Episode 261, total_loss: 214.27365112304688, q_loss 214.27328491210938, v_loss 0.00036223966162651777 ,lr 0.01
+INFO:root:epoch 0, Episode 262, total_loss: 1168.9757080078125, q_loss 1168.9757080078125, v_loss 5.360704562917817e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 263, total_loss: 1.874231219291687, q_loss 1.8742293119430542, v_loss 1.8714860061663785e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 264, total_loss: 321.9466247558594, q_loss 321.9461669921875, v_loss 0.0004632298368960619 ,lr 0.01
+INFO:root:epoch 0, Episode 265, total_loss: 152.71595764160156, q_loss 152.7158660888672, v_loss 9.023774327943102e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 266, total_loss: 557.6658935546875, q_loss 557.6658935546875, v_loss 3.3583323784114327e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 267, total_loss: 2.33756160736084, q_loss 2.3361005783081055, v_loss 0.0014609664212912321 ,lr 0.01
+INFO:root:epoch 0, Episode 268, total_loss: 555.4791259765625, q_loss 555.4774780273438, v_loss 0.0016212455229833722 ,lr 0.01
+INFO:root:epoch 0, Episode 269, total_loss: 3784.429931640625, q_loss 3784.429443359375, v_loss 0.0004430083208717406 ,lr 0.01
+INFO:root:epoch 0, Episode 270, total_loss: 1547.8990478515625, q_loss 1547.8990478515625, v_loss 1.1119888768007513e-05 ,lr 0.01
+INFO:root:val_loss 1.3219012022018433
+INFO:root:val_loss 1.3227059841156006
+INFO:root:val_loss 1.3232824802398682
+INFO:root:val_loss 1.3256590366363525
+INFO:root:val_loss 1.326634168624878
+INFO:root:val_loss 1.3284802436828613
+INFO:root:val_loss 1.3638992309570312
+INFO:root:epoch 0, Episode 271, total_loss: 826.36474609375, q_loss 826.3646850585938, v_loss 7.725922478130087e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 272, total_loss: 2.1777570247650146, q_loss 2.1777467727661133, v_loss 1.0230738553218544e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 273, total_loss: 658.3375854492188, q_loss 658.3375854492188, v_loss 5.405452611739747e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 274, total_loss: 1199.08251953125, q_loss 1199.08251953125, v_loss 3.422029521971126e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 275, total_loss: 1075.045654296875, q_loss 1075.0455322265625, v_loss 0.00012919727305416018 ,lr 0.01
+INFO:root:epoch 0, Episode 276, total_loss: 117.95430755615234, q_loss 117.95429992675781, v_loss 6.752333320036996e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 277, total_loss: 1502.35205078125, q_loss 1502.2801513671875, v_loss 0.07193870842456818 ,lr 0.01
+INFO:root:epoch 0, Episode 278, total_loss: 567.4345092773438, q_loss 567.43359375, v_loss 0.0008911012555472553 ,lr 0.01
+INFO:root:epoch 0, Episode 279, total_loss: 1116.4564208984375, q_loss 1116.455810546875, v_loss 0.0005983342998661101 ,lr 0.01
+INFO:root:epoch 0, Episode 280, total_loss: 144.63987731933594, q_loss 144.6398162841797, v_loss 6.21688668616116e-05 ,lr 0.01
+INFO:root:val_loss 1.3239766359329224
+INFO:root:val_loss 1.3235831260681152
+INFO:root:val_loss 1.3222379684448242
+INFO:root:epoch 0, Episode 281, total_loss: 3.1399221420288086, q_loss 3.1399221420288086, v_loss 4.518166818456848e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 282, total_loss: 342.5151672363281, q_loss 342.5151672363281, v_loss 1.0133620889973827e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 283, total_loss: 3811.353515625, q_loss 3811.353271484375, v_loss 0.00026723212795332074 ,lr 0.01
+INFO:root:epoch 0, Episode 284, total_loss: 1502.3275146484375, q_loss 1502.3275146484375, v_loss 1.4585968528990634e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 285, total_loss: 479.73541259765625, q_loss 479.73541259765625, v_loss 2.153017675254887e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 286, total_loss: 61.57976150512695, q_loss 61.57744216918945, v_loss 0.0023187294136732817 ,lr 0.01
+INFO:root:epoch 0, Episode 287, total_loss: 5.980640411376953, q_loss 5.980640411376953, v_loss 1.613112855097798e-13 ,lr 0.01
+INFO:root:epoch 0, Episode 288, total_loss: 1883.8466796875, q_loss 1883.8466796875, v_loss 6.403426141332602e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 289, total_loss: 497.56890869140625, q_loss 497.5688781738281, v_loss 2.4704013412701897e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 290, total_loss: 251.46641540527344, q_loss 251.46617126464844, v_loss 0.00024032405053731054 ,lr 0.01
+INFO:root:val_loss 1.3267313241958618
+INFO:root:epoch 0, Episode 291, total_loss: 198.4283447265625, q_loss 198.4283447265625, v_loss 1.2183839714907663e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 292, total_loss: 69.15425109863281, q_loss 69.15425109863281, v_loss 2.5948022397415116e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 293, total_loss: 1316.849609375, q_loss 1316.8494873046875, v_loss 0.00014446016575675458 ,lr 0.01
+INFO:root:epoch 0, Episode 294, total_loss: 2.1669673919677734, q_loss 2.166965961456299, v_loss 1.394697619616636e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 295, total_loss: 366.30950927734375, q_loss 366.3080139160156, v_loss 0.001491361646912992 ,lr 0.01
+INFO:root:epoch 0, Episode 296, total_loss: 1.9800909757614136, q_loss 1.9800909757614136, v_loss 4.4813049271397176e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 297, total_loss: 1053.647216796875, q_loss 1053.647216796875, v_loss 1.2767485713993665e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 298, total_loss: 259.1224365234375, q_loss 259.11676025390625, v_loss 0.005683185067027807 ,lr 0.01
+INFO:root:epoch 0, Episode 299, total_loss: 3920.57763671875, q_loss 3920.57763671875, v_loss 5.7728311730897985e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 300, total_loss: 8.308720588684082, q_loss 8.308691024780273, v_loss 2.9385595553321764e-05 ,lr 0.01
+INFO:root:val_loss 1.321280837059021
+INFO:root:epoch 0, Episode 301, total_loss: 283.97015380859375, q_loss 283.9701232910156, v_loss 2.2790742150391452e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 302, total_loss: 557.688720703125, q_loss 557.688720703125, v_loss 1.135790398620884e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 303, total_loss: 222.09359741210938, q_loss 222.0935516357422, v_loss 5.16230174980592e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 304, total_loss: 2.6544976234436035, q_loss 2.6544971466064453, v_loss 5.821431727781601e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 305, total_loss: 353.3572692871094, q_loss 353.3572692871094, v_loss 2.5989684218075126e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 306, total_loss: 892.9111328125, q_loss 892.9111328125, v_loss 4.1002185753313825e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 307, total_loss: 108.34431457519531, q_loss 108.34431457519531, v_loss 9.969852499125409e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 308, total_loss: 130.58128356933594, q_loss 130.58128356933594, v_loss 1.781862806637946e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 309, total_loss: 279.5596618652344, q_loss 279.5596618652344, v_loss 4.442003501026193e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 310, total_loss: 937.3479614257812, q_loss 937.3479614257812, v_loss 3.0602839160565054e-06 ,lr 0.01
+INFO:root:val_loss 1.3078827857971191
+INFO:root:val_loss 1.3016422986984253
+INFO:root:val_loss 1.30589759349823
+INFO:root:epoch 0, Episode 311, total_loss: 93.13143157958984, q_loss 93.13143157958984, v_loss 2.739983528954326e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 312, total_loss: 1.9979314804077148, q_loss 1.9979298114776611, v_loss 1.6851981854415499e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 313, total_loss: 192.44309997558594, q_loss 192.4392547607422, v_loss 0.003844892606139183 ,lr 0.01
+INFO:root:epoch 0, Episode 314, total_loss: 2742.72216796875, q_loss 2742.71728515625, v_loss 0.004822086077183485 ,lr 0.01
+INFO:root:epoch 0, Episode 315, total_loss: 617.99560546875, q_loss 617.9945678710938, v_loss 0.0010513006709516048 ,lr 0.01
+INFO:root:epoch 0, Episode 316, total_loss: 2.4666223526000977, q_loss 2.4666223526000977, v_loss 5.531389035695611e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 317, total_loss: 424.6497802734375, q_loss 424.6497802734375, v_loss 1.2574759011840797e-09 ,lr 0.01
+INFO:root:epoch 0, Episode 318, total_loss: 140.0209197998047, q_loss 140.0209197998047, v_loss 6.999911761340627e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 319, total_loss: 406.11260986328125, q_loss 406.1119384765625, v_loss 0.0006814691587351263 ,lr 0.01
+INFO:root:epoch 0, Episode 320, total_loss: 137.62759399414062, q_loss 137.62759399414062, v_loss 2.1424107217171695e-06 ,lr 0.01
+INFO:root:val_loss 1.3037257194519043
+INFO:root:val_loss 1.304794430732727
+INFO:root:val_loss 1.3048938512802124
+INFO:root:epoch 0, Episode 321, total_loss: 360.3463439941406, q_loss 360.3460998535156, v_loss 0.00025237296358682215 ,lr 0.01
+INFO:root:epoch 0, Episode 322, total_loss: 126.36538696289062, q_loss 126.364501953125, v_loss 0.0008852277533151209 ,lr 0.01
+INFO:root:epoch 0, Episode 323, total_loss: 5656.30615234375, q_loss 5656.3046875, v_loss 0.001529373461380601 ,lr 0.01
+INFO:root:epoch 0, Episode 324, total_loss: 162.01336669921875, q_loss 162.01336669921875, v_loss 1.096649043574871e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 325, total_loss: 2.5028557777404785, q_loss 2.5028553009033203, v_loss 3.5826175803777005e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 326, total_loss: 621.9876098632812, q_loss 621.9876098632812, v_loss 2.759594099188689e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 327, total_loss: 294.7122802734375, q_loss 294.712158203125, v_loss 0.00011469001037767157 ,lr 0.01
+INFO:root:epoch 0, Episode 328, total_loss: 1461.67333984375, q_loss 1461.673095703125, v_loss 0.0002753788430709392 ,lr 0.01
+INFO:root:epoch 0, Episode 329, total_loss: 776.1465454101562, q_loss 776.1465454101562, v_loss 2.717283678066451e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 330, total_loss: 2.077162265777588, q_loss 2.077162265777588, v_loss 4.059443625692438e-08 ,lr 0.01
+INFO:root:val_loss 1.3172041177749634
+INFO:root:epoch 0, Episode 331, total_loss: 57.746952056884766, q_loss 57.7469482421875, v_loss 4.980897301720688e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 332, total_loss: 554.9828491210938, q_loss 554.9828491210938, v_loss 1.26922387266859e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 333, total_loss: 1076.09423828125, q_loss 1076.093994140625, v_loss 0.00028126637334935367 ,lr 0.01
+INFO:root:epoch 0, Episode 334, total_loss: 3219.27880859375, q_loss 3219.038818359375, v_loss 0.2399766743183136 ,lr 0.01
+INFO:root:epoch 0, Episode 335, total_loss: 2761.75341796875, q_loss 2761.75341796875, v_loss 5.837163826072356e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 336, total_loss: 1223.7960205078125, q_loss 1223.7958984375, v_loss 0.0001300268922932446 ,lr 0.01
+INFO:root:epoch 0, Episode 337, total_loss: 1.9742600917816162, q_loss 1.9742599725723267, v_loss 1.4807139336880937e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 338, total_loss: 956.6484375, q_loss 956.6484375, v_loss 8.593028866243912e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 339, total_loss: 123.94151306152344, q_loss 123.93917083740234, v_loss 0.0023453880567103624 ,lr 0.01
+INFO:root:epoch 0, Episode 340, total_loss: 1315.0087890625, q_loss 1315.0087890625, v_loss 1.278616323929782e-09 ,lr 0.01
+INFO:root:val_loss 1.3155535459518433
+INFO:root:val_loss 1.3205198049545288
+INFO:root:val_loss 1.3180358409881592
+INFO:root:val_loss 1.3272695541381836
+INFO:root:val_loss 1.3052982091903687
+INFO:root:val_loss 1.3224681615829468
+INFO:root:val_loss 1.314367413520813
+INFO:root:val_loss 1.3152871131896973
+INFO:root:val_loss 1.3203471899032593
+INFO:root:val_loss 1.3231192827224731
+INFO:root:val_loss 1.3281729221343994
+INFO:root:val_loss 1.31803560256958
+INFO:root:val_loss 1.3179727792739868
+INFO:root:val_loss 1.318063735961914
+INFO:root:val_loss 1.3153406381607056
+INFO:root:val_loss 1.3151825666427612
+INFO:root:val_loss 1.3151520490646362
+INFO:root:epoch 0, Episode 341, total_loss: 1293.3314208984375, q_loss 1293.3314208984375, v_loss 7.558762504800143e-09 ,lr 0.01
+INFO:root:epoch 0, Episode 342, total_loss: 1256.601806640625, q_loss 1256.601806640625, v_loss 1.789076122804545e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 343, total_loss: 2.2944388389587402, q_loss 2.2944376468658447, v_loss 1.2122028465455514e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 344, total_loss: 2627.342041015625, q_loss 2627.33203125, v_loss 0.010047263465821743 ,lr 0.01
+INFO:root:epoch 0, Episode 345, total_loss: 246.057373046875, q_loss 246.05465698242188, v_loss 0.0027165424544364214 ,lr 0.01
+INFO:root:epoch 0, Episode 346, total_loss: 2626.625732421875, q_loss 2626.583251953125, v_loss 0.04259009286761284 ,lr 0.01
+INFO:root:epoch 0, Episode 347, total_loss: 1748.5018310546875, q_loss 1748.501708984375, v_loss 6.921653402969241e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 348, total_loss: 2.3920652866363525, q_loss 2.3920633792877197, v_loss 1.890267299131665e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 349, total_loss: 459.0401611328125, q_loss 459.0400390625, v_loss 0.00010875994485104457 ,lr 0.01
+INFO:root:epoch 0, Episode 350, total_loss: 555.1991577148438, q_loss 555.1991577148438, v_loss 4.845351497806405e-08 ,lr 0.01
+INFO:root:val_loss 1.3244731426239014
+INFO:root:val_loss 1.3206902742385864
+INFO:root:val_loss 1.3172047138214111
+INFO:root:val_loss 1.3146018981933594
+INFO:root:val_loss 1.3142870664596558
+INFO:root:val_loss 1.3135491609573364
+INFO:root:epoch 0, Episode 351, total_loss: 143.99191284179688, q_loss 143.99191284179688, v_loss 5.739722155340132e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 352, total_loss: 246.5052490234375, q_loss 246.5052490234375, v_loss 8.354854230674391e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 353, total_loss: 3062.804443359375, q_loss 3062.801025390625, v_loss 0.0032988456077873707 ,lr 0.01
+INFO:root:epoch 0, Episode 354, total_loss: 598.0567016601562, q_loss 598.0562133789062, v_loss 0.00048430668539367616 ,lr 0.01
+INFO:root:epoch 0, Episode 355, total_loss: 250.08438110351562, q_loss 250.08438110351562, v_loss 4.011362264577656e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 356, total_loss: 956.3823852539062, q_loss 956.3823852539062, v_loss 4.039270152134122e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 357, total_loss: 1170.2232666015625, q_loss 1170.2232666015625, v_loss 2.7618076714475137e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 358, total_loss: 375.9779357910156, q_loss 375.9778747558594, v_loss 6.289935845416039e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 359, total_loss: 1312.9219970703125, q_loss 1312.9219970703125, v_loss 4.406707034831925e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 360, total_loss: 2100.990478515625, q_loss 2100.990478515625, v_loss 1.4810679260790494e-07 ,lr 0.01
+INFO:root:val_loss 1.3157507181167603
+INFO:root:val_loss 1.321583867073059
+INFO:root:val_loss 1.3161128759384155
+INFO:root:val_loss 1.3138598203659058
+INFO:root:val_loss 1.322893738746643
+INFO:root:val_loss 1.315747618675232
+INFO:root:val_loss 1.3138598203659058
+INFO:root:val_loss 1.316118597984314
+INFO:root:val_loss 1.3148040771484375
+INFO:root:val_loss 1.3170627355575562
+INFO:root:val_loss 1.3170626163482666
+INFO:root:val_loss 1.32063627243042
+INFO:root:val_loss 1.3202646970748901
+INFO:root:val_loss 1.3166908025741577
+INFO:root:val_loss 1.3170619010925293
+INFO:root:val_loss 1.313860535621643
+INFO:root:val_loss 1.317062497138977
+INFO:root:val_loss 1.3170627355575562
+INFO:root:val_loss 1.3161191940307617
+INFO:root:val_loss 1.3170627355575562
+INFO:root:val_loss 1.3228942155838013
+INFO:root:val_loss 1.3228940963745117
+INFO:root:val_loss 1.3170627355575562
+INFO:root:val_loss 1.318006157875061
+INFO:root:val_loss 1.3183774948120117
+INFO:root:val_loss 1.3157477378845215
+INFO:root:val_loss 1.3148043155670166
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3170627355575562
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3148043155670166
+INFO:root:val_loss 1.3193210363388062
+INFO:root:val_loss 1.3170627355575562
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:val_loss 1.3138607740402222
+INFO:root:epoch 0, Episode 361, total_loss: 500.10888671875, q_loss 500.10888671875, v_loss 2.5213236654053617e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 362, total_loss: 161.3388671875, q_loss 161.3385009765625, v_loss 0.0003734378842636943 ,lr 0.01
+INFO:root:epoch 0, Episode 363, total_loss: 265.30670166015625, q_loss 265.30670166015625, v_loss 1.2185489595140098e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 364, total_loss: 478.5675354003906, q_loss 478.5675354003906, v_loss 2.5990595986513654e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 365, total_loss: 1313.196044921875, q_loss 1313.1953125, v_loss 0.0006817299290560186 ,lr 0.01
+INFO:root:epoch 0, Episode 366, total_loss: 1495.2099609375, q_loss 1495.2099609375, v_loss 1.7214193576364778e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 367, total_loss: 2100.972412109375, q_loss 2100.97021484375, v_loss 0.0022378643043339252 ,lr 0.01
+INFO:root:epoch 0, Episode 368, total_loss: 155.11004638671875, q_loss 155.10934448242188, v_loss 0.0006975751020945609 ,lr 0.01
+INFO:root:epoch 0, Episode 369, total_loss: 71.7365493774414, q_loss 71.7365493774414, v_loss 1.3332231318941012e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 370, total_loss: 95.005859375, q_loss 95.005859375, v_loss 3.5044514845594676e-08 ,lr 0.01
+INFO:root:val_loss 1.3091880083084106
+INFO:root:val_loss 1.3083033561706543
+INFO:root:epoch 0, Episode 371, total_loss: 2.5007097721099854, q_loss 2.5007097721099854, v_loss 2.289934109001024e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 372, total_loss: 343.5480041503906, q_loss 343.5480041503906, v_loss 2.9749781305099532e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 373, total_loss: 2.167588233947754, q_loss 2.167587995529175, v_loss 3.239049704006902e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 374, total_loss: 1501.276611328125, q_loss 1501.276611328125, v_loss 1.0445425147054266e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 375, total_loss: 154.10308837890625, q_loss 154.10308837890625, v_loss 2.436338490952039e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 376, total_loss: 2102.056640625, q_loss 2102.056640625, v_loss 1.935995186386208e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 377, total_loss: 687.4869384765625, q_loss 687.4869384765625, v_loss 4.347421054262668e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 378, total_loss: 76.67450714111328, q_loss 76.67450714111328, v_loss 2.9895779789512744e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 379, total_loss: 2.0968778133392334, q_loss 2.0968778133392334, v_loss 7.999741841180352e-11 ,lr 0.01
+INFO:root:epoch 0, Episode 380, total_loss: 57.3131217956543, q_loss 57.313106536865234, v_loss 1.4858930626360234e-05 ,lr 0.01
+INFO:root:val_loss 1.3026775121688843
+INFO:root:epoch 0, Episode 381, total_loss: 111.9203872680664, q_loss 111.9203872680664, v_loss 5.167220251678373e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 382, total_loss: 3495.80419921875, q_loss 3495.80419921875, v_loss 4.7373998057764766e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 383, total_loss: 1500.8631591796875, q_loss 1500.8631591796875, v_loss 2.3997645257622935e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 384, total_loss: 1.8430556058883667, q_loss 1.8430143594741821, v_loss 4.1293806134490296e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 385, total_loss: 422.0237731933594, q_loss 422.0237121582031, v_loss 5.79309999011457e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 386, total_loss: 2.4158265590667725, q_loss 2.4158265590667725, v_loss 8.70454836682244e-12 ,lr 0.01
+INFO:root:epoch 0, Episode 387, total_loss: 1315.2855224609375, q_loss 1315.2855224609375, v_loss 1.2400235505083401e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 388, total_loss: 704.3929443359375, q_loss 704.3928833007812, v_loss 3.570861372281797e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 389, total_loss: 253.83981323242188, q_loss 253.83978271484375, v_loss 2.442067489027977e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 390, total_loss: 2.0382697582244873, q_loss 2.03826904296875, v_loss 6.830528036516625e-07 ,lr 0.01
+INFO:root:val_loss 1.2987054586410522
+INFO:root:epoch 0, Episode 391, total_loss: 5260.947265625, q_loss 5260.94482421875, v_loss 0.0023206279147416353 ,lr 0.01
+INFO:root:epoch 0, Episode 392, total_loss: 246.08761596679688, q_loss 246.08761596679688, v_loss 4.6024214839235356e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 393, total_loss: 2.5087761878967285, q_loss 2.5087759494781494, v_loss 1.3240151019999757e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 394, total_loss: 206.2778778076172, q_loss 206.2778778076172, v_loss 1.1788570475346205e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 395, total_loss: 2244.589599609375, q_loss 2244.5888671875, v_loss 0.000634213094599545 ,lr 0.01
+INFO:root:epoch 0, Episode 396, total_loss: 77.14783477783203, q_loss 77.1478271484375, v_loss 6.213017059053527e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 397, total_loss: 4225.80810546875, q_loss 4225.80810546875, v_loss 1.7315953115826233e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 398, total_loss: 101.13488006591797, q_loss 101.13488006591797, v_loss 3.503046075437055e-09 ,lr 0.01
+INFO:root:epoch 0, Episode 399, total_loss: 2.5440516471862793, q_loss 2.5440516471862793, v_loss 5.2203475320311554e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 400, total_loss: 1750.876953125, q_loss 1750.876953125, v_loss 7.748649721861511e-09 ,lr 0.01
+INFO:root:val_loss 1.3146744966506958
+INFO:root:val_loss 1.311191201210022
+INFO:root:val_loss 1.3121042251586914
+INFO:root:val_loss 1.3091989755630493
+INFO:root:val_loss 1.3111896514892578
+INFO:root:val_loss 1.3111686706542969
+INFO:root:val_loss 1.3106820583343506
+INFO:root:val_loss 1.3092013597488403
+INFO:root:val_loss 1.3106769323349
+INFO:root:val_loss 1.3096932172775269
+INFO:root:val_loss 1.3116815090179443
+INFO:root:val_loss 1.3111896514892578
+INFO:root:val_loss 1.3091999292373657
+INFO:root:val_loss 1.3186537027359009
+INFO:root:val_loss 1.3111871480941772
+INFO:root:val_loss 1.313180685043335
+INFO:root:val_loss 1.3096930980682373
+INFO:root:val_loss 1.3092011213302612
+INFO:root:val_loss 1.3106776475906372
+INFO:root:val_loss 1.3106975555419922
+INFO:root:val_loss 1.3131791353225708
+INFO:root:val_loss 1.3125745058059692
+INFO:root:val_loss 1.305678129196167
+INFO:root:val_loss 1.3136775493621826
+INFO:root:epoch 0, Episode 401, total_loss: 292.62799072265625, q_loss 292.62799072265625, v_loss 1.068704659701325e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 402, total_loss: 377.4275817871094, q_loss 377.4275817871094, v_loss 1.3801401799184987e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 403, total_loss: 1188.6114501953125, q_loss 1188.610595703125, v_loss 0.0008823057287372649 ,lr 0.01
+INFO:root:epoch 0, Episode 404, total_loss: 140.78237915039062, q_loss 140.78237915039062, v_loss 2.487838628439931e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 405, total_loss: 68.24047088623047, q_loss 68.24047088623047, v_loss 6.728931225552515e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 406, total_loss: 480.731689453125, q_loss 480.731689453125, v_loss 1.3242728300610906e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 407, total_loss: 213.5777130126953, q_loss 213.5777130126953, v_loss 4.616360911313677e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 408, total_loss: 1455.0819091796875, q_loss 1455.0819091796875, v_loss 1.674937948337174e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 409, total_loss: 1170.2667236328125, q_loss 1170.2657470703125, v_loss 0.0009446797193959355 ,lr 0.01
+INFO:root:epoch 0, Episode 410, total_loss: 71.84162139892578, q_loss 71.84162139892578, v_loss 5.724164697795686e-09 ,lr 0.01
+INFO:root:val_loss 1.3027328252792358
+INFO:root:epoch 0, Episode 411, total_loss: 226.38185119628906, q_loss 226.38185119628906, v_loss 6.416919404728105e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 412, total_loss: 62.06539535522461, q_loss 62.06539535522461, v_loss 1.1711209779718956e-10 ,lr 0.01
+INFO:root:epoch 0, Episode 413, total_loss: 106.13196563720703, q_loss 106.13196563720703, v_loss 5.597881909125135e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 414, total_loss: 310.9899597167969, q_loss 310.9899597167969, v_loss 1.60871849175237e-09 ,lr 0.01
+INFO:root:epoch 0, Episode 415, total_loss: 1107.0322265625, q_loss 1107.0322265625, v_loss 2.175622057620785e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 416, total_loss: 1337.9298095703125, q_loss 1337.9298095703125, v_loss 2.5897434170474298e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 417, total_loss: 1192.9632568359375, q_loss 1192.9632568359375, v_loss 1.971003626977108e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 418, total_loss: 1177.1942138671875, q_loss 1177.1942138671875, v_loss 1.6822175894048996e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 419, total_loss: 92.31072235107422, q_loss 92.31072235107422, v_loss 2.9767167575300846e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 420, total_loss: 1466.1456298828125, q_loss 1466.1456298828125, v_loss 2.7183992642676458e-05 ,lr 0.01
+INFO:root:val_loss 1.3079566955566406
+INFO:root:val_loss 1.3072539567947388
+INFO:root:val_loss 1.3033607006072998
+INFO:root:val_loss 1.3038493394851685
+INFO:root:epoch 0, Episode 421, total_loss: 169.2774658203125, q_loss 169.2774658203125, v_loss 1.368348367947192e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 422, total_loss: 2.6742308139801025, q_loss 2.674229621887207, v_loss 1.2040628689646837e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 423, total_loss: 658.1121215820312, q_loss 658.1121215820312, v_loss 2.8274979513298604e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 424, total_loss: 502.63323974609375, q_loss 502.63323974609375, v_loss 2.395197462590204e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 425, total_loss: 192.7076873779297, q_loss 192.7076873779297, v_loss 9.016388275995268e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 426, total_loss: 57.63329315185547, q_loss 57.63329315185547, v_loss 4.1481987977931567e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 427, total_loss: 353.17010498046875, q_loss 353.17010498046875, v_loss 1.3755123973169248e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 428, total_loss: 81.5090103149414, q_loss 81.5090103149414, v_loss 1.7367426607961534e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 429, total_loss: 2100.878662109375, q_loss 2100.878662109375, v_loss 3.3799849916249514e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 430, total_loss: 1853.69873046875, q_loss 1853.69873046875, v_loss 2.8801243843190605e-06 ,lr 0.01
+INFO:root:val_loss 1.3062015771865845
+INFO:root:val_loss 1.3037463426589966
+INFO:root:val_loss 1.3035790920257568
+INFO:root:val_loss 1.3036773204803467
+INFO:root:val_loss 1.3037525415420532
+INFO:root:val_loss 1.3062422275543213
+INFO:root:epoch 0, Episode 431, total_loss: 2.1523966789245605, q_loss 2.1523966789245605, v_loss 2.062971793392876e-09 ,lr 0.01
+INFO:root:epoch 0, Episode 432, total_loss: 227.636962890625, q_loss 227.636962890625, v_loss 6.362295721373812e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 433, total_loss: 3494.46484375, q_loss 3494.46484375, v_loss 7.554340845672414e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 434, total_loss: 426.6685485839844, q_loss 426.6685485839844, v_loss 3.666249313027947e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 435, total_loss: 5759.412109375, q_loss 5759.41162109375, v_loss 0.00025721322163008153 ,lr 0.01
+INFO:root:epoch 0, Episode 436, total_loss: 144.4527130126953, q_loss 144.4527130126953, v_loss 4.0833009506968665e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 437, total_loss: 2102.043212890625, q_loss 2102.043212890625, v_loss 2.6460265871719457e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 438, total_loss: 259.41949462890625, q_loss 259.41949462890625, v_loss 6.683779929517186e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 439, total_loss: 1140.7344970703125, q_loss 1140.734375, v_loss 6.510950333904475e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 440, total_loss: 58.07429885864258, q_loss 58.07429885864258, v_loss 1.5413659184559947e-06 ,lr 0.01
+INFO:root:val_loss 1.2987462282180786
+INFO:root:epoch 0, Episode 441, total_loss: 181.23472595214844, q_loss 181.23472595214844, v_loss 4.729075953946449e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 442, total_loss: 672.9220581054688, q_loss 672.921875, v_loss 0.00021154744899831712 ,lr 0.01
+INFO:root:epoch 0, Episode 443, total_loss: 139.12828063964844, q_loss 139.12818908691406, v_loss 8.949349285103381e-05 ,lr 0.01
+INFO:root:epoch 0, Episode 444, total_loss: 2101.76611328125, q_loss 2101.76611328125, v_loss 1.0385019777459092e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 445, total_loss: 1310.5888671875, q_loss 1310.5888671875, v_loss 1.130732584897487e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 446, total_loss: 2099.985107421875, q_loss 2099.985107421875, v_loss 1.2222921341731308e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 447, total_loss: 72.8568344116211, q_loss 72.8568344116211, v_loss 1.582626640077799e-15 ,lr 0.01
+INFO:root:epoch 0, Episode 448, total_loss: 258.39617919921875, q_loss 258.39617919921875, v_loss 1.2870073078374844e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 449, total_loss: 620.7306518554688, q_loss 620.7304077148438, v_loss 0.0002226580400019884 ,lr 0.01
+INFO:root:epoch 0, Episode 450, total_loss: 169.3744659423828, q_loss 169.3744659423828, v_loss 9.313279036859967e-08 ,lr 0.01
+INFO:root:val_loss 1.286011815071106
+INFO:root:val_loss 1.2925944328308105
+INFO:root:val_loss 1.279768466949463
+INFO:root:epoch 0, Episode 451, total_loss: 3498.82373046875, q_loss 3498.82373046875, v_loss 2.006556769629242e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 452, total_loss: 1499.7972412109375, q_loss 1499.7972412109375, v_loss 1.4813313076178503e-10 ,lr 0.01
+INFO:root:epoch 0, Episode 453, total_loss: 2.124863386154175, q_loss 2.124858856201172, v_loss 4.57329679193208e-06 ,lr 0.01
+INFO:root:epoch 0, Episode 454, total_loss: 3.0966718196868896, q_loss 3.0966713428497314, v_loss 5.874217094969936e-07 ,lr 0.01
+INFO:root:epoch 0, Episode 455, total_loss: 556.0661010742188, q_loss 556.0661010742188, v_loss 1.531370763530049e-08 ,lr 0.01
+INFO:root:epoch 0, Episode 456, total_loss: 169.57473754882812, q_loss 169.57473754882812, v_loss 8.028537195059471e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 0, total_loss: 123.28460693359375, q_loss 123.28460693359375, v_loss 2.730893514254172e-16 ,lr 0.01
+INFO:root:epoch 1, Episode 1, total_loss: 252.74356079101562, q_loss 252.74356079101562, v_loss 5.57535622647265e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 2, total_loss: 120.6454086303711, q_loss 120.64537811279297, v_loss 2.9138549507479183e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 3, total_loss: 5245.20166015625, q_loss 5245.20166015625, v_loss 0.00011532439384609461 ,lr 0.01
+INFO:root:val_loss 1.3031551837921143
+INFO:root:val_loss 1.2811452150344849
+INFO:root:val_loss 1.2591396570205688
+INFO:root:val_loss 1.2741810083389282
+INFO:root:val_loss 1.281143307685852
+INFO:root:val_loss 1.2741827964782715
+INFO:root:val_loss 1.2811431884765625
+INFO:root:val_loss 1.2961859703063965
+INFO:root:val_loss 1.2892247438430786
+INFO:root:val_loss 1.274182677268982
+INFO:root:val_loss 1.2811431884765625
+INFO:root:val_loss 1.325150728225708
+INFO:root:val_loss 1.303146481513977
+INFO:root:val_loss 1.3031481504440308
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2961857318878174
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2961856126785278
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.303146481513977
+INFO:root:val_loss 1.296185851097107
+INFO:root:val_loss 1.2741824388504028
+INFO:root:val_loss 1.3031466007232666
+INFO:root:val_loss 1.3031467199325562
+INFO:root:val_loss 1.2741823196411133
+INFO:root:val_loss 1.2811431884765625
+INFO:root:val_loss 1.2741824388504028
+INFO:root:val_loss 1.2811431884765625
+INFO:root:val_loss 1.2741824388504028
+INFO:root:val_loss 1.281143307685852
+INFO:root:val_loss 1.303146481513977
+INFO:root:val_loss 1.325149655342102
+INFO:root:val_loss 1.2811431884765625
+INFO:root:val_loss 1.2741824388504028
+INFO:root:val_loss 1.2811431884765625
+INFO:root:val_loss 1.2961856126785278
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.3031471967697144
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2961857318878174
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2961859703063965
+INFO:root:val_loss 1.2892255783081055
+INFO:root:val_loss 1.2591389417648315
+INFO:root:val_loss 1.289228081703186
+INFO:root:val_loss 1.2741998434066772
+INFO:root:val_loss 1.259139895439148
+INFO:root:val_loss 1.325150966644287
+INFO:root:val_loss 1.325150489807129
+INFO:root:val_loss 1.2591395378112793
+INFO:root:val_loss 1.2591396570205688
+INFO:root:val_loss 1.281143307685852
+INFO:root:val_loss 1.2741930484771729
+INFO:root:val_loss 1.281065821647644
+INFO:root:val_loss 1.2961968183517456
+INFO:root:val_loss 1.2591384649276733
+INFO:root:val_loss 1.2892647981643677
+INFO:root:val_loss 1.2591338157653809
+INFO:root:val_loss 1.2591334581375122
+INFO:root:val_loss 1.281143069267273
+INFO:root:val_loss 1.2741845846176147
+INFO:root:val_loss 1.2741847038269043
+INFO:root:val_loss 1.2892308235168457
+INFO:root:val_loss 1.3042689561843872
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.2741824388504028
+INFO:root:val_loss 1.2591400146484375
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:val_loss 1.259140133857727
+INFO:root:epoch 1, Episode 4, total_loss: 1064.2337646484375, q_loss 1064.2337646484375, v_loss 1.2622359690794838e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 5, total_loss: 1313.6248779296875, q_loss 1313.6248779296875, v_loss 2.049743930143677e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 6, total_loss: 1751.4656982421875, q_loss 1751.4656982421875, v_loss 3.4125291676900815e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 7, total_loss: 199.5001983642578, q_loss 199.5001983642578, v_loss 5.181828328204574e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 8, total_loss: 132.44435119628906, q_loss 132.44435119628906, v_loss 1.865680701484962e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 9, total_loss: 4.59858512878418, q_loss 4.5985846519470215, v_loss 3.856260377688159e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 10, total_loss: 440.0644836425781, q_loss 440.06427001953125, v_loss 0.00021752114116679877 ,lr 0.01
+INFO:root:epoch 1, Episode 11, total_loss: 2.276071071624756, q_loss 2.276029348373413, v_loss 4.1637766116764396e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 12, total_loss: 125.31365966796875, q_loss 125.31365966796875, v_loss 2.015362724705483e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 13, total_loss: 1.9901987314224243, q_loss 1.9901987314224243, v_loss 1.4600842312972873e-08 ,lr 0.01
+INFO:root:val_loss 1.2809311151504517
+INFO:root:epoch 1, Episode 14, total_loss: 259.3726806640625, q_loss 259.3726806640625, v_loss 1.1147768645969336e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 15, total_loss: 2.1696205139160156, q_loss 2.16961932182312, v_loss 1.1119901728307013e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 16, total_loss: 423.6955261230469, q_loss 423.6955261230469, v_loss 6.242633503461548e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 17, total_loss: 150.33485412597656, q_loss 150.3348388671875, v_loss 1.677315594861284e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 18, total_loss: 124.60910034179688, q_loss 124.60910034179688, v_loss 3.701148898471729e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 19, total_loss: 703.2162475585938, q_loss 703.2162475585938, v_loss 5.046188562118914e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 20, total_loss: 478.4412841796875, q_loss 478.44122314453125, v_loss 5.049371247878298e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 21, total_loss: 2.4680280685424805, q_loss 2.467904567718506, v_loss 0.00012349184544291347 ,lr 0.01
+INFO:root:epoch 1, Episode 22, total_loss: 7.11991024017334, q_loss 7.11991024017334, v_loss 1.1567628365599658e-12 ,lr 0.01
+INFO:root:epoch 1, Episode 23, total_loss: 809.523681640625, q_loss 809.523681640625, v_loss 2.3542751748095725e-08 ,lr 0.01
+INFO:root:val_loss 1.293183445930481
+INFO:root:val_loss 1.2899634838104248
+INFO:root:val_loss 1.3023964166641235
+INFO:root:val_loss 1.2935611009597778
+INFO:root:val_loss 1.2856091260910034
+INFO:root:val_loss 1.2874565124511719
+INFO:root:val_loss 1.2875946760177612
+INFO:root:val_loss 1.2916995286941528
+INFO:root:val_loss 1.2983404397964478
+INFO:root:val_loss 1.2895780801773071
+INFO:root:val_loss 1.289577841758728
+INFO:root:val_loss 1.2856101989746094
+INFO:root:val_loss 1.293961524963379
+INFO:root:val_loss 1.2955080270767212
+INFO:root:epoch 1, Episode 24, total_loss: 169.21072387695312, q_loss 169.21072387695312, v_loss 3.7739238817335874e-11 ,lr 0.01
+INFO:root:epoch 1, Episode 25, total_loss: 1.9836461544036865, q_loss 1.983587384223938, v_loss 5.8713267208077013e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 26, total_loss: 365.0343017578125, q_loss 365.0343017578125, v_loss 1.3857292913144192e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 27, total_loss: 501.8014831542969, q_loss 501.80145263671875, v_loss 1.8797014490701258e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 28, total_loss: 697.4695434570312, q_loss 697.4695434570312, v_loss 4.974536977897515e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 29, total_loss: 505.3815002441406, q_loss 505.3815002441406, v_loss 6.2218314269557595e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 30, total_loss: 111.79277801513672, q_loss 111.79277801513672, v_loss 1.580256366651156e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 31, total_loss: 103.2888412475586, q_loss 103.2888412475586, v_loss 5.777444016530353e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 32, total_loss: 1176.2200927734375, q_loss 1176.2200927734375, v_loss 7.116859706002288e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 33, total_loss: 121.92030334472656, q_loss 121.92028045654297, v_loss 2.024732566496823e-05 ,lr 0.01
+INFO:root:val_loss 1.2886857986450195
+INFO:root:val_loss 1.2877037525177002
+INFO:root:val_loss 1.2855503559112549
+INFO:root:epoch 1, Episode 34, total_loss: 1070.6591796875, q_loss 1070.658447265625, v_loss 0.0007760903099551797 ,lr 0.01
+INFO:root:epoch 1, Episode 35, total_loss: 334.42626953125, q_loss 334.42626953125, v_loss 1.0426564585941378e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 36, total_loss: 366.60345458984375, q_loss 366.60345458984375, v_loss 5.58610622647393e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 37, total_loss: 223.39898681640625, q_loss 223.39898681640625, v_loss 3.90484001400182e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 38, total_loss: 74.33379364013672, q_loss 74.33378601074219, v_loss 4.78851143270731e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 39, total_loss: 1754.014892578125, q_loss 1754.014892578125, v_loss 1.8971053350469447e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 40, total_loss: 659.1419067382812, q_loss 659.1419067382812, v_loss 8.659631930640899e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 41, total_loss: 1083.409912109375, q_loss 1083.409912109375, v_loss 6.1214022935018875e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 42, total_loss: 5949.66015625, q_loss 5949.66015625, v_loss 0.00021556601859629154 ,lr 0.01
+INFO:root:epoch 1, Episode 43, total_loss: 555.33056640625, q_loss 555.33056640625, v_loss 1.2577031611726852e-06 ,lr 0.01
+INFO:root:val_loss 1.2913134098052979
+INFO:root:epoch 1, Episode 44, total_loss: 241.08612060546875, q_loss 241.08612060546875, v_loss 2.580028422016767e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 45, total_loss: 2.2810699939727783, q_loss 2.2810699939727783, v_loss 4.084706748189171e-13 ,lr 0.01
+INFO:root:epoch 1, Episode 46, total_loss: 4276.0771484375, q_loss 4276.0771484375, v_loss 1.3836917787557468e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 47, total_loss: 169.78196716308594, q_loss 169.7818603515625, v_loss 0.00010188067244598642 ,lr 0.01
+INFO:root:epoch 1, Episode 48, total_loss: 697.7005615234375, q_loss 697.7005615234375, v_loss 3.406727842047985e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 49, total_loss: 108.80638122558594, q_loss 108.80636596679688, v_loss 1.24680200315197e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 50, total_loss: 71.11210632324219, q_loss 71.11210632324219, v_loss 3.506678680764708e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 51, total_loss: 320.9986877441406, q_loss 320.9986877441406, v_loss 4.698931945767981e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 52, total_loss: 241.4396514892578, q_loss 241.43963623046875, v_loss 1.7848400602815673e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 53, total_loss: 213.28970336914062, q_loss 213.28970336914062, v_loss 2.6192915925093985e-07 ,lr 0.01
+INFO:root:val_loss 1.2789580821990967
+INFO:root:val_loss 1.2820262908935547
+INFO:root:val_loss 1.2857682704925537
+INFO:root:val_loss 1.281665325164795
+INFO:root:val_loss 1.27698814868927
+INFO:root:epoch 1, Episode 54, total_loss: 6794.38671875, q_loss 6794.38671875, v_loss 1.6242671563304611e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 55, total_loss: 141.2031707763672, q_loss 141.2031707763672, v_loss 1.4919750412900612e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 56, total_loss: 104.64119720458984, q_loss 104.64119720458984, v_loss 2.1223809199000243e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 57, total_loss: 3729.698486328125, q_loss 3729.698486328125, v_loss 4.518775313044898e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 58, total_loss: 67.48574829101562, q_loss 67.48574829101562, v_loss 2.963706720038317e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 59, total_loss: 1.873482346534729, q_loss 1.8734501600265503, v_loss 3.223145176889375e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 60, total_loss: 321.6778564453125, q_loss 321.6778564453125, v_loss 6.771558105356235e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 61, total_loss: 728.560546875, q_loss 728.560546875, v_loss 1.0033771104644984e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 62, total_loss: 1750.8740234375, q_loss 1750.8740234375, v_loss 6.455901058188829e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 63, total_loss: 76.7898178100586, q_loss 76.7898178100586, v_loss 7.634655503352406e-07 ,lr 0.01
+INFO:root:val_loss 1.2671470642089844
+INFO:root:val_loss 1.2716405391693115
+INFO:root:epoch 1, Episode 64, total_loss: 303.3977355957031, q_loss 303.3977355957031, v_loss 2.3838699902967164e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 65, total_loss: 1.9322278499603271, q_loss 1.9322271347045898, v_loss 7.378114332823316e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 66, total_loss: 586.9296875, q_loss 586.9295654296875, v_loss 9.471252997172996e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 67, total_loss: 3.0301058292388916, q_loss 3.0301058292388916, v_loss 7.659698431083939e-10 ,lr 0.01
+INFO:root:epoch 1, Episode 68, total_loss: 341.65826416015625, q_loss 341.65826416015625, v_loss 7.50115560776976e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 69, total_loss: 3587.379150390625, q_loss 3587.37890625, v_loss 0.00019371163216419518 ,lr 0.01
+INFO:root:epoch 1, Episode 70, total_loss: 3.465803861618042, q_loss 3.4658021926879883, v_loss 1.6212396758419345e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 71, total_loss: 222.2878875732422, q_loss 222.2878875732422, v_loss 3.0621880142689406e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 72, total_loss: 476.35968017578125, q_loss 476.35968017578125, v_loss 6.249100351851666e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 73, total_loss: 1836.7960205078125, q_loss 1836.7960205078125, v_loss 9.256620614905842e-06 ,lr 0.01
+INFO:root:val_loss 1.2749910354614258
+INFO:root:val_loss 1.2713282108306885
+INFO:root:val_loss 1.2721818685531616
+INFO:root:val_loss 1.2735422849655151
+INFO:root:val_loss 1.274401307106018
+INFO:root:epoch 1, Episode 74, total_loss: 478.27679443359375, q_loss 478.27679443359375, v_loss 2.7928042527491925e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 75, total_loss: 2.214876890182495, q_loss 2.214874744415283, v_loss 2.0299135030654725e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 76, total_loss: 253.34507751464844, q_loss 253.34507751464844, v_loss 3.506847079393083e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 77, total_loss: 189.20947265625, q_loss 189.20947265625, v_loss 1.3178189419704722e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 78, total_loss: 1931.5098876953125, q_loss 1931.5098876953125, v_loss 1.942151357070543e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 79, total_loss: 2.511834144592285, q_loss 2.511834144592285, v_loss 5.601700743887439e-13 ,lr 0.01
+INFO:root:epoch 1, Episode 80, total_loss: 588.06201171875, q_loss 588.06201171875, v_loss 8.546574576939747e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 81, total_loss: 65.95016479492188, q_loss 65.95015716552734, v_loss 9.170338671538047e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 82, total_loss: 619.9891967773438, q_loss 619.9891357421875, v_loss 4.478139817365445e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 83, total_loss: 2.8273727893829346, q_loss 2.8273632526397705, v_loss 9.448353921470698e-06 ,lr 0.01
+INFO:root:val_loss 1.2822716236114502
+INFO:root:epoch 1, Episode 84, total_loss: 2.7671663761138916, q_loss 2.7671663761138916, v_loss 2.8506654814464127e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 85, total_loss: 441.3261413574219, q_loss 441.3261413574219, v_loss 2.4200605821533827e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 86, total_loss: 372.7254943847656, q_loss 372.7254943847656, v_loss 8.827359465612972e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 87, total_loss: 320.0428771972656, q_loss 320.0428771972656, v_loss 7.033421667301809e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 88, total_loss: 719.7415771484375, q_loss 719.7415771484375, v_loss 1.7608666894375347e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 89, total_loss: 2531.949951171875, q_loss 2531.94970703125, v_loss 0.00013912073336541653 ,lr 0.01
+INFO:root:epoch 1, Episode 90, total_loss: 390.7925109863281, q_loss 390.7925109863281, v_loss 7.453009764901708e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 91, total_loss: 2.214513063430786, q_loss 2.214507579803467, v_loss 5.377251000027172e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 92, total_loss: 331.11700439453125, q_loss 331.1169738769531, v_loss 2.9382958018686622e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 93, total_loss: 1697.20947265625, q_loss 1697.2093505859375, v_loss 0.0001450476993340999 ,lr 0.01
+INFO:root:val_loss 1.265491247177124
+INFO:root:val_loss 1.2692584991455078
+INFO:root:val_loss 1.2695592641830444
+INFO:root:epoch 1, Episode 94, total_loss: 1.8435957431793213, q_loss 1.8435730934143066, v_loss 2.2698093744111247e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 95, total_loss: 4269.63330078125, q_loss 4269.63330078125, v_loss 1.976693475569391e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 96, total_loss: 2.0728366374969482, q_loss 2.0728328227996826, v_loss 3.841345915134298e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 97, total_loss: 294.6997985839844, q_loss 294.6997985839844, v_loss 2.5830669869719713e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 98, total_loss: 287.32965087890625, q_loss 287.32965087890625, v_loss 4.507273132503542e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 99, total_loss: 406.3915710449219, q_loss 406.3915710449219, v_loss 2.2205499590199906e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 100, total_loss: 278.5757751464844, q_loss 278.5757751464844, v_loss 9.798573955777101e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 101, total_loss: 197.768798828125, q_loss 197.768798828125, v_loss 5.937027367508563e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 102, total_loss: 112.46080017089844, q_loss 112.46080017089844, v_loss 2.3054933535604505e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 103, total_loss: 730.8907470703125, q_loss 730.8907470703125, v_loss 1.3700750059797429e-05 ,lr 0.01
+INFO:root:val_loss 1.253056287765503
+INFO:root:val_loss 1.2528345584869385
+INFO:root:epoch 1, Episode 104, total_loss: 89.79544067382812, q_loss 89.7954330444336, v_loss 5.142424470250262e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 105, total_loss: 2.7348175048828125, q_loss 2.7348175048828125, v_loss 1.7514552308472986e-11 ,lr 0.01
+INFO:root:epoch 1, Episode 106, total_loss: 163.20355224609375, q_loss 163.2035369873047, v_loss 1.4515597285935655e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 107, total_loss: 252.15817260742188, q_loss 252.1581573486328, v_loss 1.4308760000858456e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 108, total_loss: 294.0516662597656, q_loss 294.0516662597656, v_loss 3.79366724700958e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 109, total_loss: 2.4931788444519043, q_loss 2.4931788444519043, v_loss 8.600083312160223e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 110, total_loss: 957.47802734375, q_loss 957.47802734375, v_loss 4.612533999193147e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 111, total_loss: 119.34344482421875, q_loss 119.34344482421875, v_loss 8.444800982942979e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 112, total_loss: 657.7139892578125, q_loss 657.7139892578125, v_loss 8.849724508763757e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 113, total_loss: 1185.8365478515625, q_loss 1185.836181640625, v_loss 0.0003916672430932522 ,lr 0.01
+INFO:root:val_loss 1.2592569589614868
+INFO:root:val_loss 1.2609151601791382
+INFO:root:val_loss 1.2488290071487427
+INFO:root:epoch 1, Episode 114, total_loss: 129.4939727783203, q_loss 129.4938201904297, v_loss 0.00014496518997475505 ,lr 0.01
+INFO:root:epoch 1, Episode 115, total_loss: 302.1512756347656, q_loss 302.1512145996094, v_loss 5.6603457778692245e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 116, total_loss: 2.322939395904541, q_loss 2.322938919067383, v_loss 5.862922876076482e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 117, total_loss: 353.3933410644531, q_loss 353.393310546875, v_loss 2.832515565387439e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 118, total_loss: 1040.7835693359375, q_loss 1040.7835693359375, v_loss 1.0549873650234076e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 119, total_loss: 364.1566467285156, q_loss 364.1566467285156, v_loss 1.1067496643590857e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 120, total_loss: 59.181884765625, q_loss 59.18187713623047, v_loss 6.504415978270117e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 121, total_loss: 86.39957427978516, q_loss 86.39957427978516, v_loss 1.1819189893458315e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 122, total_loss: 5292.791015625, q_loss 5292.79052734375, v_loss 0.0004533767933025956 ,lr 0.01
+INFO:root:epoch 1, Episode 123, total_loss: 1502.2841796875, q_loss 1502.2841796875, v_loss 1.6658438539707277e-07 ,lr 0.01
+INFO:root:val_loss 1.2337895631790161
+INFO:root:val_loss 1.233566403388977
+INFO:root:val_loss 1.2396202087402344
+INFO:root:val_loss 1.2453137636184692
+INFO:root:epoch 1, Episode 124, total_loss: 2098.611572265625, q_loss 2098.611572265625, v_loss 2.231922053397284e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 125, total_loss: 313.82293701171875, q_loss 313.82293701171875, v_loss 4.1391646732336085e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 126, total_loss: 81.70912170410156, q_loss 81.70912170410156, v_loss 2.99522366731253e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 127, total_loss: 3499.16845703125, q_loss 3499.16845703125, v_loss 1.4854952041787328e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 128, total_loss: 222.93882751464844, q_loss 222.93882751464844, v_loss 4.416246923710787e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 129, total_loss: 292.9072265625, q_loss 292.9071960449219, v_loss 2.1207939425949007e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 130, total_loss: 3510.502685546875, q_loss 3510.50244140625, v_loss 0.00016731431242078543 ,lr 0.01
+INFO:root:epoch 1, Episode 131, total_loss: 2726.383544921875, q_loss 2726.382080078125, v_loss 0.0013666283339262009 ,lr 0.01
+INFO:root:epoch 1, Episode 132, total_loss: 156.94171142578125, q_loss 156.9416961669922, v_loss 1.9452860215096734e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 133, total_loss: 101.8541488647461, q_loss 101.85403442382812, v_loss 0.00011528246977832168 ,lr 0.01
+INFO:root:val_loss 1.2318674325942993
+INFO:root:val_loss 1.231087327003479
+INFO:root:val_loss 1.1993523836135864
+INFO:root:epoch 1, Episode 134, total_loss: 3.616117238998413, q_loss 3.616117238998413, v_loss 1.5112288156982068e-11 ,lr 0.01
+INFO:root:epoch 1, Episode 135, total_loss: 91.8050308227539, q_loss 91.80496215820312, v_loss 6.903783651068807e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 136, total_loss: 3887.787109375, q_loss 3887.7236328125, v_loss 0.06357284635305405 ,lr 0.01
+INFO:root:epoch 1, Episode 137, total_loss: 1502.1722412109375, q_loss 1502.172119140625, v_loss 6.737095100106671e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 138, total_loss: 1.87391197681427, q_loss 1.873909592628479, v_loss 2.4391447368543595e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 139, total_loss: 956.8912963867188, q_loss 956.8912963867188, v_loss 1.2555481589515693e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 140, total_loss: 359.81109619140625, q_loss 359.8102722167969, v_loss 0.000822360219899565 ,lr 0.01
+INFO:root:epoch 1, Episode 141, total_loss: 2.304847240447998, q_loss 2.3048465251922607, v_loss 7.972720368343289e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 142, total_loss: 1752.995361328125, q_loss 1752.995361328125, v_loss 1.9327571862959303e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 143, total_loss: 408.74237060546875, q_loss 408.74237060546875, v_loss 2.7966859761363594e-07 ,lr 0.01
+INFO:root:val_loss 1.2548508644104004
+INFO:root:val_loss 1.241081714630127
+INFO:root:epoch 1, Episode 144, total_loss: 1313.8541259765625, q_loss 1313.85400390625, v_loss 7.740894216112792e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 145, total_loss: 1684.6510009765625, q_loss 1684.6448974609375, v_loss 0.006046186666935682 ,lr 0.01
+INFO:root:epoch 1, Episode 146, total_loss: 2102.033935546875, q_loss 2102.03369140625, v_loss 0.00012321918620727956 ,lr 0.01
+INFO:root:epoch 1, Episode 147, total_loss: 1500.4034423828125, q_loss 1500.4034423828125, v_loss 3.635885877883993e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 148, total_loss: 1169.103271484375, q_loss 1169.1031494140625, v_loss 7.901955541456118e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 149, total_loss: 459.0653076171875, q_loss 459.0652160644531, v_loss 9.372588829137385e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 150, total_loss: 1499.3028564453125, q_loss 1499.3023681640625, v_loss 0.000541403132956475 ,lr 0.01
+INFO:root:epoch 1, Episode 151, total_loss: 2239.775390625, q_loss 2239.775146484375, v_loss 0.00026576645905151963 ,lr 0.01
+INFO:root:epoch 1, Episode 152, total_loss: 1093.7042236328125, q_loss 1093.7039794921875, v_loss 0.00027967392816208303 ,lr 0.01
+INFO:root:epoch 1, Episode 153, total_loss: 1.8916234970092773, q_loss 1.8914936780929565, v_loss 0.00012977221922483295 ,lr 0.01
+INFO:root:val_loss 1.267698049545288
+INFO:root:epoch 1, Episode 154, total_loss: 74.40480041503906, q_loss 74.40480041503906, v_loss 2.51464689426939e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 155, total_loss: 81.61129760742188, q_loss 81.61128997802734, v_loss 9.326277904619928e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 156, total_loss: 512.0682373046875, q_loss 512.0669555664062, v_loss 0.0013104596873745322 ,lr 0.01
+INFO:root:epoch 1, Episode 157, total_loss: 1170.2119140625, q_loss 1170.2117919921875, v_loss 9.328683518106118e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 158, total_loss: 138.4233856201172, q_loss 138.42335510253906, v_loss 2.5156417905236594e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 159, total_loss: 310.5753173828125, q_loss 310.5748291015625, v_loss 0.00048822126700542867 ,lr 0.01
+INFO:root:epoch 1, Episode 160, total_loss: 250.86703491210938, q_loss 250.8666534423828, v_loss 0.0003822236030828208 ,lr 0.01
+INFO:root:epoch 1, Episode 161, total_loss: 2.660677909851074, q_loss 2.660597801208496, v_loss 8.018857624847442e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 162, total_loss: 436.011474609375, q_loss 436.0110168457031, v_loss 0.0004455101443454623 ,lr 0.01
+INFO:root:epoch 1, Episode 163, total_loss: 353.5205078125, q_loss 353.5203552246094, v_loss 0.00013807520736008883 ,lr 0.01
+INFO:root:val_loss 1.2418797016143799
+INFO:root:val_loss 1.251493215560913
+INFO:root:val_loss 1.2721121311187744
+INFO:root:val_loss 1.275873064994812
+INFO:root:epoch 1, Episode 164, total_loss: 2.0781545639038086, q_loss 2.0781545639038086, v_loss 1.5142345710650318e-10 ,lr 0.01
+INFO:root:epoch 1, Episode 165, total_loss: 272.8655090332031, q_loss 272.86505126953125, v_loss 0.00044698608689941466 ,lr 0.01
+INFO:root:epoch 1, Episode 166, total_loss: 783.175048828125, q_loss 783.1749877929688, v_loss 4.2865052819252014e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 167, total_loss: 85.34835815429688, q_loss 85.34829711914062, v_loss 6.407290493370965e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 168, total_loss: 1312.772705078125, q_loss 1312.771728515625, v_loss 0.0010350218508392572 ,lr 0.01
+INFO:root:epoch 1, Episode 169, total_loss: 73.01335144042969, q_loss 73.01297760009766, v_loss 0.0003738698724191636 ,lr 0.01
+INFO:root:epoch 1, Episode 170, total_loss: 2.5291244983673096, q_loss 2.5291073322296143, v_loss 1.7176880646729842e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 171, total_loss: 271.6934509277344, q_loss 271.69268798828125, v_loss 0.0007524942047894001 ,lr 0.01
+INFO:root:epoch 1, Episode 172, total_loss: 2782.138427734375, q_loss 2782.137939453125, v_loss 0.00042333590681664646 ,lr 0.01
+INFO:root:epoch 1, Episode 173, total_loss: 1926.3775634765625, q_loss 1926.3760986328125, v_loss 0.0014950395561754704 ,lr 0.01
+INFO:root:val_loss 1.2725826501846313
+INFO:root:val_loss 1.2730309963226318
+INFO:root:val_loss 1.2728687524795532
+INFO:root:val_loss 1.272909164428711
+INFO:root:val_loss 1.2726397514343262
+INFO:root:val_loss 1.2725576162338257
+INFO:root:epoch 1, Episode 174, total_loss: 2.2639613151550293, q_loss 2.2638301849365234, v_loss 0.00013116240734234452 ,lr 0.01
+INFO:root:epoch 1, Episode 175, total_loss: 1503.1209716796875, q_loss 1503.117919921875, v_loss 0.0030953946989029646 ,lr 0.01
+INFO:root:epoch 1, Episode 176, total_loss: 67.11747741699219, q_loss 67.11715698242188, v_loss 0.00031713591306470335 ,lr 0.01
+INFO:root:epoch 1, Episode 177, total_loss: 1445.6517333984375, q_loss 1445.64501953125, v_loss 0.006746646482497454 ,lr 0.01
+INFO:root:epoch 1, Episode 178, total_loss: 3375.482421875, q_loss 3375.47998046875, v_loss 0.002326101064682007 ,lr 0.01
+INFO:root:epoch 1, Episode 179, total_loss: 2536.947509765625, q_loss 2536.946044921875, v_loss 0.0013475053710862994 ,lr 0.01
+INFO:root:epoch 1, Episode 180, total_loss: 2.1552929878234863, q_loss 2.155233860015869, v_loss 5.909099127165973e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 181, total_loss: 554.3434448242188, q_loss 554.3423461914062, v_loss 0.0011040795361623168 ,lr 0.01
+INFO:root:epoch 1, Episode 182, total_loss: 2.160811424255371, q_loss 2.1608054637908936, v_loss 5.868787411600351e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 183, total_loss: 490.4810791015625, q_loss 490.4808654785156, v_loss 0.00022442234330810606 ,lr 0.01
+INFO:root:val_loss 1.2712352275848389
+INFO:root:val_loss 1.2745716571807861
+INFO:root:epoch 1, Episode 184, total_loss: 525.1856079101562, q_loss 525.1840209960938, v_loss 0.0015672774752601981 ,lr 0.01
+INFO:root:epoch 1, Episode 185, total_loss: 78.32295227050781, q_loss 78.31702423095703, v_loss 0.00592934200540185 ,lr 0.01
+INFO:root:epoch 1, Episode 186, total_loss: 3037.27880859375, q_loss 3037.268310546875, v_loss 0.010490640066564083 ,lr 0.01
+INFO:root:epoch 1, Episode 187, total_loss: 425.26556396484375, q_loss 425.2655334472656, v_loss 2.325898276467342e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 188, total_loss: 72.90242767333984, q_loss 72.90220642089844, v_loss 0.00022060255287215114 ,lr 0.01
+INFO:root:epoch 1, Episode 189, total_loss: 2.231206178665161, q_loss 2.231196641921997, v_loss 9.575969670549966e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 190, total_loss: 69.71236419677734, q_loss 69.71158599853516, v_loss 0.000777853827457875 ,lr 0.01
+INFO:root:epoch 1, Episode 191, total_loss: 581.5504150390625, q_loss 581.5504150390625, v_loss 1.4917673070158344e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 192, total_loss: 495.9268493652344, q_loss 495.92681884765625, v_loss 3.459584331721999e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 193, total_loss: 2.262269973754883, q_loss 2.262253999710083, v_loss 1.6037101886468008e-05 ,lr 0.01
+INFO:root:val_loss 1.2704087495803833
+INFO:root:epoch 1, Episode 194, total_loss: 1499.1846923828125, q_loss 1499.1846923828125, v_loss 5.986444193695206e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 195, total_loss: 97.39269256591797, q_loss 97.3923110961914, v_loss 0.00038166376180015504 ,lr 0.01
+INFO:root:epoch 1, Episode 196, total_loss: 1.9745699167251587, q_loss 1.9744744300842285, v_loss 9.546851651975885e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 197, total_loss: 265.1966857910156, q_loss 265.1955871582031, v_loss 0.0011037213262170553 ,lr 0.01
+INFO:root:epoch 1, Episode 198, total_loss: 514.3126831054688, q_loss 514.3126220703125, v_loss 3.333265340188518e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 199, total_loss: 3088.641845703125, q_loss 3088.641845703125, v_loss 8.298255124827847e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 200, total_loss: 302.5023498535156, q_loss 302.5009765625, v_loss 0.001374723855406046 ,lr 0.01
+INFO:root:epoch 1, Episode 201, total_loss: 1702.3388671875, q_loss 1701.8265380859375, v_loss 0.512286365032196 ,lr 0.01
+INFO:root:epoch 1, Episode 202, total_loss: 114.34562683105469, q_loss 114.34420776367188, v_loss 0.0014193286187946796 ,lr 0.01
+INFO:root:epoch 1, Episode 203, total_loss: 128.8181610107422, q_loss 128.81781005859375, v_loss 0.00035265096812509 ,lr 0.01
+INFO:root:val_loss 1.2675920724868774
+INFO:root:val_loss 1.2701553106307983
+INFO:root:epoch 1, Episode 204, total_loss: 4116.919921875, q_loss 4116.91455078125, v_loss 0.00517681147903204 ,lr 0.01
+INFO:root:epoch 1, Episode 205, total_loss: 669.76171875, q_loss 669.76171875, v_loss 2.5842860850389116e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 206, total_loss: 264.84759521484375, q_loss 264.8059997558594, v_loss 0.04160147160291672 ,lr 0.01
+INFO:root:epoch 1, Episode 207, total_loss: 3882.27392578125, q_loss 3882.273681640625, v_loss 0.0001338463625870645 ,lr 0.01
+INFO:root:epoch 1, Episode 208, total_loss: 1166.94677734375, q_loss 1166.9459228515625, v_loss 0.0008940438274294138 ,lr 0.01
+INFO:root:epoch 1, Episode 209, total_loss: 78.34140014648438, q_loss 78.34137725830078, v_loss 2.173083157686051e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 210, total_loss: 2100.293212890625, q_loss 2100.2861328125, v_loss 0.007172440644353628 ,lr 0.01
+INFO:root:epoch 1, Episode 211, total_loss: 3490.863037109375, q_loss 3490.861328125, v_loss 0.0017461724346503615 ,lr 0.01
+INFO:root:epoch 1, Episode 212, total_loss: 196.37286376953125, q_loss 196.3721923828125, v_loss 0.0006716196658089757 ,lr 0.01
+INFO:root:epoch 1, Episode 213, total_loss: 3423.51708984375, q_loss 3423.51123046875, v_loss 0.0059506152756512165 ,lr 0.01
+INFO:root:val_loss 1.2695733308792114
+INFO:root:val_loss 1.256425380706787
+INFO:root:val_loss 1.2700639963150024
+INFO:root:val_loss 1.2678433656692505
+INFO:root:epoch 1, Episode 214, total_loss: 2.6332168579101562, q_loss 2.632967472076416, v_loss 0.00024934631073847413 ,lr 0.01
+INFO:root:epoch 1, Episode 215, total_loss: 366.0090026855469, q_loss 366.0089416503906, v_loss 6.600406777579337e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 216, total_loss: 259.1402282714844, q_loss 259.1400451660156, v_loss 0.00017875364574138075 ,lr 0.01
+INFO:root:epoch 1, Episode 217, total_loss: 886.8062133789062, q_loss 886.8016967773438, v_loss 0.004519056063145399 ,lr 0.01
+INFO:root:epoch 1, Episode 218, total_loss: 2101.101318359375, q_loss 2101.02880859375, v_loss 0.07242192327976227 ,lr 0.01
+INFO:root:epoch 1, Episode 219, total_loss: 1750.2882080078125, q_loss 1750.275390625, v_loss 0.012809697538614273 ,lr 0.01
+INFO:root:epoch 1, Episode 220, total_loss: 66.4601058959961, q_loss 66.46009063720703, v_loss 1.861839155026246e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 221, total_loss: 2.8347837924957275, q_loss 2.834733724594116, v_loss 5.0089878641301766e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 222, total_loss: 303.527099609375, q_loss 303.5268859863281, v_loss 0.00021569774253293872 ,lr 0.01
+INFO:root:epoch 1, Episode 223, total_loss: 1313.5645751953125, q_loss 1313.5645751953125, v_loss 4.0776575360723655e-07 ,lr 0.01
+INFO:root:val_loss 1.260365605354309
+INFO:root:val_loss 1.2640843391418457
+INFO:root:val_loss 1.2561711072921753
+INFO:root:val_loss 1.2048542499542236
+INFO:root:val_loss 1.2486326694488525
+INFO:root:val_loss 1.2685489654541016
+INFO:root:val_loss 1.2788804769515991
+INFO:root:val_loss 1.298316478729248
+INFO:root:val_loss 1.266396164894104
+INFO:root:val_loss 1.2646430730819702
+INFO:root:val_loss 1.27289617061615
+INFO:root:val_loss 1.260411262512207
+INFO:root:val_loss 1.2627148628234863
+INFO:root:val_loss 1.2630348205566406
+INFO:root:val_loss 1.2608860731124878
+INFO:root:val_loss 1.281983733177185
+INFO:root:val_loss 1.2645659446716309
+INFO:root:val_loss 1.288825511932373
+INFO:root:val_loss 1.292144775390625
+INFO:root:val_loss 1.292144775390625
+INFO:root:val_loss 1.2749382257461548
+INFO:root:val_loss 1.25971257686615
+INFO:root:val_loss 1.2608966827392578
+INFO:root:val_loss 1.2577301263809204
+INFO:root:val_loss 1.2577301263809204
+INFO:root:val_loss 1.2577301263809204
+INFO:root:val_loss 1.2577301263809204
+INFO:root:val_loss 1.2577301263809204
+INFO:root:epoch 1, Episode 224, total_loss: 1479.3592529296875, q_loss 1479.358642578125, v_loss 0.0006491322419606149 ,lr 0.01
+INFO:root:epoch 1, Episode 225, total_loss: 151.1572265625, q_loss 151.15713500976562, v_loss 9.390165359945968e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 226, total_loss: 346.8519287109375, q_loss 346.8514404296875, v_loss 0.00047964113764464855 ,lr 0.01
+INFO:root:epoch 1, Episode 227, total_loss: 293.12554931640625, q_loss 293.12261962890625, v_loss 0.002931492170318961 ,lr 0.01
+INFO:root:epoch 1, Episode 228, total_loss: 341.4236755371094, q_loss 341.423583984375, v_loss 8.847624121699482e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 229, total_loss: 99.95600128173828, q_loss 99.95587158203125, v_loss 0.00012666579277720302 ,lr 0.01
+INFO:root:epoch 1, Episode 230, total_loss: 62.180362701416016, q_loss 62.17852783203125, v_loss 0.0018362108385190368 ,lr 0.01
+INFO:root:epoch 1, Episode 231, total_loss: 161.62094116210938, q_loss 161.6209259033203, v_loss 1.0741858204710297e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 232, total_loss: 157.27780151367188, q_loss 157.27774047851562, v_loss 5.988528209854849e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 233, total_loss: 1840.4342041015625, q_loss 1840.4334716796875, v_loss 0.0007734610117040575 ,lr 0.01
+INFO:root:val_loss 1.2637927532196045
+INFO:root:val_loss 1.2625354528427124
+INFO:root:val_loss 1.2612303495407104
+INFO:root:epoch 1, Episode 234, total_loss: 2.085641622543335, q_loss 2.0830678939819336, v_loss 0.0025736798997968435 ,lr 0.01
+INFO:root:epoch 1, Episode 235, total_loss: 993.1661987304688, q_loss 993.1660766601562, v_loss 0.00012669115676544607 ,lr 0.01
+INFO:root:epoch 1, Episode 236, total_loss: 278.1224060058594, q_loss 278.12225341796875, v_loss 0.00014473444025497884 ,lr 0.01
+INFO:root:epoch 1, Episode 237, total_loss: 167.19522094726562, q_loss 167.1945037841797, v_loss 0.000719471659976989 ,lr 0.01
+INFO:root:epoch 1, Episode 238, total_loss: 132.1658172607422, q_loss 132.16574096679688, v_loss 7.554834155598655e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 239, total_loss: 660.9562377929688, q_loss 660.9561157226562, v_loss 0.0001238538243342191 ,lr 0.01
+INFO:root:epoch 1, Episode 240, total_loss: 217.04115295410156, q_loss 217.04110717773438, v_loss 5.0105791160603985e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 241, total_loss: 132.6825714111328, q_loss 132.6825714111328, v_loss 8.128824191544481e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 242, total_loss: 2.0397613048553467, q_loss 2.0396711826324463, v_loss 9.009447967400774e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 243, total_loss: 1567.5662841796875, q_loss 1567.566162109375, v_loss 0.00010779844160424545 ,lr 0.01
+INFO:root:val_loss 1.266340732574463
+INFO:root:val_loss 1.264981985092163
+INFO:root:val_loss 1.2637923955917358
+INFO:root:val_loss 1.2631123065948486
+INFO:root:epoch 1, Episode 244, total_loss: 259.42327880859375, q_loss 259.42327880859375, v_loss 8.389903882743965e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 245, total_loss: 181.70846557617188, q_loss 181.7083282470703, v_loss 0.00013806628703605384 ,lr 0.01
+INFO:root:epoch 1, Episode 246, total_loss: 330.8994140625, q_loss 330.8993835449219, v_loss 2.4835004296619445e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 247, total_loss: 2.4448959827423096, q_loss 2.444861888885498, v_loss 3.411504803807475e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 248, total_loss: 341.4729919433594, q_loss 341.47296142578125, v_loss 3.541115074767731e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 249, total_loss: 258.6238098144531, q_loss 258.623779296875, v_loss 1.8392500351183116e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 250, total_loss: 1.9896334409713745, q_loss 1.9896332025527954, v_loss 2.0460244343212253e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 251, total_loss: 2197.96240234375, q_loss 2197.96240234375, v_loss 4.154456405558449e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 252, total_loss: 430.2106628417969, q_loss 430.2105712890625, v_loss 0.0001011515487334691 ,lr 0.01
+INFO:root:epoch 1, Episode 253, total_loss: 2308.032958984375, q_loss 2308.02978515625, v_loss 0.003185620065778494 ,lr 0.01
+INFO:root:val_loss 1.2635982036590576
+INFO:root:val_loss 1.262697696685791
+INFO:root:val_loss 1.2628755569458008
+INFO:root:epoch 1, Episode 254, total_loss: 63.90468978881836, q_loss 63.9046745300293, v_loss 1.3783368558506481e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 255, total_loss: 421.00311279296875, q_loss 421.00286865234375, v_loss 0.0002526882744859904 ,lr 0.01
+INFO:root:epoch 1, Episode 256, total_loss: 251.16729736328125, q_loss 251.167236328125, v_loss 6.794957880629227e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 257, total_loss: 594.2738037109375, q_loss 594.2725830078125, v_loss 0.0012038875138387084 ,lr 0.01
+INFO:root:epoch 1, Episode 258, total_loss: 246.5911865234375, q_loss 246.5911865234375, v_loss 8.762039982457281e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 259, total_loss: 4645.5625, q_loss 4645.56201171875, v_loss 0.000613974523730576 ,lr 0.01
+INFO:root:epoch 1, Episode 260, total_loss: 62.09952163696289, q_loss 62.09952163696289, v_loss 1.1348150508183608e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 261, total_loss: 213.8213653564453, q_loss 213.8213653564453, v_loss 1.9588458144426113e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 262, total_loss: 1168.6929931640625, q_loss 1168.6929931640625, v_loss 4.134401933697518e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 263, total_loss: 1.8651925325393677, q_loss 1.8651924133300781, v_loss 1.1325387561100797e-07 ,lr 0.01
+INFO:root:val_loss 1.261049509048462
+INFO:root:epoch 1, Episode 264, total_loss: 321.81243896484375, q_loss 321.81243896484375, v_loss 9.278867452167106e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 265, total_loss: 152.66041564941406, q_loss 152.66041564941406, v_loss 3.117791607110121e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 266, total_loss: 557.4413452148438, q_loss 557.4413452148438, v_loss 2.6842761258194514e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 267, total_loss: 2.33646297454834, q_loss 2.3364596366882324, v_loss 3.28045916830888e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 268, total_loss: 555.2446899414062, q_loss 555.2446899414062, v_loss 4.393747872200038e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 269, total_loss: 3782.508544921875, q_loss 3782.508544921875, v_loss 1.8414650185150094e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 270, total_loss: 1546.736572265625, q_loss 1546.736572265625, v_loss 5.74875627989968e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 271, total_loss: 825.8610229492188, q_loss 825.8610229492188, v_loss 1.1285384715620239e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 272, total_loss: 2.179810047149658, q_loss 2.1798095703125, v_loss 3.6824337712459965e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 273, total_loss: 657.98974609375, q_loss 657.98974609375, v_loss 8.530420245733694e-07 ,lr 0.01
+INFO:root:val_loss 1.251725196838379
+INFO:root:val_loss 1.24463951587677
+INFO:root:val_loss 1.2473888397216797
+INFO:root:val_loss 1.2523834705352783
+INFO:root:val_loss 1.258588433265686
+INFO:root:val_loss 1.2468734979629517
+INFO:root:val_loss 1.244118571281433
+INFO:root:val_loss 1.2558335065841675
+INFO:root:val_loss 1.2513535022735596
+INFO:root:val_loss 1.2541084289550781
+INFO:root:val_loss 1.2418794631958008
+INFO:root:val_loss 1.2513636350631714
+INFO:root:val_loss 1.2418807744979858
+INFO:root:val_loss 1.2418785095214844
+INFO:root:val_loss 1.2418783903121948
+INFO:root:epoch 1, Episode 274, total_loss: 1198.41943359375, q_loss 1198.41943359375, v_loss 4.226184202593686e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 275, total_loss: 1074.5423583984375, q_loss 1074.5423583984375, v_loss 6.36397388120713e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 276, total_loss: 117.8451919555664, q_loss 117.8451919555664, v_loss 1.2333119059348974e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 277, total_loss: 1501.339111328125, q_loss 1501.339111328125, v_loss 1.960319423233159e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 278, total_loss: 566.30908203125, q_loss 566.30908203125, v_loss 2.9698495040975104e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 279, total_loss: 1115.3546142578125, q_loss 1115.3546142578125, v_loss 5.209237201597716e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 280, total_loss: 144.51101684570312, q_loss 144.51101684570312, v_loss 9.289545488400108e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 281, total_loss: 3.1436026096343994, q_loss 3.1436026096343994, v_loss 2.2486948414446317e-10 ,lr 0.01
+INFO:root:epoch 1, Episode 282, total_loss: 342.22161865234375, q_loss 342.22161865234375, v_loss 2.242456815793048e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 283, total_loss: 3808.6904296875, q_loss 3808.6904296875, v_loss 1.2977404821867822e-06 ,lr 0.01
+INFO:root:val_loss 1.2437742948532104
+INFO:root:val_loss 1.2510708570480347
+INFO:root:val_loss 1.242867350578308
+INFO:root:epoch 1, Episode 284, total_loss: 1501.3646240234375, q_loss 1501.3646240234375, v_loss 1.458493329664634e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 285, total_loss: 479.765380859375, q_loss 479.765380859375, v_loss 1.8278073810051865e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 286, total_loss: 61.530555725097656, q_loss 61.530548095703125, v_loss 9.155675797956064e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 287, total_loss: 6.0270490646362305, q_loss 6.0270490646362305, v_loss 1.665498929092138e-13 ,lr 0.01
+INFO:root:epoch 1, Episode 288, total_loss: 1883.0369873046875, q_loss 1883.0369873046875, v_loss 3.185032824148948e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 289, total_loss: 497.0890197753906, q_loss 497.0890197753906, v_loss 1.6296991134368e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 290, total_loss: 251.1953887939453, q_loss 251.1953582763672, v_loss 3.774466676986776e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 291, total_loss: 198.20462036132812, q_loss 198.20462036132812, v_loss 9.264235814043786e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 292, total_loss: 69.06590270996094, q_loss 69.06590270996094, v_loss 3.996197150968328e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 293, total_loss: 1316.294677734375, q_loss 1316.294677734375, v_loss 2.816148025885923e-06 ,lr 0.01
+INFO:root:val_loss 1.2413220405578613
+INFO:root:val_loss 1.239477515220642
+INFO:root:val_loss 1.2393656969070435
+INFO:root:val_loss 1.237206220626831
+INFO:root:val_loss 1.2330955266952515
+INFO:root:epoch 1, Episode 294, total_loss: 2.166442632675171, q_loss 2.166442632675171, v_loss 9.235643005922611e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 295, total_loss: 366.3263854980469, q_loss 366.3263854980469, v_loss 1.5929592791508185e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 296, total_loss: 1.9774935245513916, q_loss 1.9774935245513916, v_loss 3.835111428429627e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 297, total_loss: 1053.0718994140625, q_loss 1053.0718994140625, v_loss 3.0143678486638237e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 298, total_loss: 258.9197082519531, q_loss 258.919677734375, v_loss 3.1332296202890575e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 299, total_loss: 3917.62939453125, q_loss 3917.62939453125, v_loss 6.352698989076089e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 300, total_loss: 8.390803337097168, q_loss 8.390802383422852, v_loss 9.658348290031427e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 301, total_loss: 283.7403564453125, q_loss 283.7403259277344, v_loss 1.79318776645232e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 302, total_loss: 557.296875, q_loss 557.296875, v_loss 7.136830504350655e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 303, total_loss: 221.851318359375, q_loss 221.851318359375, v_loss 7.407940756820608e-06 ,lr 0.01
+INFO:root:val_loss 1.2387129068374634
+INFO:root:val_loss 1.2394088506698608
+INFO:root:val_loss 1.2413594722747803
+INFO:root:val_loss 1.2431749105453491
+INFO:root:epoch 1, Episode 304, total_loss: 2.6132705211639404, q_loss 2.6132700443267822, v_loss 5.952630317551666e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 305, total_loss: 352.8318786621094, q_loss 352.8318786621094, v_loss 2.2192391497810604e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 306, total_loss: 892.4012451171875, q_loss 892.4012451171875, v_loss 9.287753641729068e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 307, total_loss: 108.22904968261719, q_loss 108.22904968261719, v_loss 6.06991591212136e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 308, total_loss: 130.36599731445312, q_loss 130.36599731445312, v_loss 7.674152584513649e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 309, total_loss: 279.3265380859375, q_loss 279.3265075683594, v_loss 2.784306889225263e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 310, total_loss: 936.31005859375, q_loss 936.31005859375, v_loss 1.596230617906258e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 311, total_loss: 93.02407836914062, q_loss 93.02407836914062, v_loss 6.457818813032645e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 312, total_loss: 1.992989420890808, q_loss 1.9929887056350708, v_loss 7.056061690491333e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 313, total_loss: 190.42559814453125, q_loss 190.42559814453125, v_loss 2.5686608751129825e-06 ,lr 0.01
+INFO:root:val_loss 1.2417000532150269
+INFO:root:val_loss 1.2378300428390503
+INFO:root:val_loss 1.235713005065918
+INFO:root:val_loss 1.2398254871368408
+INFO:root:epoch 1, Episode 314, total_loss: 2740.562744140625, q_loss 2740.562744140625, v_loss 8.616514242021367e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 315, total_loss: 616.756591796875, q_loss 616.756591796875, v_loss 1.8809652146956068e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 316, total_loss: 2.4654600620269775, q_loss 2.4654600620269775, v_loss 7.259935586034771e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 317, total_loss: 423.7519836425781, q_loss 423.7519836425781, v_loss 9.931887490211011e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 318, total_loss: 139.87486267089844, q_loss 139.87486267089844, v_loss 3.4266105330971186e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 319, total_loss: 405.3269348144531, q_loss 405.3269348144531, v_loss 7.527256457251497e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 320, total_loss: 137.3572540283203, q_loss 137.3572540283203, v_loss 1.6926403532124823e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 321, total_loss: 359.9938049316406, q_loss 359.9937744140625, v_loss 3.3106436603702605e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 322, total_loss: 126.2952880859375, q_loss 126.29521942138672, v_loss 6.623664376093075e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 323, total_loss: 5651.28955078125, q_loss 5651.28955078125, v_loss 8.241956493293401e-06 ,lr 0.01
+INFO:root:val_loss 1.2430212497711182
+INFO:root:val_loss 1.2434053421020508
+INFO:root:epoch 1, Episode 324, total_loss: 161.8522491455078, q_loss 161.8522491455078, v_loss 5.244479552857229e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 325, total_loss: 2.5132856369018555, q_loss 2.5132853984832764, v_loss 2.816535982219648e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 326, total_loss: 621.2796020507812, q_loss 621.2796020507812, v_loss 6.91842615196947e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 327, total_loss: 294.46893310546875, q_loss 294.46893310546875, v_loss 6.940399998711655e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 328, total_loss: 1460.0587158203125, q_loss 1460.05859375, v_loss 7.573243055958301e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 329, total_loss: 775.509765625, q_loss 775.509765625, v_loss 2.1517280401894823e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 330, total_loss: 2.082077741622925, q_loss 2.082077741622925, v_loss 5.603954278399215e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 331, total_loss: 57.69768142700195, q_loss 57.69768142700195, v_loss 8.053019087128632e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 332, total_loss: 554.55810546875, q_loss 554.55810546875, v_loss 5.231848376752168e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 333, total_loss: 1075.4033203125, q_loss 1075.4033203125, v_loss 3.4950266126543283e-05 ,lr 0.01
+INFO:root:val_loss 1.2128009796142578
+INFO:root:val_loss 1.199198842048645
+INFO:root:val_loss 1.2122358083724976
+INFO:root:val_loss 1.2136749029159546
+INFO:root:val_loss 1.2150923013687134
+INFO:root:epoch 1, Episode 334, total_loss: 3214.138671875, q_loss 3214.130859375, v_loss 0.0077993678860366344 ,lr 0.01
+INFO:root:epoch 1, Episode 335, total_loss: 2759.832275390625, q_loss 2759.832275390625, v_loss 4.597178758558584e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 336, total_loss: 1223.1990966796875, q_loss 1223.1990966796875, v_loss 2.8932927307323553e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 337, total_loss: 1.974366307258606, q_loss 1.9743659496307373, v_loss 3.67663744782476e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 338, total_loss: 957.4598999023438, q_loss 957.4598999023438, v_loss 1.4333016906675766e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 339, total_loss: 123.98492431640625, q_loss 123.98475646972656, v_loss 0.00016507062537129968 ,lr 0.01
+INFO:root:epoch 1, Episode 340, total_loss: 1314.350341796875, q_loss 1314.350341796875, v_loss 2.0896175101370318e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 341, total_loss: 1292.84326171875, q_loss 1292.84326171875, v_loss 4.1582371324011547e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 342, total_loss: 1255.906005859375, q_loss 1255.9051513671875, v_loss 0.0008259763708338141 ,lr 0.01
+INFO:root:epoch 1, Episode 343, total_loss: 2.292149066925049, q_loss 2.2921483516693115, v_loss 8.191715892280627e-07 ,lr 0.01
+INFO:root:val_loss 1.217948079109192
+INFO:root:epoch 1, Episode 344, total_loss: 2625.047607421875, q_loss 2625.047607421875, v_loss 4.0183822420658544e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 345, total_loss: 245.88868713378906, q_loss 245.88868713378906, v_loss 1.0032160844275495e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 346, total_loss: 2626.145263671875, q_loss 2626.1435546875, v_loss 0.0017732508713379502 ,lr 0.01
+INFO:root:epoch 1, Episode 347, total_loss: 1747.206298828125, q_loss 1747.206298828125, v_loss 1.2637446161534172e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 348, total_loss: 2.3912949562072754, q_loss 2.3912949562072754, v_loss 5.2978226250388616e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 349, total_loss: 459.4071044921875, q_loss 459.4071044921875, v_loss 2.366597762204492e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 350, total_loss: 555.0377807617188, q_loss 555.0377807617188, v_loss 6.960585352544513e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 351, total_loss: 143.85137939453125, q_loss 143.85137939453125, v_loss 1.3727632364179954e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 352, total_loss: 246.39471435546875, q_loss 246.39471435546875, v_loss 3.656579394828441e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 353, total_loss: 3061.34228515625, q_loss 3061.341064453125, v_loss 0.0011357475304976106 ,lr 0.01
+INFO:root:val_loss 1.215015172958374
+INFO:root:val_loss 1.2104259729385376
+INFO:root:val_loss 1.202072262763977
+INFO:root:epoch 1, Episode 354, total_loss: 597.7606201171875, q_loss 597.7606201171875, v_loss 1.3040240673944936e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 355, total_loss: 249.9303436279297, q_loss 249.9303436279297, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 356, total_loss: 955.7139892578125, q_loss 955.7138061523438, v_loss 0.00019022462947759777 ,lr 0.01
+INFO:root:epoch 1, Episode 357, total_loss: 1169.5126953125, q_loss 1169.5126953125, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 358, total_loss: 375.7071838378906, q_loss 375.7068786621094, v_loss 0.00029441804508678615 ,lr 0.01
+INFO:root:epoch 1, Episode 359, total_loss: 1311.87646484375, q_loss 1311.87646484375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 360, total_loss: 2099.412841796875, q_loss 2099.412841796875, v_loss 1.0163243132410571e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 361, total_loss: 499.70294189453125, q_loss 499.70294189453125, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 362, total_loss: 161.3026580810547, q_loss 161.3026580810547, v_loss 3.487397523538327e-11 ,lr 0.01
+INFO:root:epoch 1, Episode 363, total_loss: 265.13299560546875, q_loss 265.13299560546875, v_loss 0.0 ,lr 0.01
+INFO:root:val_loss 1.2323511838912964
+INFO:root:val_loss 1.2309739589691162
+INFO:root:val_loss 1.2260679006576538
+INFO:root:val_loss 1.2242275476455688
+INFO:root:val_loss 1.2249962091445923
+INFO:root:epoch 1, Episode 364, total_loss: 478.3273010253906, q_loss 478.3273010253906, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 365, total_loss: 1312.5953369140625, q_loss 1312.5953369140625, v_loss 1.4649393961008172e-05 ,lr 0.01
+INFO:root:epoch 1, Episode 366, total_loss: 1494.1915283203125, q_loss 1494.1915283203125, v_loss 3.410605131648481e-13 ,lr 0.01
+INFO:root:epoch 1, Episode 367, total_loss: 2099.47509765625, q_loss 2099.47509765625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 368, total_loss: 154.94407653808594, q_loss 154.94407653808594, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 369, total_loss: 71.64183807373047, q_loss 71.64183807373047, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 370, total_loss: 94.90298461914062, q_loss 94.90298461914062, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 371, total_loss: 2.4636123180389404, q_loss 2.4636123180389404, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 372, total_loss: 343.1799621582031, q_loss 343.1799621582031, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 373, total_loss: 2.1678738594055176, q_loss 2.1678738594055176, v_loss 0.0 ,lr 0.01
+INFO:root:val_loss 1.2161643505096436
+INFO:root:epoch 1, Episode 374, total_loss: 1500.1849365234375, q_loss 1500.1849365234375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 375, total_loss: 153.97218322753906, q_loss 153.97218322753906, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 376, total_loss: 2100.56298828125, q_loss 2100.56298828125, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 377, total_loss: 686.9916381835938, q_loss 686.9916381835938, v_loss 1.3336747883840872e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 378, total_loss: 76.56060791015625, q_loss 76.56060791015625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 379, total_loss: 2.101315975189209, q_loss 2.101315975189209, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 380, total_loss: 57.32696533203125, q_loss 57.32696533203125, v_loss 4.135433471219585e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 381, total_loss: 111.83735656738281, q_loss 111.83735656738281, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 382, total_loss: 3493.470703125, q_loss 3493.470703125, v_loss 1.985075869015418e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 383, total_loss: 1499.80322265625, q_loss 1499.80322265625, v_loss 4.28183199119303e-07 ,lr 0.01
+INFO:root:val_loss 1.20945143699646
+INFO:root:val_loss 1.2015970945358276
+INFO:root:val_loss 1.2228866815567017
+INFO:root:val_loss 1.1926265954971313
+INFO:root:val_loss 1.2015970945358276
+INFO:root:val_loss 1.211683750152588
+INFO:root:val_loss 1.222886562347412
+INFO:root:val_loss 1.1926265954971313
+INFO:root:val_loss 1.182539939880371
+INFO:root:val_loss 1.210567593574524
+INFO:root:val_loss 1.2184219360351562
+INFO:root:val_loss 1.2015970945358276
+INFO:root:val_loss 1.2273924350738525
+INFO:root:val_loss 1.1915104389190674
+INFO:root:val_loss 1.2004809379577637
+INFO:root:val_loss 1.2217705249786377
+INFO:root:val_loss 1.2184219360351562
+INFO:root:val_loss 1.2363629341125488
+INFO:root:val_loss 1.2015970945358276
+INFO:root:val_loss 1.2217704057693481
+INFO:root:val_loss 1.210567593574524
+INFO:root:val_loss 1.2228866815567017
+INFO:root:epoch 1, Episode 384, total_loss: 1.85003662109375, q_loss 1.85003662109375, v_loss 2.5446493870373565e-12 ,lr 0.01
+INFO:root:epoch 1, Episode 385, total_loss: 421.6599426269531, q_loss 421.6599426269531, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 386, total_loss: 2.4187450408935547, q_loss 2.4187450408935547, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 387, total_loss: 1314.2813720703125, q_loss 1314.2813720703125, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 388, total_loss: 703.7691650390625, q_loss 703.7691650390625, v_loss 1.9793119920841207e-10 ,lr 0.01
+INFO:root:epoch 1, Episode 389, total_loss: 253.68341064453125, q_loss 253.68341064453125, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 390, total_loss: 2.034074544906616, q_loss 2.034072160720825, v_loss 2.416984898445662e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 391, total_loss: 5251.74462890625, q_loss 5251.74462890625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 392, total_loss: 245.89414978027344, q_loss 245.89414978027344, v_loss 2.3666117954235233e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 393, total_loss: 2.506523609161377, q_loss 2.506523609161377, v_loss 0.0 ,lr 0.01
+INFO:root:val_loss 1.226574420928955
+INFO:root:epoch 1, Episode 394, total_loss: 205.99810791015625, q_loss 205.99810791015625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 395, total_loss: 2243.37109375, q_loss 2243.370849609375, v_loss 0.00013543100794777274 ,lr 0.01
+INFO:root:epoch 1, Episode 396, total_loss: 77.10935974121094, q_loss 77.10935974121094, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 397, total_loss: 4226.40771484375, q_loss 4226.40771484375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 398, total_loss: 101.09307098388672, q_loss 101.09307098388672, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 399, total_loss: 2.535048007965088, q_loss 2.535048007965088, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 400, total_loss: 1749.9237060546875, q_loss 1749.9237060546875, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 401, total_loss: 292.4076843261719, q_loss 292.4076843261719, v_loss 4.701677482898958e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 402, total_loss: 377.0776062011719, q_loss 377.0776062011719, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 403, total_loss: 1187.7132568359375, q_loss 1187.7132568359375, v_loss 2.643879852461811e-13 ,lr 0.01
+INFO:root:val_loss 1.219825267791748
+INFO:root:val_loss 1.2182778120040894
+INFO:root:val_loss 1.2224398851394653
+INFO:root:val_loss 1.2164828777313232
+INFO:root:val_loss 1.2144019603729248
+INFO:root:val_loss 1.209512710571289
+INFO:root:epoch 1, Episode 404, total_loss: 140.6582489013672, q_loss 140.6582489013672, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 405, total_loss: 68.14637756347656, q_loss 68.14637756347656, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 406, total_loss: 479.8150329589844, q_loss 479.8150329589844, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 407, total_loss: 213.47201538085938, q_loss 213.47201538085938, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 408, total_loss: 1454.59765625, q_loss 1454.59765625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 409, total_loss: 1169.4222412109375, q_loss 1169.4222412109375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 410, total_loss: 71.84677124023438, q_loss 71.84677124023438, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 411, total_loss: 226.5140380859375, q_loss 226.5140380859375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 412, total_loss: 61.980899810791016, q_loss 61.980899810791016, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 413, total_loss: 106.02067565917969, q_loss 106.02067565917969, v_loss 0.0 ,lr 0.01
+INFO:root:val_loss 1.2016154527664185
+INFO:root:val_loss 1.2003241777420044
+INFO:root:val_loss 1.1771442890167236
+INFO:root:epoch 1, Episode 414, total_loss: 310.7170715332031, q_loss 310.7170715332031, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 415, total_loss: 1106.0889892578125, q_loss 1106.0889892578125, v_loss 2.376363550382621e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 416, total_loss: 1336.9588623046875, q_loss 1336.9588623046875, v_loss 1.1947808020718043e-10 ,lr 0.01
+INFO:root:epoch 1, Episode 417, total_loss: 1192.659423828125, q_loss 1192.659423828125, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 418, total_loss: 1177.2347412109375, q_loss 1177.2347412109375, v_loss 1.953658284037374e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 419, total_loss: 92.19409942626953, q_loss 92.19409942626953, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 420, total_loss: 1465.617919921875, q_loss 1465.617919921875, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 421, total_loss: 169.08839416503906, q_loss 169.08839416503906, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 422, total_loss: 2.6608047485351562, q_loss 2.6608047485351562, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 423, total_loss: 657.5542602539062, q_loss 657.5542602539062, v_loss 0.0 ,lr 0.01
+INFO:root:val_loss 1.194537878036499
+INFO:root:val_loss 1.2002910375595093
+INFO:root:val_loss 1.2009609937667847
+INFO:root:val_loss 1.190793752670288
+INFO:root:val_loss 1.1925287246704102
+INFO:root:val_loss 1.211127758026123
+INFO:root:val_loss 1.2097883224487305
+INFO:root:val_loss 1.2148717641830444
+INFO:root:val_loss 1.1938681602478027
+INFO:root:val_loss 1.1982818841934204
+INFO:root:val_loss 1.2111278772354126
+INFO:root:val_loss 1.1989516019821167
+INFO:root:val_loss 1.1861056089401245
+INFO:root:val_loss 1.1861056089401245
+INFO:root:val_loss 1.1861056089401245
+INFO:root:epoch 1, Episode 424, total_loss: 502.0765075683594, q_loss 502.0765075683594, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 425, total_loss: 192.5462646484375, q_loss 192.5462646484375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 426, total_loss: 57.65475845336914, q_loss 57.65475845336914, v_loss 4.974796041778973e-08 ,lr 0.01
+INFO:root:epoch 1, Episode 427, total_loss: 352.6978454589844, q_loss 352.6978454589844, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 428, total_loss: 81.43367004394531, q_loss 81.43367004394531, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 429, total_loss: 2098.660888671875, q_loss 2098.660888671875, v_loss 1.6519678638360347e-06 ,lr 0.01
+INFO:root:epoch 1, Episode 430, total_loss: 1851.876220703125, q_loss 1851.876220703125, v_loss 4.784047602512942e-10 ,lr 0.01
+INFO:root:epoch 1, Episode 431, total_loss: 2.153895616531372, q_loss 2.153895616531372, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 432, total_loss: 227.324462890625, q_loss 227.324462890625, v_loss 5.134893399372231e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 433, total_loss: 3491.581787109375, q_loss 3491.581787109375, v_loss 0.0 ,lr 0.01
+INFO:root:val_loss 1.1949065923690796
+INFO:root:val_loss 1.1949065923690796
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.214874029159546
+INFO:root:val_loss 1.1934592723846436
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.1963539123535156
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2333942651748657
+INFO:root:val_loss 1.2119793891906738
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.2119793891906738
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2119793891906738
+INFO:root:val_loss 1.2119793891906738
+INFO:root:val_loss 1.1934592723846436
+INFO:root:val_loss 1.1963539123535156
+INFO:root:val_loss 1.2333942651748657
+INFO:root:val_loss 1.2333942651748657
+INFO:root:val_loss 1.2119793891906738
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1949065923690796
+INFO:root:val_loss 1.1934592723846436
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.1963539123535156
+INFO:root:val_loss 1.1920119524002075
+INFO:root:val_loss 1.2134268283843994
+INFO:root:val_loss 1.2548091411590576
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:val_loss 1.1905646324157715
+INFO:root:epoch 1, Episode 434, total_loss: 426.3531494140625, q_loss 426.3531494140625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 435, total_loss: 5756.2734375, q_loss 5756.2734375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 436, total_loss: 144.31495666503906, q_loss 144.31495666503906, v_loss 6.245419967854104e-07 ,lr 0.01
+INFO:root:epoch 1, Episode 437, total_loss: 2100.103271484375, q_loss 2100.103271484375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 438, total_loss: 259.2704162597656, q_loss 259.2704162597656, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 439, total_loss: 1140.6195068359375, q_loss 1140.6195068359375, v_loss 5.140648795531888e-09 ,lr 0.01
+INFO:root:epoch 1, Episode 440, total_loss: 58.05252456665039, q_loss 58.05252456665039, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 441, total_loss: 181.08297729492188, q_loss 181.08297729492188, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 442, total_loss: 672.5590209960938, q_loss 672.5590209960938, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 443, total_loss: 139.11219787597656, q_loss 139.11219787597656, v_loss 4.0731547414907254e-06 ,lr 0.01
+INFO:root:val_loss 1.2209938764572144
+INFO:root:val_loss 1.2221400737762451
+INFO:root:val_loss 1.2226216793060303
+INFO:root:epoch 1, Episode 444, total_loss: 2101.546875, q_loss 2101.546875, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 445, total_loss: 1310.428466796875, q_loss 1310.428466796875, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 446, total_loss: 2099.23291015625, q_loss 2099.23291015625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 447, total_loss: 72.78376770019531, q_loss 72.78376770019531, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 448, total_loss: 258.15093994140625, q_loss 258.15093994140625, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 449, total_loss: 620.4257202148438, q_loss 620.4257202148438, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 450, total_loss: 169.2581024169922, q_loss 169.2581024169922, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 451, total_loss: 3496.3115234375, q_loss 3496.3115234375, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 452, total_loss: 1498.6903076171875, q_loss 1498.6903076171875, v_loss 0.0 ,lr 0.01
+INFO:root:epoch 1, Episode 453, total_loss: 2.121338129043579, q_loss 2.1213252544403076, v_loss 1.2813905414077453e-05 ,lr 0.01

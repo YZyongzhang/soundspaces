@@ -3253,3 +3253,18 @@ INFO:root:epoch 9, Episode 179, total_loss: 9.159056663513184, q_loss 9.14499187
 INFO:root:epoch 9, Episode 180, total_loss: 9.018260955810547, q_loss 9.00108814239502, v_loss 0.0171731598675251 ,lr 1.0000000000000002e-06
 INFO:root:epoch 9, Episode 181, total_loss: 3.954198122024536, q_loss 3.9308648109436035, v_loss 0.023333236575126648 ,lr 1.0000000000000002e-06
 INFO:root:epoch 9, Episode 182, total_loss: 4.540567398071289, q_loss 4.498105525970459, v_loss 0.04246196150779724 ,lr 1.0000000000000002e-06
+INFO:root:epoch 0, Episode 0, total_loss: 15263.275390625, q_loss 14185.62109375, v_loss 1077.65478515625 ,lr 0.01
+INFO:root:epoch 0, Episode 0, total_loss: 14011.4560546875, q_loss 10165.0, v_loss 3846.4560546875 ,lr 0.01
+INFO:root:epoch 0, Episode 0, total_loss: 12495.900390625, q_loss 10372.962890625, v_loss 2122.937744140625 ,lr 0.01
+INFO:root:epoch 0, Episode 0, total_loss: 26428.013671875, q_loss 24177.439453125, v_loss 2250.574462890625 ,lr 0.01
+INFO:root:val_loss 7436544000.0
+INFO:root:val_loss 64515732.0
+INFO:root:epoch 0, Episode 1, total_loss: 425801152.0, q_loss 416443360.0, v_loss 9357778.0 ,lr 0.01
+INFO:root:epoch 0, Episode 2, total_loss: 3094562.0, q_loss 2855073.75, v_loss 239488.3125 ,lr 0.01
+INFO:root:epoch 0, Episode 3, total_loss: 9917.3125, q_loss 7669.67529296875, v_loss 2247.63671875 ,lr 0.01
+INFO:root:epoch 0, Episode 4, total_loss: 9371.3544921875, q_loss 7335.8330078125, v_loss 2035.5218505859375 ,lr 0.01
+INFO:root:epoch 0, Episode 5, total_loss: 15855.236328125, q_loss 10737.9384765625, v_loss 5117.2978515625 ,lr 0.01
+INFO:root:epoch 0, Episode 6, total_loss: 2840.1513671875, q_loss 2782.931396484375, v_loss 57.2198486328125 ,lr 0.01
+INFO:root:epoch 0, Episode 7, total_loss: 446.79693603515625, q_loss 399.03985595703125, v_loss 47.75707244873047 ,lr 0.01
+INFO:root:epoch 0, Episode 8, total_loss: 3676.864501953125, q_loss 2238.021484375, v_loss 1438.843017578125 ,lr 0.01
+INFO:root:epoch 0, Episode 9, total_loss: 126.47730255126953, q_loss 112.60945129394531, v_loss 13.867850303649902 ,lr 0.01

@@ -1,0 +1,25 @@
+INFO:root:epoch 0, Episode 0, total_loss: 122638.1875, q_loss 122307.6953125, v_loss 330.49462890625 ,lr 0.01
+INFO:root:val_loss 31981156352.0
+INFO:root:epoch 0, Episode 1, total_loss: 1122915712.0, q_loss 1122887040.0, v_loss 28717.046875 ,lr 0.01
+INFO:root:epoch 0, Episode 2, total_loss: 3091099.0, q_loss 3089253.75, v_loss 1845.264404296875 ,lr 0.01
+INFO:root:epoch 0, Episode 3, total_loss: 3877281.5, q_loss 3875993.5, v_loss 1287.87939453125 ,lr 0.01
+INFO:root:epoch 0, Episode 4, total_loss: 18034008.0, q_loss 18030218.0, v_loss 3790.570068359375 ,lr 0.01
+INFO:root:epoch 0, Episode 5, total_loss: 22247.736328125, q_loss 22182.27734375, v_loss 65.45893859863281 ,lr 0.01
+INFO:root:val_loss 11950.4658203125
+INFO:root:epoch 0, Episode 6, total_loss: 15990.314453125, q_loss 15944.322265625, v_loss 45.992340087890625 ,lr 0.01
+INFO:root:epoch 0, Episode 7, total_loss: 2856.7119140625, q_loss 2839.365478515625, v_loss 17.346519470214844 ,lr 0.01
+INFO:root:epoch 0, Episode 8, total_loss: 1293.2646484375, q_loss 1280.6802978515625, v_loss 12.584329605102539 ,lr 0.01
+INFO:root:epoch 0, Episode 9, total_loss: 1047.33251953125, q_loss 1043.559814453125, v_loss 3.772683620452881 ,lr 0.01
+INFO:root:epoch 0, Episode 10, total_loss: 446.31378173828125, q_loss 444.05731201171875, v_loss 2.256483554840088 ,lr 0.01
+INFO:root:val_loss 775.0381469726562
+INFO:root:epoch 0, Episode 11, total_loss: 612.61669921875, q_loss 609.8103637695312, v_loss 2.806324005126953 ,lr 0.01
+INFO:root:epoch 0, Episode 12, total_loss: 531.6239624023438, q_loss 530.1553955078125, v_loss 1.468571662902832 ,lr 0.01
+INFO:root:epoch 0, Episode 13, total_loss: 1630.8343505859375, q_loss 1629.5634765625, v_loss 1.270890235900879 ,lr 0.01
+INFO:root:epoch 0, Episode 14, total_loss: 567.9171752929688, q_loss 563.8038330078125, v_loss 4.113316535949707 ,lr 0.01
+INFO:root:epoch 0, Episode 15, total_loss: 848.0950317382812, q_loss 839.3618774414062, v_loss 8.733150482177734 ,lr 0.01
+INFO:root:val_loss 3788.170166015625
+INFO:root:epoch 0, Episode 16, total_loss: 333.6933288574219, q_loss 331.4243469238281, v_loss 2.2689807415008545 ,lr 0.01
+INFO:root:epoch 0, Episode 17, total_loss: 1342.803955078125, q_loss 1341.0059814453125, v_loss 1.7979604005813599 ,lr 0.01
+INFO:root:epoch 0, Episode 18, total_loss: 1421.822265625, q_loss 1415.2027587890625, v_loss 6.619478225708008 ,lr 0.01
+INFO:root:epoch 0, Episode 19, total_loss: 1120.3665771484375, q_loss 1118.3240966796875, v_loss 2.0425243377685547 ,lr 0.01
+INFO:root:epoch 0, Episode 20, total_loss: 1319.34033203125, q_loss 1311.9281005859375, v_loss 7.412245750427246 ,lr 0.01

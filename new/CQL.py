@@ -29,6 +29,14 @@ class Net(nn.Module):
         self.audio_net = audio.AudioNet(64 , 4 ,width_dim=128 , height_dim=36).to(self.device)
         self.audio_net.load_state_dict(torch.load(a_model_path))
         self.audio_net.eval()
+        ####################################
+        #可选select
+        self.select_net = nn.Sequential(
+            nn.Linear(self.hidden_dim , self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim , self.hidden_dim)
+        )
+        ####################################
         self.q_net = nn.Sequential(
             nn.Linear(self.hidden_dim, self.hidden_dim),
             nn.ReLU(),
@@ -74,7 +82,8 @@ class Net(nn.Module):
         visual = visual_input*mask
         visual = visual.permute(0,3,2,1)
         combined_encode = self.visualnet.visual_net(visual)
-        Q = self.q_net(combined_encode)
+        select_encode = self.select_net(combined_encode)
+        Q = self.q_net(select_encode)
         return Q
     def initialize_weights_uniform(self, weight_range=(-0.1, 0.1), bias_range=(-0.1, 0.1)):
         for name, module in self.named_modules():
@@ -86,32 +95,45 @@ class Net(nn.Module):
                 if hasattr(module, 'bias') and module.bias is not None:
                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
 class MyData(Dataset):
-    def __init__(self,data):
+    def __init__(self,datalist):
+        data = datalist[0]
+        done = datalist[2]
+        frist_state = datalist[3]
         self.audio_ = self.get_data(data,'audio')
         self.tag_ = self.get_data(data,'rl_pred')
         self.visual_ = self.get_data(data,'camera')
         self.reward_ = self.get_data(data,'reward')
-        self.audio = list()
+        self.done = list()
+        self.next_audio = list()
         self.tag = list()
-        self.visual = list()
+        self.next_visual = list()
         self.reward = list()
         for index,tag in enumerate(self.tag_):
             if tag == 3:
-                self.audio_ = self.audio_[:index]
-                self.visual_ = self.visual_[:index]
-                self.reward_ = self.reward_[:index]
-                self.tag_ = self.tag_[:index]
+                self.next_audio = self.audio_[:index+1]
+                self.next_visual = self.visual_[:index+1]
+                self.reward = self.reward_[:index+1]
+                self.tag = self.tag_[:index+1]
                 break
+        for d in done:
+            if d[0] == False :
+                self.done.append(0)
+            elif d[0] == True:
+                self.done.append(1)
         # logging.info(self.tag_)
+        ##  get state , next_state
+        self.pre_audio = [frist_state[0]['audio']] + self.next_audio[:-1]
+        self.pre_visual = [frist_state[0]['camera']] + self.next_visual[:-1]
+        # print(self.done)
     def get_data(self , data , name):
         d = list()
         for i in range(len(data)):
             d.extend(data[i][name])
         return d
     def __len__(self):
-        return len(self.audio_)
+        return len(self.done)
     def __getitem__(self,index):
-        return self.audio_[index] ,self.visual_[index] ,self.tag_[index] ,self.reward_[index]
+        return self.pre_audio[index] ,self.pre_visual[index] ,self.next_audio[index],self.next_visual[index],self.tag[index] ,self.reward[index] ,self.done[index]
 class CQL:
     def __init__(self, model, learning_rate=1e-5, alpha=1.0):
         self.lr = learning_rate
@@ -124,32 +146,38 @@ class CQL:
         self.criterion = nn.CrossEntropyLoss()
     
     def compute_loss(self, Q,target_Q, audio , visual , labels):
-        
+        # with torch.no_grad():
+        #     reward = Q.sum()
+        a_Q = Q.gather(1, labels.unsqueeze(1))
         # Q-value loss (mean squared error between predicted Q-values and target Q-values)
-        q_loss = nn.MSELoss()(Q, target_Q)
+        q_loss = nn.MSELoss()(a_Q, target_Q)
         
         # V-value loss (using the same target Q as the CQL algorithm)
-        q_regularization = torch.mean(torch.square(Q - self.target_model(audio[1:] , visual[1:]).gather(1, labels[:-1].unsqueeze(1))))
-        
+        # q_regularization = torch.mean(torch.square(Q - self.target_model(audio[1:] , visual[1:]).gather(1, labels[:-1].unsqueeze(1))))
+        q_regularization = torch.logsumexp(Q, dim=1).mean() - torch.mean(a_Q)
+# ?
         
 
         # Total loss
         total_loss = q_loss + self.alpha * q_regularization
-        return total_loss , q_loss , q_regularization
+        return total_loss , q_loss , q_regularization 
 
-    def train_step(self, audio, visual_input, labels, reward ,lr):
+    def train_step(self, pre_audio, pre_visual,next_audio,next_visual, labels, reward ,done,lr):
         self.lr = lr
         for param_grop in self.optimizer.param_groups:
             param_grop['lr'] = self.lr
-        Q = self.model(audio[:-1], visual_input[:-1]).gather(1, labels[:-1].unsqueeze(1))
+        pre_audio = pre_audio.float()
+        pre_visual = pre_visual.float()
+        Q = self.model(pre_audio, pre_visual)
         # gained best action Q value
-        next_q_values = self.target_model(audio[1:] , visual_input[1:])
+        next_q_values = self.target_model(next_audio, next_visual)
         # next Q value 
         max_next_q_values = next_q_values.max(1)[0].unsqueeze(1)
         # get the PI policy gianed action 
-        target_q_values = reward[1:].unsqueeze(1) +   self.gamma * max_next_q_values
+        # target_q_values = reward.unsqueeze(1) +   self.gamma * max_next_q_values
+        target_q_values = reward.unsqueeze(1) +   self.gamma * max_next_q_values*(1-done).unsqueeze(1)
         # get the state value
-        total_loss , q_loss , q_regularization = self.compute_loss(Q,target_q_values ,audio , visual_input,labels)
+        total_loss , q_loss , q_regularization  = self.compute_loss(Q,target_q_values ,audio , visual,labels)
         self.optimizer.zero_grad()
         total_loss.backward()
         self.optimizer.step()
@@ -157,14 +185,9 @@ class CQL:
         return total_loss.item(), q_loss.item(),q_regularization.item()
     def update_target_network(self):
         self.target_model.load_state_dict(self.model.state_dict())
-    def val(self, audio , visual , lable):
-        with torch.no_grad():
-            q = self.model(audio , visual)
-            val_loss = self.criterion(q , lable)
-        return val_loss
         
 def train(writer):
-    path = "../data_pre/sim_512"
+    path = "../data/RL/newdone"
     val_path = "../data/RL/random"
     files = os.listdir(path=path)
     val_files = os.listdir(path=val_path)
@@ -172,7 +195,7 @@ def train(writer):
     model = Net().to(device)
     cql = CQL(model)
     num_episode = len(files)
-    num_epoch = 10
+    num_epoch = 2
     nums = 0
     for epoch in range(num_epoch):
         for episode in range(num_episode):
@@ -182,39 +205,43 @@ def train(writer):
             with open(file_path, 'rb') as f:
                 data = pickle.load(f)
             dataset = MyData(data)
-            dataloader = DataLoader(dataset=dataset, batch_size=dataset.__len__())
+            dataloader = DataLoader(dataset=dataset, batch_size=16  , shuffle = True)
             
             for batch_idx, batch in enumerate(dataloader):
-                batch_audio, batch_visual, batch_labels, batch_reward = batch
-                batch_audio, batch_visual, batch_labels, batch_reward = batch_audio.to(device), batch_visual.to(device), batch_labels.to(device), batch_reward.to(device)
+                batch_pre_audio, batch_pre_visual, batch_next_audio , batch_next_visual,batch_labels, batch_reward ,batch_done = batch
+                batch_pre_audio, batch_pre_visual, batch_next_audio , batch_next_visual, batch_labels, batch_reward ,batch_done= batch_pre_audio.to(device), batch_pre_visual.to(device), batch_next_audio.to(device) , batch_next_visual.to(device), batch_labels.to(device), batch_reward.to(device),batch_done.to(device)
 
-                total_loss, q_loss,q_regularization  = cql.train_step(batch_audio, batch_visual, batch_labels, batch_reward ,lr)
+                total_loss, q_loss,q_regularization  = cql.train_step(batch_pre_audio, batch_pre_visual, batch_next_audio,batch_next_visual,batch_labels, batch_reward , batch_done,lr)
                 print(f'nums {nums} ,epoch {epoch}, Episode {episode}, total_loss: {total_loss}, q_loss {q_loss}, v_loss {q_regularization},lr {lr}')
                 logging.info(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, q_loss {q_loss}, v_loss {q_regularization} ,lr {lr}')
-                if nums % 100 == 0:
-                    val_file_path = os.path.join(val_path , val_files[episode])
-                    with open(val_file_path , 'rb') as f:
-                        val_data = pickle.load(f)
-                    val_dataset = MyData(data)
-                    dataloader = DataLoader(dataset=dataset, batch_size=dataset.__len__())
-                    for batch_idx, batch in enumerate(dataloader):
-                        batch_audio, batch_visual, batch_labels, batch_reward = batch
-                        batch_audio, batch_visual, batch_labels, batch_reward = batch_audio.to(device), batch_visual.to(device), batch_labels.to(device), batch_reward.to(device)
-                        val_loss = cql.val(batch_audio , batch_visual , batch_labels)
-                        logging.info(f"val_loss {val_loss}")
+                if nums % 10 == 0:
+                    # model.eval()
+                    # # with torch.no_grad():
+                    # val_file_path = os.path.join(val_path , val_files[episode])
+                    # with open(val_file_path , 'rb') as f:
+                    #     val_data = pickle.load(f)
+                    # val_dataset = MyData(val_data)
+                    # dataloader = DataLoader(dataset=val_dataset, batch_size=val_dataset.__len__())
+                    # for batch_idx, batch in enumerate(dataloader):
+                    #     batch_audio, batch_visual, batch_labels, batch_reward = batch
+                    #     batch_audio, batch_visual, batch_labels, batch_reward = batch_audio.to(device), batch_visual.to(device), batch_labels.to(device), batch_reward.to(device)
+                    #     val_loss, _,_ ,rwd_val= cql.train_step(batch_audio , batch_visual , batch_labels ,batch_reward ,lr)
+                    #     logging.info(f"val_loss {val_loss}")
                     # Log losses to TensorBoard
                     writer.add_scalar('Loss/q_loss', q_loss, nums)
                     writer.add_scalar('Loss/q_regularization', q_regularization, nums)
                     # Log total loss
                     writer.add_scalar('Loss/train', total_loss, nums)
-                    writer.add_scalar('loss/val' , val_loss , nums)
+                    # writer.add_scalar('train/reward' , rwd , nums)
+                    # writer.add_scalar('loss/val' , val_loss , nums)
+                    # writer.add_scalar('val/reward' , rwd_val , nums)
                     cql.update_target_network()
                 nums+=1
-    torch.save(cql.model.state_dict() , 'rl_model_useolddata.pth')
+    torch.save(cql.model.state_dict() , 'rl_model_done.pth')
 
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/cql_level_11'
+    log_dir = './logs/cql_31'
     writer = SummaryWriter(log_dir)
-    logging.basicConfig(filename='output_cql_6.log', level=logging.INFO)
+    logging.basicConfig(filename='output_cql_29.log', level=logging.INFO)
     train(writer)
