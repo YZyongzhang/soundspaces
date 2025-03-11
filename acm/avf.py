@@ -107,7 +107,7 @@ class MyData(Dataset):
         return self.preaudio[idx],self.previsual[idx], self.nextaudio[idx], self.nextvisual[idx],self.done[idx],self.reward[idx],self.action[idx]
     def load_data(self,path):
         # 将整个数据打包成一个大的batch
-        files = list()
+        files = list() 
         for p in path:
             files_path = os.listdir(p)
             for f in files_path :
