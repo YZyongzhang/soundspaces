@@ -49,18 +49,6 @@ class AVFNet(nn.Module):
             nn.Linear(64,self.out_put)
         )
         self.initialize_weights_uniform()
-    # def forward(self,audio,visual):
-    #     # print(visual.shape)
-    #     visual = visual.permute(0,3,2,1)
-    #     mel_features = torch.from_numpy(self.deal_audio(audio)).to(self.device)
-    #     audio_fea = self.audio(mel_features)
-    #     visual_fea = self.visual(visual)
-    #     combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
-    #     action = self.action_net(combinencode)
-    #     return action
-    #############################
-    # 特征模型取中间层进行训练
-    #############################
     def forward(self,audio,visual):
         # print(visual.shape)
         visual = visual.permute(0,3,2,1)
@@ -68,7 +56,19 @@ class AVFNet(nn.Module):
         audio_fea = self.audio(mel_features)
         visual_fea = self.visual(visual)
         combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
-        return combinencode
+        action = self.action_net(combinencode)
+        return action
+    #############################
+    # 特征模型取中间层进行训练
+    #############################
+    # def forward(self,audio,visual):
+    #     # print(visual.shape)
+    #     visual = visual.permute(0,3,2,1)
+    #     mel_features = torch.from_numpy(self.deal_audio(audio)).to(self.device)
+    #     audio_fea = self.audio(mel_features)
+    #     visual_fea = self.visual(visual)
+    #     combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
+    #     return combinencode
     def deal_audio(self,audio):
         mel_features = []
         audio = audio.cpu().numpy()
@@ -100,14 +100,12 @@ class MyData(Dataset):
         # } , done ,self.obs]
         self.preaudio,self.previsual, self.nextaudio, self.nextvisual,self.done,self.reward,self.action = self.deal_data(batch_data)
     def __len__(self):
-        print(len(self.done))
-        print(len(self.action))
         return len(self.preaudio)
     def __getitem__(self,idx):
         return self.preaudio[idx],self.previsual[idx], self.nextaudio[idx], self.nextvisual[idx],self.done[idx],self.reward[idx],self.action[idx]
     def load_data(self,path):
         # 将整个数据打包成一个大的batch
-        files = list() 
+        files = list()
         for p in path:
             files_path = os.listdir(p)
             for f in files_path :
@@ -123,6 +121,8 @@ class MyData(Dataset):
         for i in range(len(data)):
             d.extend(data[i][name])
         return d
+    def get_error(self):
+        return self.error
     def deal_data(self,batch_datas):
         pre_audio = list()
         pre_visual = list()
@@ -131,11 +131,13 @@ class MyData(Dataset):
         done = list()
         reward = list()
         action = list()
-        
-        for batch_data  in tqdm(batch_datas,desc='deal batch_data' , unit="batch_datas"):
+        self.error = list()
+        for batch_id,batch_data in enumerate(tqdm(batch_datas,desc='deal batch_data' , unit="batch_datas")):
             data = batch_data[0]
             done_ = batch_data[2]
             frist_state = batch_data[3]
+            if len(data) != 1:
+                continue
             self.audio_ = self.get_data(data,'audio')
             self.tag_ = self.get_data(data,'rl_pred')
             self.visual_ = self.get_data(data,'camera')
@@ -147,15 +149,16 @@ class MyData(Dataset):
             self.reward = list()
             for index,tag in enumerate(self.tag_):
                 if tag == 3 or index == 199:
-                    self.next_audio = self.audio_[:index]
-                    self.next_visual = self.visual_[:index]
-                    self.reward = self.reward_[:index]
-                    self.tag = self.tag_[:index]
+                    self.next_audio = self.audio_[:index+1]
+                    self.next_visual = self.visual_[:index+1]
+                    self.reward = self.reward_[:index+1]
+                    self.tag = self.tag_[:index+1]
                     # 不包含stop信息，如需包含请index+1。具体就是指最后执行完stop之后不再会有相同的img产生
                     break
             self.next_audio.pop(0)
             self.next_visual.pop(0)
-            self.tag.pop(-1)
+            self.reward.pop(0)
+            self.tag.pop(0)
             for d in done_:
                 if d[0] == False :
                     self.done.append(0)
@@ -164,7 +167,8 @@ class MyData(Dataset):
             ##  get state , next_state
             self.pre_audio = [frist_state[0]['audio']] + self.next_audio[:-1]
             self.pre_visual = [frist_state[0]['camera']] + self.next_visual[:-1]
-            
+            if len(self.done) != len(self.tag):
+                self.error.append(batch_id)
             pre_audio.extend(self.pre_audio)
             pre_visual.extend(self.pre_visual)
             next_audio.extend(self.next_audio)
@@ -212,11 +216,11 @@ def train():
                 run_id = 1
                 running_loss = 0.0
             episode +=1      
-    torch.save(model.state_dict(), './checkpoint/avnf6.pth')
+    torch.save(model.state_dict(), './checkpoint/avnf_finnal.pth')
     writer.close()
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/loss/avf6'
+    log_dir = './logs/loss/avf_finnal'
     writer = SummaryWriter(log_dir)
     logging.basicConfig(filename='./logs/audio/avf.log', level=logging.INFO)
     train()

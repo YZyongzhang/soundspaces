@@ -31,9 +31,9 @@ class AVNet(nn.Module):
         )
         self.initialize_weights_uniform()
     def forward(self,audio,visual):
-        combinencode = self.avf(audio , visual)
+        target_q , combinencode = self.avf(audio , visual)
         action_q = self.Q_net(combinencode)
-        return action_q
+        return action_q , target_q
     def initialize_weights_uniform(self, weight_range=(-0.1, 0.1), bias_range=(-0.1, 0.1)):
         for name, module in self.named_modules():
             if isinstance(module, (nn.Linear, nn.Conv2d)):
@@ -128,7 +128,8 @@ class MyData(Dataset):
             reward.extend(self.reward)
             action.extend(self.tag)
         return pre_audio,pre_visual, next_audio, next_visual,done,reward,action
-class CQL:
+
+class TQL:
     def __init__(self, model, device ,learning_rate=1e-5, alpha=1.0):
         self.lr = learning_rate
         self.gamma = 0.9
@@ -138,60 +139,37 @@ class CQL:
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
         self.alpha = alpha  # CQL's regularization coefficient
         self.criterion = nn.CrossEntropyLoss()
-    
     def compute_loss(self, Q,target_Q , labels):
         # with torch.no_grad():
         #     reward = Q.sum()
         a_Q = Q.gather(1, labels.unsqueeze(1))
+        max_Q = target_Q.max(1)[0].unsqueeze(1)
         # Q-value loss (mean squared error between predicted Q-values and target Q-values)
-        q_loss = nn.MSELoss()(a_Q, target_Q)
-        
-        # V-value loss (using the same target Q as the CQL algorithm)
-        # q_regularization = torch.mean(torch.square(Q - self.target_model(audio[1:] , visual[1:]).gather(1, labels[:-1].unsqueeze(1))))
-        q_regularization = torch.logsumexp(Q, dim=1).mean() - a_Q.mean()
-# ?
-# 为什么说这个地方时保守项，这样看，在pytorch中，q_regularization是一定会下降的，又因为q值进行了计算
-# logsumexp一定会不断地朝向a_qmean趋近。另一方面，q值也在拟合，所以就在q的过程中加入了一个正则化
-        
-
-        # Total loss
-        total_loss = 0.5*q_loss + self.alpha * q_regularization
-        return total_loss , q_loss , q_regularization 
-
+        q_loss = nn.MSELoss()(a_Q, max_Q)
+        return  q_loss
     def train_step(self, pre_audio, pre_visual,next_audio,next_visual, labels, reward ,done,lr):
         self.lr = lr
         for param_grop in self.optimizer.param_groups:
             param_grop['lr'] = self.lr
         pre_audio = pre_audio.float()
         pre_visual = pre_visual.float()
-        Q = self.model(pre_audio, pre_visual)
-        # gained best action Q value
-        next_q_values = self.target_model(next_audio, next_visual)
-        # next Q value 
-        max_next_q_values = next_q_values.max(1)[0].unsqueeze(1)
-        # get the PI policy gianed action 
-        # target_q_values = reward.unsqueeze(1) +   self.gamma * max_next_q_values
-        target_q_values = reward.unsqueeze(1) +   self.gamma * max_next_q_values*(1-done).unsqueeze(1)
-        # get the state value
-        total_loss , q_loss , q_regularization  = self.compute_loss(Q,target_q_values ,labels)
+        Q,target_Q = self.model(pre_audio, pre_visual)
+        total_loss  = self.compute_loss(Q,target_Q ,labels)
         self.optimizer.zero_grad()
         total_loss.backward()
         self.optimizer.step()
-
-        return total_loss.item(), q_loss.item(),q_regularization.item()
-    def update_target_network(self):
-        self.target_model.load_state_dict(self.model.state_dict())
+        return total_loss.item()
 def train(logging):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = AVNet(128 , 4 ,width_dim=128 , height_dim=36).to(device)
     model.train()
     lr = 1e-5
-    cql = CQL(model , device)
+    tql = TQL(model , device)
     path = [ '../data/RL/newdone']
     mydata = MyData(path=path)
     print(mydata.__len__())
     episode = 0
-    numsepoch = 200
+    numsepoch = 50
     dataloader = DataLoader(dataset=mydata , batch_size = 32 , shuffle = True)
     time_start = time.time()
     for epoch in range(numsepoch):
@@ -200,22 +178,19 @@ def train(logging):
         for batch_data in dataloader:
             batch_pre_audio, batch_pre_visual, batch_next_audio , batch_next_visual,batch_done, batch_reward ,batch_labels,= batch_data
             batch_pre_audio, batch_pre_visual, batch_next_audio , batch_next_visual, batch_labels, batch_reward ,batch_done= batch_pre_audio.to(device), batch_pre_visual.to(device), batch_next_audio.to(device) , batch_next_visual.to(device), batch_labels.to(device), batch_reward.to(device),batch_done.to(device)
-            total_loss, q_loss,q_regularization  = cql.train_step(batch_pre_audio, batch_pre_visual, batch_next_audio,batch_next_visual,batch_labels, batch_reward , batch_done,lr)
-            print(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, q_loss {q_loss}, v_loss {q_regularization},lr {lr}')
-            logging.info(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, q_loss {q_loss}, v_loss {q_regularization} ,lr {lr}')
+            total_loss  = tql.train_step(batch_pre_audio, batch_pre_visual, batch_next_audio,batch_next_visual,batch_labels, batch_reward , batch_done,lr)
+            print(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss},lr {lr}')
+            logging.info(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss},lr {lr}')
             if episode % 10 == 0:
-                    writer.add_scalar('Loss/q_loss', q_loss, episode)
-                    writer.add_scalar('Loss/q_regularization', q_regularization, episode)
                     # Log total loss
                     writer.add_scalar('Loss/train', total_loss, episode)
-                    cql.update_target_network()
             episode+=1
     logging.info(f"10 epoch cost time {(time.time() - time_start) % 60}m{(time.time() - time_start) // 60}s")
-    torch.save(model.state_dict(), './checkpoint/avn.pth')
+    torch.save(model.state_dict(), './checkpoint/TQL.pth')
     writer.close()
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/loss/avn'
+    log_dir = './logs/loss/TQL'
     writer = SummaryWriter(log_dir)
-    logging.basicConfig(filename='./logs/audio/avn_bel.log', level=logging.INFO)
+    logging.basicConfig(filename='./logs/audio/tql.log', level=logging.INFO)
     train(logging)
