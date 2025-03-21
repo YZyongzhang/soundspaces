@@ -25,7 +25,7 @@ class Net(nn.Module):
         self.visualnet.load_state_dict(torch.load(v_model_path))
         self.visualnet.eval()
         # a_model_path = "./new/checkpoint/audio_weights_fine_tune.pth"
-        a_model_path = "./checkpoint/audio_weights_fine_tune.pth"
+        a_model_path = "./checkpoint/audio_weights_release.pth"
         self.audio_net = audio.AudioNet(64 , 4 ,width_dim=128 , height_dim=36).to(self.device)
         self.audio_net.load_state_dict(torch.load(a_model_path))
         self.audio_net.eval()
@@ -188,9 +188,9 @@ class CQL:
         
 def train(writer):
     path = "../data/RL/newdone"
-    val_path = "../data/RL/random"
+    # val_path = "../data/RL/random"
     files = os.listdir(path=path)
-    val_files = os.listdir(path=val_path)
+    # val_files = os.listdir(path=val_path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Net().to(device)
     cql = CQL(model)

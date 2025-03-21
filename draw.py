@@ -2,6 +2,8 @@ from matplotlib import pyplot as plt
 from utils.angles import *
 import math
 from habitat.utils.visualizations import maps
+from habitat_sim.utils import common as utils
+import magnum as mn
 class Draw:
     def __init__(self):
         pass
@@ -26,6 +28,7 @@ class Draw:
         points_topdown = []
         bounds = pathfinder.get_bounds()
         for point in points:
+            # print(point)
             # convert 3D x,z to topdown x,y
             px = (point[0] - bounds[0][0]) / meters_per_pixel
             py = (point[2] - bounds[0][2]) / meters_per_pixel
@@ -87,24 +90,26 @@ class Draw:
 
         return hablab_topdown_map, xy_vis_points
 
-    def add_agent_pos_angle(self , pathfinder, top_down_graph, agent_pos, agent_q):
-        agent_angle = quat_to_angle(agent_q)
-        show_angle = math.atan2(agent_angle[0], agent_angle[2])
+    def add_agent_pos_angle(self , pathfinder, top_down_graph, agent_pos, agent_q ,sim):
         grid_dimensions = (top_down_graph.shape[0], top_down_graph.shape[1])
-
-        grid_pos = maps.to_grid(
-            agent_pos[2],
-            agent_pos[0],
-            grid_dimensions,
-            pathfinder=pathfinder,
+        agent_grid_pos = maps.to_grid(
+            agent_pos[2], agent_pos[0], grid_dimensions, pathfinder=pathfinder
         )
-
+        agent_forward = utils.quat_to_magnum(
+            sim.agents[0].get_state().rotation
+        ).transform_vector(mn.Vector3(0, 0, -1.0))
+        agent_orientation = math.atan2(agent_forward[0], agent_forward[2])
+        # draw the agent and trajectory on the map
         maps.draw_agent(
-            top_down_graph, grid_pos, show_angle, agent_radius_px=16
+            top_down_graph, agent_grid_pos, agent_orientation, agent_radius_px=16
         )
+        # maps.draw_agent(
+        #     top_down_graph, grid_pos, show_angle, agent_radius_px=16
+        # )
 
         return top_down_graph
     def show_graph(self , env):
+        sim = env._sim
         source_pos = env.get_source_pos()
         agent_pos = env.get_agent_pos()
         vis_points = source_pos
@@ -112,7 +117,7 @@ class Draw:
         agent_r = env.get_agent_rotation()
 
         for agent_id in range(env._num_agents):
-            x = self.add_agent_pos_angle(env._sim.pathfinder, x, agent_pos[agent_id], agent_r[agent_id])
+            x = self.add_agent_pos_angle(env._sim.pathfinder, x, agent_pos[agent_id], agent_r[agent_id] ,sim)
 
         self.display_map(x,y)
     def show_path_graph(self , env , sound , agent ,image_filename):

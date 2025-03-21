@@ -15,7 +15,7 @@ class VisualNet(nn.Module):
         super().__init__()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         # self.model_path = "./new/checkpoint/audio_weights_fine_tune.pth"
-        self.model_path = "./checkpoint/audio_weights_fine_tune.pth"
+        self.model_path = "./checkpoint/audio_weights_release.pth"
         self.hid_dim = hid_dim
         self.out_put = out_put
         self.width_dim = width_dim

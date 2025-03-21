@@ -9,13 +9,13 @@ import pickle
 from config import config
 from env.v0d0 import Env
 from utils.batch import *
-from new import model
+from acm.dsac.dsac import AVNet
 random.seed(config["random_seed"])
 class Actor:
     def __init__(self, config):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model_path = './data/checkpoint/rl_model_5.pth'
-        self.agent = model().to(self.device)
+        self.model_path = './acm/dsac/checkpoint/DSAC_easy_100000.pth'
+        self.agent = AVNet(128, 4, 128, 36).to(self.device)
         self.agent.load_state_dict(torch.load(self.model_path))
         self._config = config
         self._num_episodes = 0
@@ -35,11 +35,9 @@ class Actor:
         audio = torch.from_numpy(audio)
         visual = visual.unsqueeze(0)
         audio = audio.unsqueeze(0)
-        visual = visual.float()
-        audio = audio.float()
-        print(visual.dtype)
-        print(audio.dtype)
-        action_list  = self.agent(audio , visual)
+        visual = visual.float().to(self.device)
+        audio = audio.float().to(self.device)
+        action_list  = self.agent(audio , visual)[0]
         action = torch.max(action_list,dim=1)[1].tolist()
         print(action)
         return action[0]
@@ -48,19 +46,6 @@ class Actor:
     def reset(self):
         self._idx = 0
         
-    def shortest_path(self, from_pos, to_pos):
-        """
-        Depreciated, using built-in shortestpath method, granularity is not enough
-        """
-        path = habitat_sim.ShortestPath()
-        path.requested_start = from_pos
-        path.requested_end = to_pos
-        found_path = self._sim.pathfinder.find_path(path)
-        path_results = (found_path, path.geodesic_distance, path.points)
-        if len(path_results[-1]) > 1:
-            return path_results[-1][1]
-        else:
-            return None
     def act(self, env):
         if self.num == 0:
             logging.info(f"agent sound source_pos is {env.get_source_pos()[0]}")
@@ -84,23 +69,6 @@ class Actor:
         self._idx += 1
         self.num+=1
         return ret
-    def mid_point(self,agent_pos = None , level = None):
-        if level == None:
-            level = 'level2'
-        if agent_pos == None:
-            agent_pos = self.env.get_agent_pos()[0]
-        while True:
-            rand_pos = self._sim.pathfinder.get_random_navigable_point_near(agent_pos , radius = self.level[level])
-            if (
-                np.linalg.norm(rand_pos - agent_pos) > 1.0
-                and np.linalg.norm(rand_pos - agent_pos) < 3.0
-                and self.shortest_path(rand_pos, agent_pos) is not None
-                and self._sim.pathfinder.is_navigable(rand_pos)
-            ):
-                self.paths = self.env.get_shortest_action_list(goal_pos=rand_pos)[0]
-                break
-            else:
-                print(f'rand_pos {rand_pos} is false')
     def rollout(self):
         self.reset()
         self.num = 0
@@ -136,7 +104,7 @@ class Actor:
 def collect():
     actor = Actor(config)
     seq_list = list()
-    for num_episodes in range(10):
+    for num_episodes in range(20):
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
         result_list = [actor.rollout()]
@@ -157,33 +125,5 @@ def collect():
 if __name__ == "__main__":
     logging.basicConfig(filename='./data/RL/val/RLDATA.log', level=logging.INFO)
     collect()
-###########################
-# 在验证集上运行
-###########################
-# from config import config
-# from env.v0d0 import Env
-# import habitat_sim
-# import pickle
-# import torch
-# import os
-# from new import model
-# class val():
-#     def __init__(self):
-#         model_path = './data/checkpoint/rl_model_5.pth'
-#         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-#         self.agent = model().to(self.device)
-#         self.agent.load_state_dict(torch.load(model_path))
-#     def take_action(self , visual , audio):
-#         action = torch.max(self.agent(audio , visual) , dim = 1)
-#         return action[1].tolist()
-# def val():
-#     env = Env(config)
-#     env.reset()
-#     path = './data/RL/random'
-#     files = os.listdir(path)
-#     files = files[0:10]
-#     files_path = list()
-#     for file in files :
-#         files_path.append(os.path.join(path, file))
     
         

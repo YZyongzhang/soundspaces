@@ -11,7 +11,12 @@ import  pickle
 import logging
 import time
 from avf import AVFNet
-class AVNet(nn.Module):
+model_path = './checkpoint/avnf_finnal_1.pth'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+avf = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(device)
+avf.load_state_dict(torch.load(model_path))
+avf.eval()
+class Actor(nn.Module):
     def __init__(self,hid_dim , out_put , width_dim,height_dim):
         super().__init__()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cup')
@@ -19,20 +24,42 @@ class AVNet(nn.Module):
         self.out_put = out_put
         self.width_dim = width_dim
         self.height_dim = height_dim
-        # self.model_path = '/data/Getuanhui/checkpoint/avnf_finnal.pth'
-        self.model_path = './checkpoint/avnf_finnal_1.pth'
-        self.avf = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
-        self.avf.load_state_dict(torch.load(self.model_path))
-        self.avf.eval()
-        self.Q_net = nn.Sequential(
+        self.actor = nn.Sequential(
             nn.Linear(128,64),
             nn.ReLU(),
             nn.Linear(64,self.out_put)
         )
         self.initialize_weights_uniform()
     def forward(self,audio,visual):
-        combinencode = self.avf(audio , visual)
-        action_q = self.Q_net(combinencode)
+        combinencode = avf(audio , visual)
+        action_pi = self.actor(combinencode)
+        return action_pi
+    def initialize_weights_uniform(self, weight_range=(-0.1, 0.1), bias_range=(-0.1, 0.1)):
+        for name, module in self.named_modules():
+            if isinstance(module, (nn.Linear, nn.Conv2d)):
+                if hasattr(module, 'weight') and module.weight is not None:
+                    nn.init.uniform_(module.weight, a=weight_range[0], b=weight_range[1])
+                if hasattr(module, 'bias') and module.bias is not None:
+                    nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
+class Critic(nn.Module):
+    def __init__(self,hid_dim , out_put , width_dim,height_dim):
+        super().__init__()
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cup')
+        self.hid_dim = hid_dim
+        self.out_put = out_put
+        self.width_dim = width_dim
+        self.height_dim = height_dim
+        self.critic = nn.Sequential(
+            nn.Linear(128,64),
+            nn.ReLU(),
+            nn.Linear(64,32),
+            nn.ReLU(),
+            nn.Linear(32,1)
+        )
+        self.initialize_weights_uniform()
+    def forward(self,audio,visual):
+        combinencode = avf(audio , visual)
+        action_q = self.critic(combinencode)
         return action_q
     def initialize_weights_uniform(self, weight_range=(-0.1, 0.1), bias_range=(-0.1, 0.1)):
         for name, module in self.named_modules():
@@ -128,65 +155,53 @@ class MyData(Dataset):
             reward.extend(self.reward)
             action.extend(self.tag)
         return pre_audio,pre_visual, next_audio, next_visual,done,reward,action
-class CQL:
-    def __init__(self, model, device ,learning_rate=1e-5, alpha=1.0):
+class ACC:
+    def __init__(self,learning_rate=1e-5, alpha=1.0):
         self.lr = learning_rate
         self.gamma = 0.9
-        self.model = model
-        self.target_model = model
+        self.actor = Actor(128 , 4 ,width_dim=128 , height_dim=36).to(device)
+        self.critic = Critic(128 , 4 ,width_dim=128 , height_dim=36).to(device)
+        self.target_critic = Critic(128 , 4 ,width_dim=128 , height_dim=36).to(device)
         self.device = device
-        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.lr)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=self.lr)
         self.alpha = alpha  # CQL's regularization coefficient
         self.criterion = nn.CrossEntropyLoss()
-    
-    def compute_loss(self, Q,target_Q , labels):
-        # with torch.no_grad():
-        #     reward = Q.sum()
-        a_Q = Q.gather(1, labels.unsqueeze(1))
-        # Q-value loss (mean squared error between predicted Q-values and target Q-values)
-        q_loss = nn.MSELoss()(a_Q, target_Q)
-        
-        # V-value loss (using the same target Q as the CQL algorithm)
-        # q_regularization = torch.mean(torch.square(Q - self.target_model(audio[1:] , visual[1:]).gather(1, labels[:-1].unsqueeze(1))))
-        q_regularization = torch.logsumexp(Q, dim=1).mean() - a_Q.mean()
-# ?
-# 为什么说这个地方时保守项，这样看，在pytorch中，q_regularization是一定会下降的，又因为q值进行了计算
-# logsumexp一定会不断地朝向a_qmean趋近。另一方面，q值也在拟合，所以就在q的过程中加入了一个正则化
-        
-
-        # Total loss
-        total_loss = 0.5*q_loss + self.alpha * q_regularization
-        return total_loss , q_loss , q_regularization 
+        self.baseline = 0.0
 
     def train_step(self, pre_audio, pre_visual,next_audio,next_visual, labels, reward ,done,lr):
-        self.lr = lr
-        for param_grop in self.optimizer.param_groups:
-            param_grop['lr'] = self.lr
         pre_audio = pre_audio.float()
         pre_visual = pre_visual.float()
-        Q = self.model(pre_audio, pre_visual)
+        Q = self.critic(pre_audio, pre_visual)
+        # self.baseline = (self.baseline + torch.mean(Q.detach()))/2
         # gained best action Q value
-        next_q_values = self.target_model(next_audio, next_visual)
-        # next Q value 
-        max_next_q_values = next_q_values.max(1)[0].unsqueeze(1)
+        next_q_values = self.critic(next_audio, next_visual)
         # get the PI policy gianed action 
         # target_q_values = reward.unsqueeze(1) +   self.gamma * max_next_q_values
-        target_q_values = reward.unsqueeze(1) +   self.gamma * max_next_q_values*(1-done).unsqueeze(1)
-        # get the state value
-        total_loss , q_loss , q_regularization  = self.compute_loss(Q,target_q_values ,labels)
-        self.optimizer.zero_grad()
-        total_loss.backward()
-        self.optimizer.step()
-
-        return total_loss.item(), q_loss.item(),q_regularization.item()
+        target_q_values = reward.unsqueeze(1) +   self.gamma *next_q_values*(1-done).unsqueeze(1)
+        td_error = target_q_values - Q
+        log_probs = torch.log(self.actor(pre_audio , pre_visual).gather(1,labels.unsqueeze(1)))
+        actor_loss = torch.mean(-log_probs*td_error.detach())
+        print(Q)
+        print(target_q_values)
+        critic_loss = torch.mean(nn.MSELoss()(Q , target_q_values))
+        # q_regularization = Q.mean() - self.baseline
+        # total_loss = actor_loss + critic_loss + q_regularization
+        total_loss = actor_loss + critic_loss
+        
+        self.q_optimizer.zero_grad()
+        critic_loss.backward()
+        self.q_optimizer.step()
+        self.actor_optimizer.zero_grad()
+        actor_loss.backward()
+        self.actor_optimizer.step()
+        
+        return actor_loss.item(), critic_loss.item() , total_loss.item()
     def update_target_network(self):
         self.target_model.load_state_dict(self.model.state_dict())
 def train(logging):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = AVNet(128 , 4 ,width_dim=128 , height_dim=36).to(device)
-    model.train()
     lr = 1e-5
-    cql = CQL(model , device)
+    acc = ACC()
     path = [ '../data/RL/newdone']
     mydata = MyData(path=path)
     print(mydata.__len__())
@@ -200,22 +215,22 @@ def train(logging):
         for batch_data in dataloader:
             batch_pre_audio, batch_pre_visual, batch_next_audio , batch_next_visual,batch_done, batch_reward ,batch_labels,= batch_data
             batch_pre_audio, batch_pre_visual, batch_next_audio , batch_next_visual, batch_labels, batch_reward ,batch_done= batch_pre_audio.to(device), batch_pre_visual.to(device), batch_next_audio.to(device) , batch_next_visual.to(device), batch_labels.to(device), batch_reward.to(device),batch_done.to(device)
-            total_loss, q_loss,q_regularization  = cql.train_step(batch_pre_audio, batch_pre_visual, batch_next_audio,batch_next_visual,batch_labels, batch_reward , batch_done,lr)
-            print(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, q_loss {q_loss}, v_loss {q_regularization},lr {lr}')
-            logging.info(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, q_loss {q_loss}, v_loss {q_regularization} ,lr {lr}')
+            actor_loss, critic_loss,total_loss  = acc.train_step(batch_pre_audio, batch_pre_visual, batch_next_audio,batch_next_visual,batch_labels, batch_reward , batch_done,lr)
+            print(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, cirtic_loss {critic_loss}, actor_loss {actor_loss},lr {lr}')
+            logging.info(f'epoch {epoch}, Episode {episode}, total_loss: {total_loss}, cirtic_loss {critic_loss}, actor_loss {actor_loss} ,lr {lr}')
             if episode % 10 == 0:
-                    writer.add_scalar('Loss/q_loss', q_loss, episode)
-                    writer.add_scalar('Loss/q_regularization', q_regularization, episode)
+                    writer.add_scalar('Loss/cirtic_loss', critic_loss, episode)
+                    writer.add_scalar('Loss/actor_loss', actor_loss, episode)
                     # Log total loss
                     writer.add_scalar('Loss/train', total_loss, episode)
-                    cql.update_target_network()
+                    # acc.update_target_network()
             episode+=1
     logging.info(f"10 epoch cost time {(time.time() - time_start) % 60}m{(time.time() - time_start) // 60}s")
-    torch.save(model.state_dict(), './checkpoint/avn.pth')
+    torch.save(acc.actor.state_dict(), './checkpoint/acc.pth')
     writer.close()
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/loss/avn'
+    log_dir = './logs/loss/acc'
     writer = SummaryWriter(log_dir)
     logging.basicConfig(filename='./logs/audio/avn_bel.log', level=logging.INFO)
     train(logging)

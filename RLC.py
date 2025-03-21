@@ -9,7 +9,8 @@ import pickle
 from config import config
 from env.v0d0 import Env
 from utils.batch import *
-random.seed(config["random_seed"])
+# random.seed(config["random_seed"])
+random.seed(int(time.time()))
 
 class Actor:
     def __init__(self, config):
@@ -99,7 +100,7 @@ def collect():
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
         result_lists ,_ ,_ = actor.rollout()
-        path = os.path.join(f"data/RL/turn0",  f"rl_episode_{num_episodes}.pkl")
+        path = os.path.join(f"data/RL/easydata",  f"rl_episode_{num_episodes}.pkl")
         with open(path, "wb") as f:
             pickle.dump(result_lists, f)
         actor.path_point = list()
@@ -108,5 +109,5 @@ def collect():
         logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
 
 if  __name__== "__main__":
-    logging.basicConfig(filename='./data/RL/turn0/RLDATA.log', level=logging.INFO)
+    logging.basicConfig(filename='./data/RL/easydata/RLDATA.log', level=logging.INFO)
     collect()

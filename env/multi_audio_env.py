@@ -239,7 +239,7 @@ class MultiAudioEnv(ParallelEnv):
             agent = self._sim.get_agent(agent_id)
             agent_state = habitat_sim.AgentState()
             while True:
-                rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 2.5)
+                rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 3.0)
                 if (
                     (
                         np.linalg.norm(rand_pos - self._source_poses[0])
@@ -426,9 +426,13 @@ class MultiAudioEnv(ParallelEnv):
             (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10
             for agent_id in range(self._num_agents)
         ]
-        for agent_id in range(self._num_agents):
-            if self._prev_geo_dist[agent_id] - geo_dist[agent_id] == 0:
-                r[agent_id] = 10
+        
+        # 朝向目标正的，没有朝向目标小负值
+        # reward = 0 
+        # 
+        # for agent_id in range(self._num_agents):
+        #     if self._prev_geo_dist[agent_id] - geo_dist[agent_id] == 0:
+        #         r[agent_id] = 10
         
         self._prev_geo_dist = geo_dist
 

@@ -141,8 +141,8 @@ class Actor:
 def collect():
     actor = Actor(config)
     seq_list = list()
-    for num_episodes in range(300):
-        s = f'level{(num_episodes//100) + 1 }'
+    for num_episodes in range(600):
+        s = f'level{(num_episodes//200) + 1 }'
         actor.le = actor.level[s]
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
@@ -166,5 +166,5 @@ def collect():
         logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
 
 if  __name__== "__main__":
-    logging.basicConfig(filename='./data/RL/level_rate/RLDATA.log', level=logging.INFO)
+    logging.basicConfig(filename='./data/RL/level/RLDATA.log', level=logging.INFO)
     collect()

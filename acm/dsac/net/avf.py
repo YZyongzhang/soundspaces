@@ -10,7 +10,6 @@ import torch.optim as optim
 import  pickle
 import logging
 import time
-from dsac.data.data1 import Data
 class AVFNet(nn.Module):
     def __init__(self,hid_dim , out_put , width_dim,height_dim):
         super().__init__()
@@ -50,6 +49,18 @@ class AVFNet(nn.Module):
             nn.Linear(64,self.out_put)
         )
         self.initialize_weights_uniform()
+    # def forward(self,audio,visual):
+        # print(visual.shape)
+        # visual = visual.permute(0,3,2,1)
+        # mel_features = torch.from_numpy(self.deal_audio(audio)).to(self.device)
+        # audio_fea = self.audio(mel_features)
+        # visual_fea = self.visual(visual)
+        # combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
+        # action = self.action_net(combinencode)
+        # return action
+    #############################
+    # 特征模型取中间层进行训练
+    #############################
     def forward(self,audio,visual):
         # print(visual.shape)
         visual = visual.permute(0,3,2,1)
@@ -57,19 +68,7 @@ class AVFNet(nn.Module):
         audio_fea = self.audio(mel_features)
         visual_fea = self.visual(visual)
         combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
-        action = self.action_net(combinencode)
-        return action
-    """
-    特征模型提取中间层进行计算
-    """
-    # def forward(self,audio,visual):
-    #     # print(visual.shape)
-    #     visual = visual.permute(0,3,2,1)
-    #     mel_features = torch.from_numpy(self.deal_audio(audio)).to(self.device)
-    #     audio_fea = self.audio(mel_features)
-    #     visual_fea = self.visual(visual)
-    #     combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
-    #     return combinencode
+        return combinencode
     def deal_audio(self,audio):
         mel_features = []
         audio = audio.cpu().numpy()
@@ -179,20 +178,12 @@ class MyData(Dataset):
             action.extend(self.tag)
         return pre_audio,pre_visual, next_audio, next_visual,done,reward,action
 def train():
-    time_star = time.time()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(device)
     model.train()
-    
-    path = ['../data/RL/mydata']
-    paths = os.listdir(path=path[0])
-    path_files = list()
-    for i in paths:
-        path_files.append(os.path.join(path[0] , i))
-    num_split = 50
-    split_lists = np.array_split(path_files, num_split)
-    split_lists = [list(sublist) for sublist in split_lists]
-    
+    path = "../data/RL/newdone"
+    mydata = MyData(path=[path])
+    dataloader = DataLoader(dataset = mydata , batch_size = 16 , shuffle = True)
     numepoch = 70
     lr = 1e-5
     criterion = nn.CrossEntropyLoss()
@@ -202,32 +193,34 @@ def train():
         # if epoch % 5 == 0 and epoch != 0:
         #     for param_grop in optimizer.param_groups:
         #         param_grop['lr'] = lr / 10
-        for i in split_lists:
-            dataset = Data(path=i)
-            dataloader = DataLoader(dataset=dataset, batch_size=32, shuffle=True)
-            for batch_idx, batch_data in enumerate(dataloader):
-                batch_pre_audio, batch_pre_visual, _ , _,_, _ ,batch_labels= batch_data
-                batch_pre_audio = batch_pre_audio.float().to(device)
-                batch_pre_visual = batch_pre_visual.float().to(device)
-                batch_labels = batch_labels.to(device)
-                optimizer.zero_grad()
-                outputs = model(batch_pre_audio , batch_pre_visual)
+        running_loss = 0.0
+        run_id = 1
+        for batch_idx, batch_data in enumerate(dataloader):
+            batch_pre_audio, batch_pre_visual, _ , _,_, _ ,batch_labels= batch_data
+            batch_pre_audio = batch_pre_audio.float().to(device)
+            batch_pre_visual = batch_pre_visual.float().to(device)
+            batch_labels = batch_labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(batch_pre_audio , batch_pre_visual)
 
-                loss = criterion(outputs, batch_labels)
-                loss.backward()
-                optimizer.step()
-                print(f'eposide:{episode} , loss:{loss.item()}')
-                writer.add_scalar('Loss/train', loss, episode)
-                if episode % 1000 == 0:
-                    logging.info(f'Epoch {epoch} , episode : {episode} , use time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s')
-                if episode % 100000 == 0 and episode != 0:
-                    torch.save(model.state_dict(), f'./checkpoint/avnf_finnal_2_{episode}.pth')
-                episode +=1
-    torch.save(model.state_dict(), './checkpoint/avnf_finnal_2.pth')
+            loss = criterion(outputs, batch_labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+            run_id+=1
+            print(f'eposide:{episode} , loss:{loss.item()}')
+            if episode % 10 == 0:
+                avg_train_loss = running_loss / run_id
+                writer.add_scalar('Loss/train', avg_train_loss, episode)
+                run_id = 1
+                running_loss = 0.0
+            episode +=1      
+    torch.save(model.state_dict(), './checkpoint/avnf_finnal_1.pth')
     writer.close()
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/loss/avf_1'
+    log_dir = './logs/loss/avf_finnal_1'
     writer = SummaryWriter(log_dir)
     logging.basicConfig(filename='./logs/audio/avf.log', level=logging.INFO)
     train()
