@@ -45,7 +45,7 @@ class Draw:
             path_x = [point[0] for point in path]  # 获取所有 x 坐标
             path_y = [point[1] for point in path]  # 获取所有 y 坐标
         print(path_x)
-        plt.plot(path_x, path_y , color="blue", alpha=0.7, label="Path" ,linewidth = 2)
+        plt.plot(path_x, path_y  , color="blue", alpha=0.7, label="Path" ,linewidth = 2)
         plt.plot(path_x[-1] , path_y[-1] , marker = 'o' , markersize = 5 , color='blue' , alpha=0.7, label="finnal_point")
         # plt.plot(path[:-1][0],path[:-1][0] , marker = 'o' , markersize = 5 ,color="blue", alpha=0.7, label="finnal_point")
             

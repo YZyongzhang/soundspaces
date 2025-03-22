@@ -69,8 +69,8 @@ class MultiAudioEnv(ParallelEnv):
         # self._num_agents = config["agents_num"]
         self._num_agents = 1
         self._num_sources = config["sources_num"]
-        # self._max_episode_steps = config["max_episode_steps"]
-        self._max_episode_steps = 61
+        self._max_episode_steps = config["max_episode_steps"]
+        # self._max_episode_steps = 61
         self._sequence_length = config["sequence_length"] + 1  # add bootstrap
         self._success_distance = config["success_distance"]
 
@@ -398,7 +398,9 @@ class MultiAudioEnv(ParallelEnv):
         self._prev_geo_dist = [
             self.get_geodesic_distance(agent_id) for agent_id in range(self._num_agents)
         ]
-
+        self._prev_angle_dist = [
+                self.get_angle(agent_id) for agent_id in range(self._num_agents)
+            ]
         return s
 
     def _get_observations(self):
@@ -454,29 +456,32 @@ class MultiAudioEnv(ParallelEnv):
         geo_dist = [
             self.get_geodesic_distance(agent_id) for agent_id in range(self._num_agents)
         ]
+        angle_dist = [
+                self.get_angle(agent_id) for agent_id in range(self._num_agents)
+            ]
         # 乘以2 / 5 / 20
         # 
         r = [
             
-            (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10
+            (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10 + \
+            (self._prev_angle_dist[agent_id] - angle_dist[agent_id]) / 10
             for agent_id in range(self._num_agents)
         ]
-        # for agent_id in range(self._num_agents):
-        #     if self._prev_geo_dist[agent_id] - geo_dist[agent_id] == 0:
-        #         r[agent_id] = 10
-        
+
 
         self._prev_geo_dist = geo_dist
-
+        self._prev_angle_dist = angle_dist
         # if agent reaches the goal (< success_distance), return 1
         for agent_id in range(self._num_agents):
-            if (
-                np.linalg.norm(
-                    self._sim.get_agent(agent_id).get_state().position
-                    - self._source_poses[0]
-                )
-                < self._success_distance
-            ):
+            # if (
+            #     np.linalg.norm(
+            #         self._sim.get_agent(agent_id).get_state().position
+            #         - self._source_poses[0]
+            #     )
+            #     < self._success_distance
+            # )
+            #     r[agent_id] = 100
+            if self._stopped_agents[agent_id]:
                 r[agent_id] = 100
 
         for agent_id in range(self._num_agents):
@@ -567,7 +572,7 @@ class MultiAudioEnv(ParallelEnv):
         # get reward
         r = self._reward()
         # get done
-        done = self._count >= self._max_episode_steps or self._success() or self._stopped_agents[agent_id]
+        done = self._count >= self._max_episode_steps  or self._stopped_agents[agent_id]
         # done = self._count >= self._max_episode_steps or self._stopped_agents[agent_id]
         # get info
         info = {
@@ -669,6 +674,45 @@ class MultiAudioEnv(ParallelEnv):
         found_path = self._sim.pathfinder.find_path(path)
         path_results = (found_path, path.geodesic_distance, path.points)
         return path_results[1]
+    
+    """
+    这一部分是对turn进行求解reward
+    这里只设置了一个agent 没有过多的设置。后续更改注意这里
+    """
+    
+    
+    def get_angle(self,agent_id):
+        stander = self.change_dim_array(np.array([0,self.get_source_pos()[0][-2],-1]))
+        sound_agent_vertor = self.change_dim_array(self.get_source_pos()[0] - self.get_agent_pos()[0])
+
+        target_rotation_vector = self.change_dim_vector(self.rotation_vector_between_vectors(sound_agent_vertor, stander))
+
+        target_rotation = quaternion.from_rotation_vector(target_rotation_vector)
+
+        agent_rotation = self.get_agent_rotation()[0]
+        angle = self.Angle(agent_rotation , target_rotation)
+        return angle
+    def change_dim_array(self,array):
+        num1 = array[-1]
+        return np.array([array[0], num1 , 0])
+    def change_dim_vector(self,vector):
+        num1 = vector[-1]
+        num2 = vector[-2]
+        return np.array([vector[0], num1 , num2])
+    def rotation_vector_between_vectors(self,v1, v2):
+        axis = np.cross(v1, v2)
+        angle = np.arccos(np.clip(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)), -1.0, 1.0))
+        if np.linalg.norm(axis) == 0:
+            return np.zeros(3)
+        else:
+            return axis / np.linalg.norm(axis) * angle
+    def Angle(self,agent_rotation,target_rotation):
+        a = angle_between_quats(agent_rotation,target_rotation)
+        return np.degrees(a)
+    
+    """
+    这一部分是对turn进行求解reward
+    """
 
     def get_geo_distance_list(self):
         return [self.get_geodesic_distance(i) for i in range(self._num_agents)]

@@ -43,12 +43,14 @@ def parse_args():
     parser.add_argument("--sample_rate", type=float, default=24000)
 
     # env args
-    parser.add_argument("--max_episode_steps", type=int, default=100)
+    # parser.add_argument("--max_episode_steps", type=int, default=100)
+    parser.add_argument("--max_episode_steps", type=int, default=200)
     parser.add_argument("--sequence_length", type=int, default=60)
     parser.add_argument("--step_time", type=float, default=0.75)
     parser.add_argument("--success_distance", type=float, default=1.0)
     parser.add_argument("--audio_dir", type=str, default="../res/singing.wav")
-    parser.add_argument("--forward_amount", type=float, default=0.25)
+    # parser.add_argument("--forward_amount", type=float, default=0.25)
+    parser.add_argument("--forward_amount", type=float, default=0.15)
 
     # architecture args
     parser.add_argument("--hid_dim_l", type=int, default=256)# 512
