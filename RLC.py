@@ -61,13 +61,13 @@ class Actor:
         
         return angle
     def mid_point(self, agent_point_from ,agent_point_to ,r):
-
+        limit = 0
         while True:
             rand_pos = self._sim.pathfinder.get_random_navigable_point_near(agent_point_from , radius = r)
             if (
-                np.linalg.norm(rand_pos - agent_point_from) > r - 0.5
-                and np.linalg.norm(rand_pos - agent_point_from) < r + 0.5  # 圆环的空间
-                and self.shortest_path(rand_pos, agent_point_from) is not None
+                # np.linalg.norm(rand_pos - agent_point_from) > r - 0.5
+                # and np.linalg.norm(rand_pos - agent_point_from) < r + 1.0  # 圆环的空间
+                self.shortest_path(rand_pos, agent_point_from) is not None
                 and self._sim.pathfinder.is_navigable(rand_pos)
                 and self.angle_between_points( agent_point_from , rand_pos , agent_point_to) > 20 # 设置角度的位置
                 and self.angle_between_points( agent_point_from , rand_pos , agent_point_to) < 40
@@ -76,14 +76,20 @@ class Actor:
                 break
             else:
                 print(f'rand_pos {rand_pos} is false')
-                logging.info(f'rand_pos {rand_pos} is false')
-        return rand_pos    
+                if limit > 100 :
+                    break
+                limit += 1
+                # logging.info(f'rand_pos {rand_pos} is false')
+        if limit > 100 or limit == 100:
+            return agent_point_from
+        else:
+            return rand_pos    
     def greedy_act(self, env):
         ret = list()
         self.path_point.append(env.get_agent_pos()[0])
         action = self.paths[self._idx]
         print(f"agent action: {action}")
-        logging.info(f"agent action: {action} idx :{self._idx}") 
+        logging.info(f"agent action: {action}") 
         act_id = env.action_str_2_id(action) 
         ret.append({
             "rl_pred": act_id,
@@ -100,7 +106,7 @@ class Actor:
         # action = self.paths[self._idx]
         action = random.choice(self.random_action)
         print(f"agent action: {action}")
-        logging.info(f"agent action: {action} idx :{self._idx}") 
+        logging.info(f"agent action: {action}") 
         act_id = env.action_str_2_id(action) 
         ret.append({
             "rl_pred": act_id,
@@ -139,14 +145,16 @@ class Actor:
                 r = 1/2 * (np.linalg.norm(path.points[index] - path.points[index+1]))
                 point  = self.mid_point(path.points[index] , path.points[index+1] , r)
                 print(f"插入一个元素{point}")
-                logging.info(f"插入一个元素{point}")
+                # logging.info(f"插入一个元素{point}")
                 insert_points.append(point)
         result_point = self.insert_list_evenly(path.points , insert_points)
-        logging.info(result_point)
+        # logging.info(result_point)
         return result_point
         # 通过使用result_point 获取到action list
     def get_action_list(self,point):
         return self.env.get_shortest_action_list(goal_pos=point)[0]
+    def get_max_step(self , seq):
+        pass
     def rollout(self):
         self.env.reset()
         self.obs = self.env._get_observations()
@@ -157,13 +165,13 @@ class Actor:
         self.points = self.get_path_point()
         # logging.info(f"frist path action is {self.paths}")
         for index , value in enumerate(self.points):
-            logging.info(index)
+            # logging.info(index)
             self.paths = self.env.get_shortest_action_list(goal_pos=value)[0]
-            logging.info(self.paths)
+            # logging.info(self.paths)
             self.reset()
             while True:
                 rl_output_list = self.greedy_act(env)
-                logging.info(rl_output_list[0]['rl_pred'])
+                # logging.info(rl_output_list[0]['rl_pred'])
                 if index != len(self.points) - 1 and rl_output_list[0]['rl_pred'] == 3:
                     break
                 all_list = [self.env.step(rl_output_list)]
@@ -173,7 +181,7 @@ class Actor:
                 info_list = [t[3] for t in all_list]
                 all_r_list.append(r_list)
                 done.append(done_list)
-                logging.info(done_list)
+                logging.info(f"reward is {r_list}")
                 if all(done_list):
                     for k, v in info_list[0].items():
                         logging.info(f"Env  {k}: {v}")
@@ -183,33 +191,40 @@ class Actor:
 
         seq_list = list()
         seq_list += env.get()
+        max_step = len(done)
         
+        if max_step > 80 :
+            level = 2
+        elif max_step > 40 and max_step < 80:
+            level = 1
+        else:
+            level = 0
+            
         result = [seq_list , {
             'path_point':self.path_point,
             'sound_pos':env.get_source_pos()[0]
         } , done ,self.obs]
         self.path_point = list()
         torch.cuda.empty_cache()
-        return  result, return_, num_success
+        return  result, return_, num_success , level
 
 def collect():
     actor = Actor(config)
     seq_list = list()
-    for num_episodes in range(100):
-        # s = f'level{(num_episodes//200) + 1 }'
-        s = 'level3'
-        # actor.le = actor.level[s]
+    level_episode = [0,0,0]
+    for num_episodes in range(1200):
         t_start = time.time()
-        logging.info(f"Episode {num_episodes}")
-        result_lists ,_ ,_ = actor.rollout()
-        path = os.path.join(f"data/RL/forward_angle/{s}",  f"rl_episode_{s}_{num_episodes}.pkl")
+        result_lists ,_ ,_,level = actor.rollout()
+        level_episode[level] += 1
+        path = os.path.join(f"data/RL/success_and_stop_data/level{level}",  f"rl_episode_level{level}_{level_episode[level]}.pkl")
         with open(path, "wb") as f:
             pickle.dump(result_lists, f)
         actor.path_point = list()
         seq_list.clear()
-        logging.info(f"offline_episode_RL_{num_episodes}.pkl")
-        logging.info(f"Episode {num_episodes} time: {time.time()-t_start}")
-
+        current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        logging.info(f"level {level} file name rl_episode_{level_episode[level]}_{num_episodes}.pkl")
+        logging.info(f"episode time {(time.time() - t_start) // 60} m {(time.time() - t_start) % 60} s")
+        logging.info(f"now time is {current_time_str}")
 if  __name__== "__main__":
-    logging.basicConfig(filename='./data/RL/forward_angle/RLDATA.log', level=logging.INFO)
+    logging.basicConfig(filename='./data/RL/success_and_stop_data/RLDATA.log', level=logging.INFO)
     collect()

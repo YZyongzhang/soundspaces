@@ -8,13 +8,14 @@ from torch.distributions import Categorical
 from torch.nn.utils import clip_grad_norm_
 import os , sys
 from tqdm import tqdm
+import random
 import torch.optim as optim
 import  pickle
 import logging
 import time
 # from data.mydata import MyData
 # from data.newdata import newMyData
-from data.data1 import Data
+from data.angle_data import Data
 from net.sac_cql import DiscreteSAC_CQL
 from net.sac_cql_1 import DiscreteSAC_CQL_1
 def train():
@@ -68,19 +69,31 @@ def train_1():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     cql = DiscreteSAC_CQL_1()
     episode = 0
-
-    path = ['../../data/RL/mydata']
-    paths = os.listdir(path=path[0])
-    path_files = list()
-    for i in paths:
-        path_files.append(os.path.join(path[0] , i))
+    val_paths = ['../../data/RL/best_action_forward_angle_valdata']
+    val_path = [os.path.join(val_paths[0] , i) for i in os.listdir(val_paths[0])]
+    path_ = ['../../data/RL/muti_level_data/level0' , '../../data/RL/muti_level_data/level1', '../../data/RL/muti_level_data/level2']
+    level0 = [os.path.join(path_[0] , f) for f in os.listdir(path_[0])]
+    level1 = [os.path.join(path_[1] , f) for f in os.listdir(path_[1])]
+    level2 = [os.path.join(path_[2] , f) for f in os.listdir(path_[2])]
     num_split = 50
-    split_lists = np.array_split(path_files, num_split)
-    split_lists = [list(sublist) for sublist in split_lists]
-
+    split_lists = []
+    split_lists_level0 = np.array_split(level0, num_split)
+    split_lists_level1 = np.array_split(level1, num_split)
+    split_lists_level2 = np.array_split(level2, num_split)
+    split_lists_level0 = [list(sublist) for sublist in split_lists_level0]
+    split_lists_level1 = [list(sublist) for sublist in split_lists_level1]
+    split_lists_level2 = [list(sublist) for sublist in split_lists_level2]
+    
+    split_lists.extend(split_lists_level0)
+    # split_lists.extend(split_lists_level1)
+    # split_lists.extend(split_lists_level2)
     num_epochs = 500
     for epoch in range(num_epochs):
-        
+        if epoch == 50 :
+            split_lists.extend(split_lists_level1)
+        if epoch == 100 :
+            split_lists.extend(split_lists_level2)
+        logging.info(f'split_lists len is {len(split_lists)}')
         for i in split_lists:
             dataset = Data(path=i)
             dataloader = DataLoader(dataset=dataset, batch_size=32, shuffle=True)
@@ -97,25 +110,39 @@ def train_1():
                 for loss_name, loss_value in loss_dict.items():
                     writer.add_scalar(f'Loss/{loss_name}', loss_value, episode)
                 print(f'Epoch {epoch} , episode : {episode} , use time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s')
+                if episode % 100 == 0:
+                    reward , reward_dict = val(cql=cql  , val_path=val_path)
+                    for reward_name, reward_value in reward_dict.items():
+                        writer.add_scalar(f'Loss/{reward_name}', reward_value, episode)
+                        writer.add_scalar(f'Loss/{reward_name}_diff', reward_value - reward, episode)
                 if episode % 1000 == 0:
                     logging.info(f'Epoch {epoch} , episode : {episode} , use time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s')
                 episode+=1
-                if episode % 5000 == 0 and episode != 0:
-                    torch.save(cql.policy.state_dict(), f'./checkpoint/policy_1_{episode}.pth')
-                    torch.save(cql.critic1.state_dict(), f'./checkpoint/critic1_1_{episode}.pth')
-                    torch.save(cql.critic2.state_dict(), f'./checkpoint/critic2_1_{episode}.pth')
-    now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                if episode % 10000 == 0 and episode != 0:
+                    torch.save(cql.policy.state_dict(), f'./checkpoint/policy_2_{episode}.pth')
+                    torch.save(cql.critic1.state_dict(), f'./checkpoint/critic1_2_{episode}.pth')
+                    torch.save(cql.critic2.state_dict(), f'./checkpoint/critic2_2_{episode}.pth')
+        now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     
-    logging.info(f"begin time : {current_time_str} now time :{now_time}")
-    logging.info(f'log : ./logs/loss/DSAC6 ; path : ./checkpoint/policy_1.pth  ./checkpoint/critic1_1.pth  ./checkpoint/critic2_1.pth; ')
-    logging.info(f"time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
-    torch.save(cql.policy.state_dict(), './checkpoint/policy_1.pth')
-    torch.save(cql.critic1.state_dict(), './checkpoint/critic1_1.pth')
-    torch.save(cql.critic2.state_dict(), './checkpoint/critic2_1.pth')
+        logging.info(f"begin time : {current_time_str} now time :{now_time}")
+        logging.info(f'log : ./logs/loss/DSAC6 ; path : ./checkpoint/policy_2.pth  ./checkpoint/critic1_2.pth  ./checkpoint/critic2_2.pth; ')
+        logging.info(f"time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
+    torch.save(cql.policy.state_dict(), './checkpoint/policy_2.pth')
+    torch.save(cql.critic1.state_dict(), './checkpoint/critic1_2.pth')
+    torch.save(cql.critic2.state_dict(), './checkpoint/critic2_2.pth')
+def val(val_path , cql):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    file = [random.choice(val_path)]
+    val_data = Data(file)
+    pre_audio = torch.tensor(np.array(val_data.preaudio)).to(device)
+    pre_visual = torch.tensor(np.array(val_data.previsual)).to(device)
+    reward = torch.tensor(np.array(val_data.reward)).sum(-1)
+    reward_dict = cql.val_step(pre_audio , pre_visual)
+    return reward , reward_dict
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
-    log_dir = './logs/loss/DSAC9'
+    log_dir = './logs/loss/DSAC14'
     writer = SummaryWriter(log_dir)
-    logging.basicConfig(filename='./logs/DSAC9.log', level=logging.INFO,filemode='a')
+    logging.basicConfig(filename='./logs/DSAC14.log', level=logging.INFO,filemode='a')
     # train()
     train_1()# screen sac1

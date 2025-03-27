@@ -10,12 +10,13 @@ from config import config
 from env.v0d0 import Env
 from utils.batch import *
 from acm.dsac.dsac import AVNet
+from acm.dsac.net.sac_cql_1 import DiscreteSAC_CQL_1
 random.seed(config["random_seed"])
 class Actor:
     def __init__(self, config):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model_path = './acm/dsac/checkpoint/DSAC_easy_100000.pth'
-        self.agent = AVNet(128, 4, 128, 36).to(self.device)
+        self.model_path = './acm/dsac/checkpoint/LSTM_100000.pth'
+        self.agent = DiscreteSAC_CQL_1().to(self.device)
         self.agent.load_state_dict(torch.load(self.model_path))
         self._config = config
         self._num_episodes = 0
@@ -30,6 +31,8 @@ class Actor:
             'sound':[],
             'agent':[]
         }
+        self.ht = torch.rand(1*1,64).cuda()
+        self.ct = torch.rand(1*1,64).cuda()
     def get_action(self , visual , audio):
         visual = torch.from_numpy(visual)
         audio = torch.from_numpy(audio)
@@ -37,12 +40,17 @@ class Actor:
         audio = audio.unsqueeze(0)
         visual = visual.float().to(self.device)
         audio = audio.float().to(self.device)
-        action_list  = self.agent(audio , visual)[0]
+        state,(ht , ct ) = self.agent.lstm(audio , visual , self.ht ,self.ct)
+        self.ht = ht
+        self.ct = ct
+        action_list = self.agent.critic1(state)
         action = torch.max(action_list,dim=1)[1].tolist()
         print(action)
         return action[0]
         
-
+    def reset_lstm(self):
+        self.ht = torch.rand(1*1,64).cuda()
+        self.ct = torch.rand(1*1,64).cuda()
     def reset(self):
         self._idx = 0
         
@@ -71,6 +79,7 @@ class Actor:
         return ret
     def rollout(self):
         self.reset()
+        self.reset_lstm()
         self.num = 0
         self.path_id = 0
         self._num_episodes += 1

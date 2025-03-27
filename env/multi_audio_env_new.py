@@ -69,8 +69,8 @@ class MultiAudioEnv(ParallelEnv):
         # self._num_agents = config["agents_num"]
         self._num_agents = 1
         self._num_sources = config["sources_num"]
-        self._max_episode_steps = config["max_episode_steps"]
-        # self._max_episode_steps = 61
+        # self._max_episode_steps = config["max_episode_steps"]
+        self._max_episode_steps = 61
         self._sequence_length = config["sequence_length"] + 1  # add bootstrap
         self._success_distance = config["success_distance"]
 
@@ -263,14 +263,15 @@ class MultiAudioEnv(ParallelEnv):
                 agent_state = habitat_sim.AgentState()
                 while True:
                     rand_pos = self._sim.pathfinder.get_random_navigable_point()
+                    # rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 2.0)
                     if (
                         (
                             np.linalg.norm(rand_pos - self._source_poses[0])
-                            > self._success_distance + 0.2
+                            > self._success_distance + 0.5
                         )
                         and (
                             np.linalg.norm(rand_pos - self._source_poses[0])
-                            < self._success_distance + 9.0
+                            < self._success_distance + 6.0
                         )
                         and (
                             self.shortest_path(rand_pos, self._source_poses[0]) is not None
@@ -464,7 +465,7 @@ class MultiAudioEnv(ParallelEnv):
         r = [
             
             (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10 + \
-            (self._prev_angle_dist[agent_id] - angle_dist[agent_id]) / 10
+            (self._prev_angle_dist[agent_id] - angle_dist[agent_id]) / 5
             for agent_id in range(self._num_agents)
         ]
 
@@ -473,16 +474,16 @@ class MultiAudioEnv(ParallelEnv):
         self._prev_angle_dist = angle_dist
         # if agent reaches the goal (< success_distance), return 1
         for agent_id in range(self._num_agents):
-            # if (
-            #     np.linalg.norm(
-            #         self._sim.get_agent(agent_id).get_state().position
-            #         - self._source_poses[0]
-            #     )
-            #     < self._success_distance
-            # )
-            #     r[agent_id] = 100
-            if self._stopped_agents[agent_id]:
+            if (
+                np.linalg.norm(
+                    self._sim.get_agent(agent_id).get_state().position
+                    - self._source_poses[0]
+                )
+                < self._success_distance
+            ):
                 r[agent_id] = 100
+            # if self._stopped_agents[agent_id]:
+            #     r[agent_id] = 100
 
         for agent_id in range(self._num_agents):
             # if agent is crushed, return -1
@@ -572,8 +573,9 @@ class MultiAudioEnv(ParallelEnv):
         # get reward
         r = self._reward()
         # get done
-        done = self._count >= self._max_episode_steps  or self._stopped_agents[agent_id]
-        # done = self._count >= self._max_episode_steps or self._stopped_agents[agent_id]
+        # done = self._count >= self._max_episode_steps  or self._success() or self._stopped_agents[agent_id]
+        # 到时候把这两个条件全部融合在一起
+        done = self._count >= self._max_episode_steps or self._stopped_agents[agent_id]
         # get info
         info = {
             "count": self._count,
