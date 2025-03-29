@@ -119,17 +119,17 @@ def train_1():
                     logging.info(f'Epoch {epoch} , episode : {episode} , use time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s')
                 episode+=1
                 if episode % 10000 == 0 and episode != 0:
-                    torch.save(cql.policy.state_dict(), f'./checkpoint/policy_2_{episode}.pth')
-                    torch.save(cql.critic1.state_dict(), f'./checkpoint/critic1_2_{episode}.pth')
-                    torch.save(cql.critic2.state_dict(), f'./checkpoint/critic2_2_{episode}.pth')
+                    torch.save(cql.policy.state_dict(), f'../../data/checkpoint/acmcheckpoint/policy_2_{episode}.pth')
+                    torch.save(cql.critic1.state_dict(), f'../../data/checkpoint/acmcheckpoint/critic1_2_{episode}.pth')
+                    torch.save(cql.critic2.state_dict(), f'../../data/checkpoint/acmcheckpoint/critic2_2_{episode}.pth')
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     
         logging.info(f"begin time : {current_time_str} now time :{now_time}")
         logging.info(f'log : ./logs/loss/DSAC6 ; path : ./checkpoint/policy_2.pth  ./checkpoint/critic1_2.pth  ./checkpoint/critic2_2.pth; ')
         logging.info(f"time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
-    torch.save(cql.policy.state_dict(), './checkpoint/policy_2.pth')
-    torch.save(cql.critic1.state_dict(), './checkpoint/critic1_2.pth')
-    torch.save(cql.critic2.state_dict(), './checkpoint/critic2_2.pth')
+    torch.save(cql.policy.state_dict(), '../../data/checkpoint/acmcheckpoint/policy_2.pth')
+    torch.save(cql.critic1.state_dict(), '../../data/checkpoint/acmcheckpoint/critic1_2.pth')
+    torch.save(cql.critic2.state_dict(), '../../data/checkpoint/acmcheckpoint/critic2_2.pth')
 def val(val_path , cql):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     file = [random.choice(val_path)]

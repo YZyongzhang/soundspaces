@@ -1,5 +1,6 @@
 import logging
 import torch
+import pdb
 import os
 import time
 import random
@@ -11,12 +12,16 @@ from env.v0d0 import Env
 from utils.batch import *
 from acm.dsac.dsac import AVNet
 from acm.dsac.net.sac_cql_1 import DiscreteSAC_CQL_1
+from acm.avf import AVFNet
 random.seed(config["random_seed"])
 class Actor:
     def __init__(self, config):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model_path = './acm/dsac/checkpoint/LSTM_100000.pth'
-        self.agent = DiscreteSAC_CQL_1().to(self.device)
+        # self.model_path = './acm/dsac/checkpoint/LSTM_100000.pth'
+        # self.agent = DiscreteSAC_CQL_1().to(self.device)
+        # avf path
+        self.model_path = './data/checkpoint/acmcheckpoint/avf_40000.pth'
+        self.agent = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
         self.agent.load_state_dict(torch.load(self.model_path))
         self._config = config
         self._num_episodes = 0
@@ -40,13 +45,17 @@ class Actor:
         audio = audio.unsqueeze(0)
         visual = visual.float().to(self.device)
         audio = audio.float().to(self.device)
-        state,(ht , ct ) = self.agent.lstm(audio , visual , self.ht ,self.ct)
-        self.ht = ht
-        self.ct = ct
-        action_list = self.agent.critic1(state)
-        action = torch.max(action_list,dim=1)[1].tolist()
+        #  lstm model
+        # state,(ht , ct ) = self.agent.lstm(audio , visual , self.ht ,self.ct)
+        # self.ht = ht
+        # self.ct = ct
+        # action_list = self.agent.critic1(state)
+        
+        # avf model
+        action = self.agent(audio , visual).max(dim = -1)[1]
+        # pdb.set_trace()
         print(action)
-        return action[0]
+        return int(action)
         
     def reset_lstm(self):
         self.ht = torch.rand(1*1,64).cuda()

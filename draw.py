@@ -4,6 +4,8 @@ import math
 from habitat.utils.visualizations import maps
 from habitat_sim.utils import common as utils
 import magnum as mn
+import numpy as np
+import quaternion
 class Draw:
     def __init__(self):
         pass
@@ -45,7 +47,7 @@ class Draw:
             path_x = [point[0] for point in path]  # 获取所有 x 坐标
             path_y = [point[1] for point in path]  # 获取所有 y 坐标
         print(path_x)
-        plt.plot(path_x, path_y  , color="blue", alpha=0.7, label="Path" ,linewidth = 2)
+        plt.plot(path_x, path_y  ,marker = "o",markersize = 5, color="darkblue", alpha=0.7, label="Path" ,linewidth = 5)
         plt.plot(path_x[-1] , path_y[-1] , marker = 'o' , markersize = 5 , color='blue' , alpha=0.7, label="finnal_point")
         # plt.plot(path[:-1][0],path[:-1][0] , marker = 'o' , markersize = 5 ,color="blue", alpha=0.7, label="finnal_point")
             
@@ -118,14 +120,26 @@ class Draw:
 
         for agent_id in range(env._num_agents):
             x = self.add_agent_pos_angle(env._sim.pathfinder, x, agent_pos[agent_id], agent_r[agent_id] ,sim)
-
+        
         self.display_map(x,y)
     def show_path_graph(self , env , sound , agent ,image_filename):
         source_pos = sound
         agent_point = agent
         x, s = self.get_td_map(env._sim.pathfinder, vis_points=source_pos)
         x, a = self.get_td_map(env._sim.pathfinder, vis_points=agent_point)
-
+        
+        grid_dimensions = (x.shape[0], x.shape[1])
+        agent_grid_pos = maps.to_grid(
+            agent_point[-1][2], agent_point[-1][0], grid_dimensions, pathfinder=env._sim.pathfinder
+        )
+        agent_forward = utils.quat_to_magnum(
+            np.quaternion(1, 0, 0, 0)
+        ).transform_vector(mn.Vector3(0, 0, -1.0))
+        agent_orientation = math.atan2(agent_forward[0], agent_forward[2])
+        maps.draw_agent(
+            x, agent_grid_pos, agent_orientation, agent_radius_px=16
+        )
+        
         self.display_path_map(x,s,a,image_filename)
     def draw(self, sim ,path):
         meters_per_pixel = 0.025
@@ -158,6 +172,15 @@ class Draw:
         top_down_map, trajectory[0], initial_angle, agent_radius_px=8
         )
         return top_down_map
+    # def optim_point(self,points):
+    #     # point is agent path point list(np.array()) - > list(np.array())
+    #     # get the frist point to compute angle 
+    #     # result is list(np.array())
+    #     result_point = list()
+    #     begin_point = points[0]
+    #     for p in points:
+    #         angle = self.compute_angle(begin_point , p)
+    #         if angle
 def print_scene_recur(scene, limit_output=10):
     print(
         f"House has {len(scene.levels)} levels, {len(scene.regions)} regions and {len(scene.objects)} objects"

@@ -11,7 +11,6 @@ from env.v0d0 import Env
 from utils.batch import *
 from quaternion import from_euler_angles, as_float_array
 import quaternion
-# random.seed(config["random_seed"])
 random.seed(int(time.time()))
 
 class Actor:
@@ -88,23 +87,6 @@ class Actor:
         ret = list()
         self.path_point.append(env.get_agent_pos()[0])
         action = self.paths[self._idx]
-        print(f"agent action: {action}")
-        logging.info(f"agent action: {action}") 
-        act_id = env.action_str_2_id(action) 
-        ret.append({
-            "rl_pred": act_id,
-            "lstm_h": np.zeros((self._config["hid_dim_l"],), np.float32),
-            "lstm_c": np.zeros((self._config["hid_dim_l"],), np.float32),
-        })
-        
-        self._idx += 1
-        return ret
-    def random_act(self,env):
-        # 我们这里便不要done了，全部让它跑满200个step，但是random的过程种，turn reward 便不能设置为10，这里应该是0
-        ret = list()
-        self.path_point.append(env.get_agent_pos()[0])
-        # action = self.paths[self._idx]
-        action = random.choice(self.random_action)
         print(f"agent action: {action}")
         logging.info(f"agent action: {action}") 
         act_id = env.action_str_2_id(action) 
@@ -208,23 +190,36 @@ class Actor:
         torch.cuda.empty_cache()
         return  result, return_, num_success , level
 
-def collect():
-    actor = Actor(config)
-    seq_list = list()
-    level_episode = [125,120,67]
+def collect(env_path):
+    level_episode = [0,0,0]
+    env_indx = 0
     for num_episodes in range(1200):
+        print(num_episodes)
+        if num_episodes % 100 == 0:
+            level_episode = [0,0,0]
+            config['scene_dir'] = env_path[env_indx]
+            env_name =  env_path[env_indx][-15:-4]
+            print(f"change environment name {env_name}")
+            os.makedirs('./data/RL/muti_env_data/'+ env_name + "/level0" , exist_ok=True)
+            os.makedirs('./data/RL/muti_env_data/'+ env_name + "/level1" , exist_ok=True)
+            os.makedirs('./data/RL/muti_env_data/'+ env_name + "/level2" , exist_ok=True)
+            actor = Actor(config)
+            env_indx +=1
         t_start = time.time()
         result_lists ,_ ,_,level = actor.rollout()
         level_episode[level] += 1
-        path = os.path.join(f"data/RL/success_and_stop_data/level{level}",  f"rl_episode_level{level}_{level_episode[level]}.pkl")
+        path = os.path.join(f"data/RL/muti_env_data/{env_name}/level{level}",  f"rl_episode_level{level}_{level_episode[level]}.pkl")
         with open(path, "wb") as f:
             pickle.dump(result_lists, f)
         actor.path_point = list()
-        seq_list.clear()
         current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         logging.info(f"level {level} file name rl_episode_{level}_{level_episode[level]}.pkl")
         logging.info(f"episode time {(time.time() - t_start) // 60} m {(time.time() - t_start) % 60} s")
         logging.info(f"now time is {current_time_str}")
 if  __name__== "__main__":
-    logging.basicConfig(filename='./data/RL/success_and_stop_data/RLDATA.log', level=logging.INFO)
-    collect()
+    path_ = './data/scene_datasets/MP3D/v1/mp3d'
+    # for env_name in os.listdir(path_[:12]):
+    #     os.makedirs('./data/RL/muti_env_data/'+ env_name , exist_ok=True)
+    env_path = [os.path.join(f"{path_}/{i}" , f"{i}.glb") for i in os.listdir(path_)]
+    logging.basicConfig(filename='./data/RL/muti_env_data/RLDATA.log', level=logging.INFO)
+    collect(env_path)

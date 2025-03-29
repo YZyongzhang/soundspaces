@@ -12,7 +12,6 @@ import torch.optim as optim
 import  pickle
 import logging
 import time
-from concurrent.futures import ProcessPoolExecutor
 # 自定义 AVFNet
 # from acm.dsac.data.angle_data import Data
 # from acm.dsac.net.avf import AVFNet
@@ -28,49 +27,38 @@ class AVNet(nn.Module):
         self.width_dim = width_dim
         self.height_dim = height_dim
 
-        self.model_path = '../checkpoint/avnf_finnal_1.pth'
+        # self.model_path = '../checkpoint/avnf_finnal_1.pth'
         # self.model_path = 'acm/checkpoint/avnf_finnal_1.pth'
+        self.model_path = '../../data/checkpoint/acmcheckpoint/avf_40000.pth'
         self.avf = AVFNet(hid_dim=128, out_put=4, width_dim=128, height_dim=36).to(self.device)
-        self.avf.load_state_dict(torch.load(self.model_path))
-        self.avf.eval()
-
+        # self.avf.load_state_dict(torch.load(self.model_path))
+        # self.avf.eval()
         self.Q_net1 = nn.Sequential(
-            nn.Linear(64, 32),
+            nn.Linear(128, 64),
             nn.ReLU(),
-            nn.Linear(32, self.out_put)
+            nn.Linear(64, self.out_put)
         )
         self.Q_net2 = nn.Sequential(
-            nn.Linear(64, 32),
+            nn.Linear(128, 64),
             nn.ReLU(),
-            nn.Linear(32, self.out_put)
+            nn.Linear(64, self.out_put)
         )
 
         self.policy_net = nn.Sequential(
-            nn.Linear(64, 32),
+            nn.Linear(128, 64),
             nn.ReLU(),
-            nn.Linear(32, self.out_put)
+            nn.Linear(64, self.out_put)
         )
-        self.lstm = nn.LSTM(input_size=128, hidden_size=64, num_layers=1,batch_first=True).to(self.device)
-        self.ht = torch.rand(1*1,1,64).cuda()
-        self.ct = torch.rand(1*1,1,64).cuda()
         self.initialize_weights_uniform()
 
-    def forward(self, audio, visual , ht = None , ct = None):
+    def forward(self, audio, visual):
         audio  = audio.squeeze(1)
         visual = visual.squeeze(1)
         combinencode = self.avf(audio, visual)
-        combinencode  = combinencode.unsqueeze(1).permute(1,0,2)
-        batch_size  = combinencode.shape[0]
-        seq_len = combinencode.shape[1]
-        if ht == None and ct == None:
-            state , (ht , ct) = self.lstm(combinencode , (self.ht , self.ct))
-        else :
-            state , (ht , ct) = self.lstm(combinencode , (ht , ct))
-        state = state.reshape(batch_size * seq_len , -1)
-        q1 = self.Q_net1(state)
-        q2 = self.Q_net2(state)
-        logits = self.policy_net(state)
-        return q1, q2, logits, ht , ct
+        q1 = self.Q_net1(combinencode)
+        q2 = self.Q_net2(combinencode)
+        logits = self.policy_net(combinencode)
+        return q1, q2, logits
 
     def initialize_weights_uniform(self, weight_range=(-0., 0.1), bias_range=(-0.1, 0.1)):
         for name, module in self.named_modules():
@@ -81,7 +69,7 @@ class AVNet(nn.Module):
                     nn.init.uniform_(module.bias, a=bias_range[0], b=bias_range[1])
     
 class DiscreteSAC_CQL:
-    def __init__(self, model, device, learning_rate=1e-4, alpha=0.1, tau=0.005):
+    def __init__(self, model, device, learning_rate=1e-5, alpha=0.1, tau=0.005):
         self.model = model
         self.target_entropy = -4 
         self.target_model = AVNet(128, 4, 128, 36).to(device)
@@ -116,9 +104,9 @@ class DiscreteSAC_CQL:
             pre_audio.float(), pre_visual.float(), next_audio.float(), next_visual.float(), \
             labels.long(), reward.float(), done.float()
         
-        q1, q2, logits,_,_ = self.model(pre_audio, pre_visual)
+        q1, q2, logits = self.model(pre_audio, pre_visual)
         with torch.no_grad():
-            next_q1, next_q2, next_logits,_,_ = self.target_model(next_audio, next_visual)
+            next_q1, next_q2, next_logits = self.target_model(next_audio, next_visual)
             next_min_q = torch.min(next_q1, next_q2)
             next_policy = F.softmax(next_logits, dim=1)
             next_value = (next_policy * (next_min_q - self.alpha.detach() * torch.log(next_policy + 1e-10))).sum(dim=1)
@@ -153,9 +141,10 @@ def train():
     model.train()
     cql = DiscreteSAC_CQL(model, device)
     episode = 0
-    path = ['../../data/RL/success_and_stop_data/level0' ,'../../data/RL/success_and_stop_data/level1' ]
+    path = ['../../data/RL/success_and_stop_data/level0' ,'../../data/RL/success_and_stop_data/level1', '../../data/RL/success_and_stop_data/level2']
     files0 = [os.path.join(path[0] , i) for i in os.listdir(path[0])]
     files1 = [os.path.join(path[1] , i) for i in os.listdir(path[1])]
+    files2 = [os.path.join(path[2] , i) for i in os.listdir(path[2])]
     dataset = Data(path=files0)
     dataloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
     num_epochs = 500
