@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./acm')
+sys.path.append('./acm/dsac')
 import logging
 import torch
 import pdb

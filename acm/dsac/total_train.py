@@ -13,8 +13,6 @@ import torch.optim as optim
 import  pickle
 import logging
 import time
-# from data.mydata import MyData
-# from data.newdata import newMyData
 from data.angle_data import Data
 from net.sac_cql_1 import DiscreteSAC_CQL_1
 def train_1():

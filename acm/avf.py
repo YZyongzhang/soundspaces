@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import librosa
 import numpy as np
 from torch.utils.data import Dataset , DataLoader 
-import os
+import os , pdb
 from tqdm import tqdm
 import torch.optim as optim
 import  pickle
@@ -136,13 +136,13 @@ def train():
             optimizer.step()
             print(f'eposide:{episode} , loss:{loss.item()}')
             writer.add_scalar('Loss/train', loss, episode)
+            if episode % 200 == 0 :
+                now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                logging.info(f"now time :{now_time}")
+            if episode % 2000 == 0:
+                torch.save(model.state_dict() , f'../data/checkpoint/acmcheckpoint/avf_adddata_{episode}.pth')
             episode +=1
-        if episode % 200 == 0 :
-            now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            logging.info(f"now time :{now_time}")
-        if episode % 2000 == 0 and episode != 0:
-            torch.save(model.state_dict() , f'../../data/checkpoint/acmcheckpoint/avf_adddata_{episode}.pth')
-    torch.save(model.state_dict(), f'../../data/checkpoint/acmcheckpoint/avf_adddata_{episode}.pth')
+    torch.save(model.state_dict(), f'../data/checkpoint/acmcheckpoint/avf_adddata_{episode}.pth')
     
     writer.close()
 if __name__ == '__main__':

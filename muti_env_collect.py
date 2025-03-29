@@ -220,6 +220,7 @@ if  __name__== "__main__":
     path_ = './data/scene_datasets/MP3D/v1/mp3d'
     # for env_name in os.listdir(path_[:12]):
     #     os.makedirs('./data/RL/muti_env_data/'+ env_name , exist_ok=True)
-    env_path = [os.path.join(f"{path_}/{i}" , f"{i}.glb") for i in os.listdir(path_)]
+    exit_env_path = ['UwV83HsGsw3' , 'YmJkqBEsHnH']
+    env_path = [os.path.join(f"{path_}/{i}" , f"{i}.glb") for i in os.listdir(path_) if i not in exit_env_path]
     logging.basicConfig(filename='./data/RL/muti_env_data/RLDATA.log', level=logging.INFO)
     collect(env_path)

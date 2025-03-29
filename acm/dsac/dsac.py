@@ -12,12 +12,8 @@ import torch.optim as optim
 import  pickle
 import logging
 import time
-# 自定义 AVFNet
-# from acm.dsac.data.angle_data import Data
-# from acm.dsac.net.avf import AVFNet
 from data.angle_data import Data
 from net.avf import AVFNet
-# from acm.dsac.data.newdata import newMyData
 class AVNet(nn.Module):
     def __init__(self, hid_dim, out_put, width_dim, height_dim):
         super().__init__()
