@@ -22,13 +22,10 @@ class AVNet(nn.Module):
         self.out_put = out_put
         self.width_dim = width_dim
         self.height_dim = height_dim
-
-        # self.model_path = '../checkpoint/avnf_finnal_1.pth'
-        # self.model_path = 'acm/checkpoint/avnf_finnal_1.pth'
         self.model_path = '../../data/checkpoint/acmcheckpoint/avf_40000.pth'
         self.avf = AVFNet(hid_dim=128, out_put=4, width_dim=128, height_dim=36).to(self.device)
-        # self.avf.load_state_dict(torch.load(self.model_path))
-        # self.avf.eval()
+        self.avf.load_state_dict(torch.load(self.model_path))
+        self.avf.eval()
         self.Q_net1 = nn.Sequential(
             nn.Linear(128, 64),
             nn.ReLU(),

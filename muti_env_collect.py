@@ -200,6 +200,7 @@ def collect(env_path):
             config['scene_dir'] = env_path[env_indx]
             env_name =  env_path[env_indx][-15:-4]
             print(f"change environment name {env_name}")
+            logging.info(f"this env name is ########################################{env_name}")
             os.makedirs('./data/RL/muti_env_data/'+ env_name + "/level0" , exist_ok=True)
             os.makedirs('./data/RL/muti_env_data/'+ env_name + "/level1" , exist_ok=True)
             os.makedirs('./data/RL/muti_env_data/'+ env_name + "/level2" , exist_ok=True)
