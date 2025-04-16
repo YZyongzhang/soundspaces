@@ -104,9 +104,8 @@ class CQLSAC(nn.Module):
         self.device = device
         
         self.gamma = 0.99
-        self.tau = 1e-2
-        hidden_size = 256
-        learning_rate = 5e-4
+        self.tau = 0.005
+        learning_rate = 1e-5
         self.clip_grad_param = 1
 
         self.target_entropy = -self.action_size  # -dim(A)
@@ -358,7 +357,7 @@ def train(ckpt_dir):
             )
             print(f'epoch:{epoch} , episode {episode}' + ",".join([f"{k}: {v}" for k, v in loss_dict.items()]))
             for name, item in loss_dict.items():
-                writer.add_scalar('loss/name', item, episode)
+                writer.add_scalar(f'loss/{name}', item, episode)
             episode += 1
             
             if episode % 1000 == 0 :

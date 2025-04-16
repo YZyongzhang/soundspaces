@@ -21,7 +21,7 @@ from yz.net import use_combinencode_level_data_advance_stop as Data
 from yz.net import use_combinencode_data as Val_Data
 # from yz.net.utils import lmdb_sampler
 from yz.net.utils import lmdb_sampler_advance_stop
-
+from yz.net.sac_cql.sac_cql import DiscreteSAC_CQL as SAC_CQL
 
 class AVNet(nn.Module):
     def __init__(self, hid_dim, out_put, width_dim, height_dim):
@@ -198,7 +198,7 @@ def train(ckpt_dir):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = AVNet(128, 4, 128, 36).to(device)
     model.train()
-    cql = DiscreteSAC_CQL(model, device)
+    cql = SAC_CQL(model, device)
     episode = 0
     database_path_stop = [os.path.join(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/' , i) \
         for i in os.listdir(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/')]
@@ -353,7 +353,7 @@ if __name__ == '__main__':
     ckpt_dir = base_dir + '/ckpt/' + time_stamp
     train_message = base_dir + 'train.log'
     with open(train_message , 'a') as f:
-        f.write(f'\n{time_stamp} , message: 将alpha loss 中的一个符号改一下，我觉得这个应该有问题。')
+        f.write(f'\n{time_stamp} , message: 用最开始的那个model了，发现这个改来改去还是最开始的acc高')
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(loss_dir, exist_ok=True)
