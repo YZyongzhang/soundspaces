@@ -13,3 +13,4 @@ experiments/
 *.pth
 log/
 database/
+lambda.sh
