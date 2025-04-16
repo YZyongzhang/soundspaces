@@ -9,7 +9,7 @@ my_script
 .vscode/
 experiments/
 # *.ipynb
-SAM/checkpoint
 *.path
 *.pth
 log/
+database/
