@@ -133,8 +133,8 @@ def collect(logger):
 
 
 if __name__ == "__main__":
-    from env.v0d0 import Env
-    from utils.batch import *
+    from yz.env.v0d0 import Env
+    from yz.utils.batch import *
     import torch
     import time, pickle
 
