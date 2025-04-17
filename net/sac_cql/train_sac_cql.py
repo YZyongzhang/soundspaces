@@ -13,8 +13,9 @@ import logging
 import time
 import pdb
 import sys
+import ray
 sys.path.append('/home/getuanhui/project/sound-spaces')
-from yz.config import agent_config
+from yz.config import agent_config , config
 
 # from yz.net import use_combinencode_level_data as Data
 from yz.net import use_combinencode_level_data_advance_stop as Data
@@ -22,6 +23,7 @@ from yz.net import use_combinencode_data as Val_Data
 # from yz.net.utils import lmdb_sampler
 from yz.net.utils import lmdb_sampler_advance_stop
 from yz.net.sac_cql.sac_cql_fine_tune import DiscreteSAC_CQL as SAC_CQL
+from yz.val_scripts.spl import Actor
 
 class AVNet(nn.Module):
     def __init__(self, hid_dim, out_put, width_dim, height_dim):
@@ -336,6 +338,76 @@ def train(ckpt_dir):
 
     torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth')
 
+def module_test_spl_val(chpt_dir):
+    # database_dir = agent_config.DATABASE_DIR
+    database_dir = agent_config.RELATIVE_DATABASE_DIR
+    current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    time_star = time.time()
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = AVNet(128, 4, 128, 36).to(device)
+    model.train()
+    cql = SAC_CQL(model, device)
+    episode = 0
+    database_path_stop = [os.path.join(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/' , i) \
+        for i in os.listdir(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/')]
+    
+    database_path = [os.path.join(f'{database_dir}/new_key_shffule_mutienv_data_combinencode_level/' , i) \
+        for i in os.listdir(f'{database_dir}/new_key_shffule_mutienv_data_combinencode_level/')]
+    init_sample_dict = {
+        'level_0':1,
+        'level_1':0,
+        'level_2':0,
+    }
+    sampler = lmdb_sampler_advance_stop(database_path,stop_database_path=database_path_stop, shuffle=True)
+    sampler.sample_data(sample=init_sample_dict)
+    dataset = Data(database_path , database_path_stop)
+    dataloader = DataLoader(dataset=dataset,\
+        sampler=sampler ,batch_size=256)
+    
+    val_data_base = f'{database_dir}/val_database_combinencode/'
+    val_dataloader = DataLoader(dataset=Val_Data(val_data_base) , batch_size=256)
+    
+    num_epochs = 500
+
+    for epoch in range(num_epochs):
+        if epoch > 50 and epoch % 10 == 0 and epoch < 200:
+            if 0.1 * ( (epoch - 50) / 10 ) <= 1:
+                level_1_rate = 0.1 * ( (epoch - 50) / 10 )
+            else:
+                level_1_rate = 1
+            sample_dict = {
+                'level_0':1,
+                'level_1':level_1_rate,
+                'level_2':0,
+            }
+            sampler.sample_data(sample=sample_dict)
+            dataloader = DataLoader(dataset=dataset,\
+                    sampler=sampler ,batch_size=256)
+        
+        if epoch > 200 and epoch % 10 == 0 and epoch < 400:
+            if 0.1 * ( (epoch - 200) / 10 ) <= 1:
+                level_2_rate = 0.1 * ( (epoch - 200) / 10 )
+            else:
+                level_2_rate = 1
+            sample_dict = {
+                'level_0':1,
+                'level_1':1,
+                'level_2':level_2_rate,
+            }
+            sampler.sample_data(sample=sample_dict)
+            dataloader = DataLoader(dataset=dataset,\
+                    sampler=sampler ,batch_size=256)
+            
+        if epoch % 1 == 0:
+           num_actors = 10
+           num_gpus = 1
+           ray.init(num_cpus=10, num_gpus=num_gpus)
+           actors = [Actor.remote(cql) for i in range(num_actors)]
+           
+           import pdb; pdb.set_trace()
+           token_id = [actor.val.remote() for actor in actors]
+           result_measurement = ray.get(token_id)
+           print(result_measurement)
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
     from datetime import datetime
@@ -354,3 +426,4 @@ if __name__ == '__main__':
     writer = SummaryWriter(loss_dir)
     logging.basicConfig(filename=f'{log_dir}/{time_stamp}.log', level=logging.INFO,filemode='a')
     train(ckpt_dir)
+    # module_test_spl_val(ckpt_dir)

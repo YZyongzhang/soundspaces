@@ -78,17 +78,17 @@ class DiscreteSAC_CQL:
         # pdb.set_trace()
         q_loss = F.mse_loss(min_q, target_q.unsqueeze(1))
         
+        # 通过这种方式训练的loss很显然会出现两个Q网络会出现只能训练好一个的情况
         # CQL 额外约束
         q_regularization = self.alpha_cql * ( (torch.logsumexp(q1, dim=1).mean() - q1.mean()) + \
                            (torch.logsumexp(q2, dim=1).mean() - q2.mean()) )
         
         # 策略损失（离散 SAC）
         policy_dist = F.softmax(logits, dim=1)
-        policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - torch.min(q1,q2)), dim=1))
+        policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
 
         total_loss = q_loss +  q_regularization + policy_loss
         return total_loss, q_loss, q_regularization, policy_loss
-
     def train_step(self, pre_state , next_state, labels, reward, done):
 
 

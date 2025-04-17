@@ -8,8 +8,8 @@ import random
 import ray
 import habitat_sim
 import pickle
-# from yz.config import config
-from yz.config.env_config import config
+from yz.config import config
+# from yz.config.env_config import config
 from yz.env.v0d0 import Env
 from yz.utils.batch import *
 from yz.utils.batch import *
@@ -17,27 +17,14 @@ from yz.utils.metrics import *
 from yz.net import AVFNet ,AVNet
 random.seed(config["random_seed"])
 
+@ray.remote
 class Actor:
-    def __init__(self, config):
-        # self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # self.model_path = f'/home/getuanhui/project/sound-spaces/yz/experiments//ckpt/2025-04-15~09-35-21/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_100000.pth'
-        # self.avf_model_path = '/home/getuanhui/project/sound-spaces/yz/data/checkpoint/acmcheckpoint/avf_muti_env_90000.pth'
-        # self.agent = AVNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
-        # self.agent.load_state_dict(torch.load(self.model_path))
-        # self.agent.eval()
-        # self.avf = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
-        # self.avf.load_state_dict(torch.load(self.avf_model_path))
-        # self.avf.eval()
-        
-        
+    def __init__(self, model):
         self._config = config
+        self.model = model
         self._num_episodes = 0
         self.env = Env(config)
         self._sim = self.env._sim
-        self.path_point = {
-            'sound_pos':[],
-            'path_point':[]
-        }
     def get_action(self , visual , audio):
         visual = torch.from_numpy(visual)
         audio = torch.from_numpy(audio)
@@ -57,11 +44,9 @@ class Actor:
         
     def act(self, env):
         ret = list()
-        self.path_point['path_point'].append(env.get_agent_pos()[0])
         obs = env._get_observations()
         visual = obs[0]['camera']
         audio = obs[0]['audio']
-        # pdb.set_trace()
         action = self.get_action(visual , audio)
         ret.append({
             "rl_pred": action,
@@ -116,65 +101,60 @@ class Actor:
 
         torch.cuda.empty_cache()
         return  seq_list, return_, sum(success_list), last_geo_distance, for_spl
-def val():
-    ray.init()
-    num_actors = 10
-    num_gpus = 1 / num_actors
-    actors = [
-        ray.remote(num_cpus=6, num_gpus=num_gpus)(Actor).remote(config)
-        for _ in range(num_actors)
-    ]
-    measurements = {
-        'spl':[],
-        'soft_spl':[],
-        'success_rate':[],
-        'sum_reward':[]
-    }
-    
-    for num_episodes in range(10):
-        t_start = time.time()
-        token_id = [actor.rollout.remote() for actor in actors]
-        # pdb.set_trace()
-        result_list = ray.get(token_id)
-        # pdb.set_trace()
-        return_list = list()
-        num_success_list = list()
-        last_geo_distance_list = list()
-        for_spl_all = {
-            "success": list(),
-            "shortest_distances": list(),
-            "path_lengths": list(),
+    def val(self):
+        actors = self.model
+        measurements = {
+            'spl':[],
+            'soft_spl':[],
+            'success_rate':[],
+            'sum_reward':[]
         }
         
-        
-        for result in result_list:
-            seq_list_, return_, num_success, last_geo_distance_, for_spl_ = result
-            return_list.append(return_)
-            num_success_list.append(num_success)
-            last_geo_distance_list.append(last_geo_distance_)
-            for_spl_all["success"] += for_spl_["success"]
-            for_spl_all["shortest_distances"] += for_spl_["shortest_distances"]
-            for_spl_all["path_lengths"] += for_spl_["path_lengths"]
+        for num_episodes in range(10):
             
-        success = for_spl_all["success"]
-        shortest_distances = for_spl_all["shortest_distances"]
-        path_lengths = for_spl_all["path_lengths"]
+            # pdb.set_trace()
+            result_list = self.rollout()
+            # pdb.set_trace()
+            return_list = list()
+            num_success_list = list()
+            last_geo_distance_list = list()
+            for_spl_all = {
+                "success": list(),
+                "shortest_distances": list(),
+                "path_lengths": list(),
+            }
+            
+            
+            for result in result_list:
+                seq_list_, return_, num_success, last_geo_distance_, for_spl_ = result
+                return_list.append(return_)
+                num_success_list.append(num_success)
+                last_geo_distance_list.append(last_geo_distance_)
+                for_spl_all["success"] += for_spl_["success"]
+                for_spl_all["shortest_distances"] += for_spl_["shortest_distances"]
+                for_spl_all["path_lengths"] += for_spl_["path_lengths"]
+                
+            success = for_spl_all["success"]
+            shortest_distances = for_spl_all["shortest_distances"]
+            path_lengths = for_spl_all["path_lengths"]
+            
+            spl = calculate_spl(
+                for_spl_all["success"],
+                for_spl_all["shortest_distances"],
+                for_spl_all["path_lengths"],
+            )
+            soft_spl = calculate_soft_spl(
+                for_spl_all["shortest_distances"],
+                for_spl_all["path_lengths"], 
+            )
+            measurements['spl'].append(spl)
+            measurements['soft_spl'].append(soft_spl)
+            measurements['success_rate'].append(success)
+            measurements['sum_reward'].append(result_list)
+        return measurements
         
-        spl = calculate_spl(
-            for_spl_all["success"],
-            for_spl_all["shortest_distances"],
-            for_spl_all["path_lengths"],
-        )
-        soft_spl = calculate_soft_spl(
-            for_spl_all["shortest_distances"],
-            for_spl_all["path_lengths"], 
-        )
-        measurements['spl'].append(spl)
-        measurements['soft_spl'].append(soft_spl)
-        measurements['success_rate'].append(success)
-        measurements['sum_reward'].append(result_list)
-if __name__ == "__main__":
-    # pdb.set_trace()
-    val()
+# if __name__ == "__main__":
+#     # pdb.set_trace()
+#     val()
     
         
