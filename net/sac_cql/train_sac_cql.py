@@ -23,7 +23,7 @@ from yz.net import use_combinencode_data as Val_Data
 # from yz.net.utils import lmdb_sampler
 from yz.net.utils import lmdb_sampler_advance_stop
 from yz.net.sac_cql.sac_cql_fine_tune import DiscreteSAC_CQL as SAC_CQL
-from yz.val_scripts.spl import Actor
+# from yz.val_scripts.spl import Actor
 
 class AVNet(nn.Module):
     def __init__(self, hid_dim, out_put, width_dim, height_dim):
@@ -273,13 +273,17 @@ def train(ckpt_dir):
             model.eval()
             total_q_1_value = 0
             total_q_2_value = 0
+            total_double_q_min_value = 0
             train_total_q_1_value = 0
             train_total_q_2_value = 0
+            train_total_double_q_min_value=0
             q_1_accuracy = 0
             q_2_accuracy = 0
+            double_q_min_accuracy = 0
             actor_accuracy = 0
             train_q_1_accuracy = 0
             train_q_2_accuracy = 0
+            train_double_q_min_accuracy=0
             train_actor_accuracy = 0
             num_batches = 0
             with torch.no_grad():
@@ -290,21 +294,27 @@ def train(ckpt_dir):
                     q_1 , q_2 , action = model(batch_pre_state)  # [batch, num_actions]
                     q_1_action = torch.argmax(q_1, dim=1)  # greedy action
                     q_2_action = torch.argmax(q_2, dim=1)
+                    double_q_min_action = torch.argmax(torch.min(q_1,q_2),dim = 1)
                     actor_action = torch.argmax(action, dim=1)
                     q_1_selected = q_1.gather(1, q_1_action.unsqueeze(1)).squeeze(1)
                     q_2_selected = q_2.gather(1, q_2_action.unsqueeze(1)).squeeze(1)
+                    double_q_min_action_selected = torch.min(q_1,q_2).gather(1 , double_q_min_action.unsqueeze(1)).squeeze(1)
                     total_q_1_value += q_1_selected.mean().item()
                     total_q_2_value += q_2_selected.mean().item()
+                    total_double_q_min_value += double_q_min_action_selected.mean().item()
                     q_1_accuracy += ((q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
                     q_2_accuracy += ((q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    double_q_min_accuracy += ((double_q_min_action == batch_labels).sum().item())/ batch_labels.size(0)
                     actor_accuracy += ((actor_action == batch_labels).sum().item())/ batch_labels.size(0)
                     num_batches += 1
                     if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
                         break
                 writer.add_scalar('val/total_q_1_value', total_q_1_value / 10, epoch)
                 writer.add_scalar('val/total_q_2_value', total_q_2_value / 10, epoch)
+                writer.add_scalar('val/double_q_min', total_double_q_min_value / 10, epoch)
                 writer.add_scalar('val/q_1_accuracy', q_1_accuracy / 10, epoch)
                 writer.add_scalar('val/q_2_accuracy', q_2_accuracy / 10, epoch)
+                writer.add_scalar('val/double_q_min_accuracy', double_q_min_accuracy / 10, epoch)
                 writer.add_scalar('val/actor_accuracy', actor_accuracy / 10, epoch)
                 num_batches = 0
                 for batch in dataloader: 
@@ -314,22 +324,30 @@ def train(ckpt_dir):
                     train_q_1 , train_q_2 , train_action = model(batch_pre_state)  # [batch, num_actions]
                     train_q_1_action = torch.argmax(train_q_1, dim=1)  # greedy action
                     train_q_2_action = torch.argmax(train_q_2, dim=1)
+                    train_double_q_min_action = torch.argmax(torch.min(train_q_1 , train_q_2) , dim=1)
                     train_actor_action = torch.argmax(train_action, dim=1)
                     train_q_1_selected = train_q_1.gather(1, train_q_1_action.unsqueeze(1)).squeeze(1)
                     train_q_2_selected = train_q_2.gather(1, train_q_2_action.unsqueeze(1)).squeeze(1)
+                    train_double_q_min_selected = torch.min(train_q_1,train_q_2).gather(1 , train_double_q_min_action.unsqueeze(1)).squeeze(1)
+                    
                     train_total_q_1_value += train_q_1_selected.mean().item()
                     train_total_q_2_value += train_q_2_selected.mean().item()
+                    train_total_double_q_min_value+=train_double_q_min_selected.mean().item()
                     train_q_1_accuracy += ((train_q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
                     train_q_2_accuracy += ((train_q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_double_q_min_accuracy+=((train_double_q_min_action == batch_labels).sum().item())/batch_labels.size(0)
+                    
                     train_actor_accuracy += ((train_actor_action == batch_labels).sum().item())/ batch_labels.size(0)
                     num_batches += 1
                     if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
                         break
                 writer.add_scalar('train/total_q_1_value', train_total_q_1_value / 10, epoch)
                 writer.add_scalar('train/total_q_2_value', train_total_q_2_value / 10, epoch)
+                writer.add_scalar('train/train_total_double_q_min_value', train_total_double_q_min_value / 10, epoch)
                 writer.add_scalar('train/q_1_accuracy', train_q_1_accuracy / 10, epoch)
                 writer.add_scalar('train/q_2_accuracy', train_q_2_accuracy / 10, epoch)
                 writer.add_scalar('train/actor_accuracy', train_actor_accuracy / 10, epoch)
+                writer.add_scalar('train/train_double_q_min_accuracy', train_double_q_min_accuracy / 10, epoch)
             model.train()
                 
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
