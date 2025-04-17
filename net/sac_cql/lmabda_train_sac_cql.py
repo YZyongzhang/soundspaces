@@ -60,115 +60,67 @@ class AVNet(nn.Module):
 class DiscreteSAC_CQL:
     def __init__(self, model, device, learning_rate=1e-4, alpha=0.1, tau=0.005):
         self.model = model
-        self.action_dim = 4
-        self.target_entropy = -self.action_dim  # 目标熵（离散 SAC）
+        self.target_entropy = -4  # 目标熵（离散 SAC）
         self.target_model = AVNet(128, 4, 128, 36).to(device)
         self.target_model.load_state_dict(self.model.state_dict())
         self.device = device
         self.lr = learning_rate
         self.tau = tau  # 目标网络软更新系数
-        self.temperature = 1.0
-        self.target_action_gap = 10
+        
         # alpha 相关参数
         self.log_alpha = torch.tensor([0.0], requires_grad=True, device=device)  # log_alpha 存储
         self.alpha = self.log_alpha.exp().detach() # 计算 alpha , 脱离计算图
-        self.alpha_optimizer = optim.Adam([self.log_alpha], lr=self.lr)  # Adam 优化器
+        self.alpha_optimizer = optim.Adam([self.log_alpha], lr=3e-4)  # Adam 优化器
         # cql_alpha 相关参数
-        #self.log_alpha_cql = torch.tensor([0.0], requires_grad=True, device="cuda")  # CQL 的 alpha 参数
-        #self.alpha_cql = self.log_alpha_cql.exp()  # 指数映射，确保 alpha 始终为正
-        #self.alpha_cql_optimizer = optim.Adam([self.log_alpha_cql], lr=self.lr)  # 使用 Adam 优化
-        self.cql_alpha = 0.1
+        self.log_alpha_cql = torch.tensor(0.0, requires_grad=True, device="cuda")  # CQL 的 alpha 参数
+        self.alpha_cql = self.log_alpha_cql.exp()  # 指数映射，确保 alpha 始终为正
+        self.alpha_cql_optimizer = torch.optim.Adam([self.log_alpha_cql], lr=1e-4)  # 使用 Adam 优化
+
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
 
-    # def compute_loss(self, q1, q2, logits, target_q, labels):
-    #     """ 计算离散 SAC + CQL 损失 """
-
-    #     # 选取执行的动作 Q 值
-    #     pdb.set_trace()
-    #     a_Q1 = q1.gather(1, labels.unsqueeze(1))
-    #     a_Q2 = q2.gather(1, labels.unsqueeze(1))
-    #     min_q = torch.min(a_Q1, a_Q2)  # 双 Q 学习
-
-    #     # Q-learning 目标
-    #     # pdb.set_trace()
-    #     q_loss = F.mse_loss(min_q, target_q.unsqueeze(1))
-
-    #     # CQL 额外约束
-    #     q_regularization = ( (torch.logsumexp(q1, dim=1).mean() - a_Q1.mean()) + \
-    #                        (torch.logsumexp(q2, dim=1).mean() - a_Q2.mean()) )
-        
-    #     alpha_cql_loss = -torch.mean(self.log_alpha_cql.exp() * (q_regularization.detach() - self.target_action_gap))
-    #     # 策略损失（离散 SAC）
-    #     policy_dist = F.softmax(logits / self.temperature, dim=1)
-    #     policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
-
-    #     total_loss = q_loss +  q_regularization + policy_loss
-    #     return total_loss, q_loss, q_regularization, policy_loss , alpha_cql_loss
     def compute_loss(self, q1, q2, logits, target_q, labels):
-        """
-        计算 Discrete SAC + CQL 的综合损失
-        包括 Q loss、policy loss、CQL regularization、alpha loss 和 alpha_cql_loss
-        """
+        """ 计算离散 SAC + CQL 损失 """
 
         # 选取执行的动作 Q 值
-        a_Q1 = q1.gather(1, labels.unsqueeze(1))
-        a_Q2 = q2.gather(1, labels.unsqueeze(1))
-        min_q = torch.min(a_Q1, a_Q2)  # [batch_size, 1]
+        a_Q1 = q1.gather(1, labels.squeeze(0).unsqueeze(1))
+        a_Q2 = q2.gather(1, labels.squeeze(0).unsqueeze(1))
+        min_q = torch.min(a_Q1, a_Q2)  # 双 Q 学习
 
-        # ========================
-        # 1. Q-Learning Loss
-        # ========================
-        q_loss = F.mse_loss(min_q, target_q.unsqueeze(1))  # Q-target loss
+        # Q-learning 目标
+        # pdb.set_trace()
+        q_loss = F.mse_loss(min_q, target_q.unsqueeze(1))
 
-        # ========================
-        # 2. CQL Regularization
-        # ========================
-        logsum_q1 = torch.logsumexp(q1, dim=1).mean()
-        logsum_q2 = torch.logsumexp(q2, dim=1).mean()
-        cql_regularization = (logsum_q1 - a_Q1.mean()) + (logsum_q2 - a_Q2.mean())
+        # CQL 额外约束
+        q_regularization = self.alpha_cql * ( (torch.logsumexp(q1, dim=1).mean() - a_Q1.mean()) + \
+                           (torch.logsumexp(q2, dim=1).mean() - a_Q2.mean()) )
+        
+        alpha_cql_loss = -torch.mean(self.log_alpha_cql.exp() * (q_regularization.detach() + self.target_entropy))
+        # 策略损失（离散 SAC）
+        policy_dist = F.softmax(logits, dim=1)
+        policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
 
-        # CQL Alpha Loss (优化 alpha_cql)
-        # alpha_cql_loss = -torch.mean(self.cql_alpha * (cql_regularization.detach() - self.target_action_gap))
-
-        # ========================
-        # 3. Policy Loss（修复版本）
-        # ========================
-        q_min_all = torch.min(q1, q2)  # [batch, action_dim]
-        log_policy = F.log_softmax(logits / self.temperature, dim=1)  # [batch, action_dim]
-        policy_dist = log_policy.exp()
-
-        policy_loss = torch.mean(torch.sum(
-            policy_dist * (self.alpha.detach() * log_policy - q_min_all),
-            dim=1))
-
-        # ========================
-        # 4. Total Loss
-        # ========================
-        total_loss = q_loss + self.cql_alpha * cql_regularization + policy_loss
-
-        return total_loss, q_loss, cql_regularization, policy_loss
+        total_loss = q_loss +  q_regularization + policy_loss
+        return total_loss, q_loss, q_regularization, policy_loss , alpha_cql_loss
 
     def train_step(self, pre_state , next_state, labels, reward, done):
 
 
         q1, q2, logits = self.model(pre_state)
         with torch.no_grad():
-            # pdb.set_trace()
             next_q1, next_q2, next_logits = self.target_model(next_state)
             next_min_q = torch.min(next_q1, next_q2)
-            next_policy = F.softmax(next_logits / self.temperature , dim=1)
-            
+            next_policy = F.softmax(next_logits, dim=1)
             next_value = (next_policy * (next_min_q - self.alpha.detach() * torch.log(next_policy + 1e-10))).sum(dim=1)
             # pdb.set_trace()
             target_q = reward + (1 - done) * 0.99 * next_value
-        total_loss, q_loss, q_regularization, policy_loss= self.compute_loss(q1, q2, logits, target_q , labels)
+        total_loss, q_loss, q_regularization, policy_loss ,alpha_cql_loss= self.compute_loss(q1, q2, logits, target_q , labels)
         
         # _,_, alp_logits = self.model(pre_audio, pre_visual)
         # 计算 entropy 并优化 alpha
-        policy_dist = F.softmax(logits / self.temperature, dim=1)
+        policy_dist = F.softmax(logits, dim=1)
         entropy = -torch.sum(policy_dist * torch.log(policy_dist + 1e-10), dim=1).mean()
-        alpha_loss = torch.mean(self.log_alpha.exp() * (entropy.detach() - self.target_entropy))
+        alpha_loss = -torch.mean(self.log_alpha.exp() * (entropy.detach() + self.target_entropy))
 
         self.optimizer.zero_grad()
         total_loss.backward()
@@ -178,15 +130,17 @@ class DiscreteSAC_CQL:
         alpha_loss.backward()
         self.alpha_optimizer.step()
         
-        #self.alpha_cql_optimizer.zero_grad()
-        #alpha_cql_loss.backward()
-        #self.alpha_cql_optimizer.step()
+        self.alpha_cql_optimizer.zero_grad()
+        alpha_cql_loss.backward()
+        self.alpha_cql_optimizer.step()
         # 更新 alpha
+        self.alpha = self.log_alpha.exp()
+        self.alpha_cql = self.log_alpha_cql.exp()
         # 目标网络软更新
         for target_param, param in zip(self.target_model.parameters(), self.model.parameters()):
             target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
 
-        return total_loss.item(), q_loss.item(), q_regularization.item(), policy_loss.item(), alpha_loss.item(), self.alpha.item()
+        return total_loss.item(), q_loss.item(), q_regularization.item(), policy_loss.item(), alpha_loss.item(), self.alpha.item() ,alpha_cql_loss.item() , self.alpha_cql.item()
 
 
 def train(ckpt_dir):
@@ -252,7 +206,7 @@ def train(ckpt_dir):
             batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch_data
             batch_done = batch_done.to(device)
                 
-            total_loss, q_loss, q_regularization, policy_loss ,alpha_loss, alpha= cql.train_step(
+            total_loss, q_loss, q_regularization, policy_loss ,alpha_loss, alpha ,alpha_cql_loss , alpha_cql= cql.train_step(
                 batch_pre_state ,batch_next_state, batch_labels, batch_reward, batch_done
             )
             writer.add_scalar('Loss/total_loss', total_loss, episode)
@@ -261,8 +215,8 @@ def train(ckpt_dir):
             writer.add_scalar('Loss/policy_loss', policy_loss, episode)
             writer.add_scalar('Loss/alpha_loss', alpha_loss, episode)
             writer.add_scalar('Loss/alpha', alpha, episode)
-            #writer.add_scalar('Loss/cql_alpha_loss', cql_alpha_loss, episode)
-            # writer.add_scalar('Loss/cql_alpha', cql_alpha, episode)
+            writer.add_scalar('Loss/cql_alpha_loss', alpha_cql_loss, episode)
+            writer.add_scalar('Loss/cql_alpha', alpha_cql, episode)
             print(f'Epoch {epoch} , episode : {episode}: Loss {total_loss}, Q-Loss {q_loss}, CQL-Reg {q_regularization}, Policy Loss {policy_loss}')
             episode += 1
             
@@ -352,7 +306,7 @@ if __name__ == '__main__':
     ckpt_dir = base_dir + '/ckpt/' + time_stamp
     train_message = base_dir + 'train.log'
     with open(train_message , 'a') as f:
-        f.write(f'\n{time_stamp} , message: 在集群上跑一样的测试')
+        f.write(f'\n{time_stamp} , message: 在集群上跑的测试，这个是用最初的train，可能曲线不是很好，但是acc高')
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(loss_dir, exist_ok=True)

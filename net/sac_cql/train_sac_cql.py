@@ -254,18 +254,12 @@ def train(ckpt_dir):
             batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch_data
             batch_done = batch_done.to(device)
                 
-            total_loss, q_loss, q_regularization, policy_loss ,alpha_loss, alpha ,cql_alpha_loss , cql_alpha= cql.train_step(
+            loss_dict = cql.train_step(
                 batch_pre_state ,batch_next_state, batch_labels, batch_reward, batch_done
             )
-            writer.add_scalar('Loss/total_loss', total_loss, episode)
-            writer.add_scalar('Loss/q_loss', q_loss, episode)
-            writer.add_scalar('Loss/q_regularization', q_regularization, episode)
-            writer.add_scalar('Loss/policy_loss', policy_loss, episode)
-            writer.add_scalar('Loss/alpha_loss', alpha_loss, episode)
-            writer.add_scalar('Loss/alpha', alpha, episode)
-            writer.add_scalar('Loss/cql_alpha_loss', cql_alpha_loss, episode)
-            writer.add_scalar('Loss/cql_alpha', cql_alpha, episode)
-            print(f'Epoch {epoch} , episode : {episode}: Loss {total_loss}, Q-Loss {q_loss}, CQL-Reg {q_regularization}, Policy Loss {policy_loss}')
+            print(f'epoch:{epoch} , episode {episode}' + ",".join([f"{k}: {v}" for k, v in loss_dict.items()]))
+            for name, item in loss_dict.items():
+                writer.add_scalar(f'loss/{name}', item, episode)
             episode += 1
             
             if episode % 1000 == 0 :

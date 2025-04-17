@@ -48,7 +48,7 @@ class AVNet(nn.Module):
         return q1, q2, logits
     
 class DiscreteSAC_CQL:
-    def __init__(self, model, device, learning_rate=1e-4, alpha=0.1, tau=0.005):
+    def __init__(self, model, device, learning_rate=1e-4, cql_alpha=0.1, tau=0.005):
         self.model = model
         self.target_entropy = -4  # 目标熵（离散 SAC）
         self.target_model = AVNet(128, 4, 128, 36).to(device)
@@ -61,7 +61,8 @@ class DiscreteSAC_CQL:
         self.log_alpha = torch.tensor([0.0], requires_grad=True, device=device)  # log_alpha 存储
         self.alpha = self.log_alpha.exp().detach() # 计算 alpha , 脱离计算图
         self.alpha_optimizer = optim.Adam([self.log_alpha], lr=3e-4)  # Adam 优化器
-
+        
+        self.alpha_cql = cql_alpha
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
 
@@ -76,18 +77,17 @@ class DiscreteSAC_CQL:
         # Q-learning 目标
         # pdb.set_trace()
         q_loss = F.mse_loss(min_q, target_q.unsqueeze(1))
-
-        # CQL 额外约束
-        q_regularization = self.alpha_cql * ( (torch.logsumexp(q1, dim=1).mean() - a_Q1.mean()) + \
-                           (torch.logsumexp(q2, dim=1).mean() - a_Q2.mean()) )
         
-        alpha_cql_loss = -torch.mean(self.log_alpha_cql.exp() * (q_regularization.detach() + self.target_entropy))
+        # CQL 额外约束
+        q_regularization = self.alpha_cql * ( (torch.logsumexp(q1, dim=1).mean() - q1.mean()) + \
+                           (torch.logsumexp(q2, dim=1).mean() - q2.mean()) )
+        
         # 策略损失（离散 SAC）
         policy_dist = F.softmax(logits, dim=1)
-        policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
+        policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - torch.min(q1,q2)), dim=1))
 
         total_loss = q_loss +  q_regularization + policy_loss
-        return total_loss, q_loss, q_regularization, policy_loss , alpha_cql_loss
+        return total_loss, q_loss, q_regularization, policy_loss
 
     def train_step(self, pre_state , next_state, labels, reward, done):
 
@@ -100,30 +100,36 @@ class DiscreteSAC_CQL:
             next_value = (next_policy * (next_min_q - self.alpha.detach() * torch.log(next_policy + 1e-10))).sum(dim=1)
             # pdb.set_trace()
             target_q = reward + (1 - done) * 0.99 * next_value
-        total_loss, q_loss, q_regularization, policy_loss ,alpha_cql_loss= self.compute_loss(q1, q2, logits, target_q , labels)
+        total_loss, q_loss, q_regularization, policy_loss = self.compute_loss(q1, q2, logits, target_q , labels)
         
         # _,_, alp_logits = self.model(pre_audio, pre_visual)
         # 计算 entropy 并优化 alpha
         policy_dist = F.softmax(logits, dim=1)
         entropy = -torch.sum(policy_dist * torch.log(policy_dist + 1e-10), dim=1).mean()
-        alpha_loss = -torch.mean(self.log_alpha.exp() * (entropy.detach() + self.target_entropy))
-
+        alpha_loss = torch.mean(-self.log_alpha.exp() * entropy - self.log_alpha.exp() * self.target_entropy)
+        
+        self.alpha_optimizer.zero_grad()
+        alpha_loss.backward(retain_graph=True)
+        self.alpha_optimizer.step()
+        
+        
         self.optimizer.zero_grad()
         total_loss.backward()
         self.optimizer.step()
-
-        self.alpha_optimizer.zero_grad()
-        alpha_loss.backward()
-        self.alpha_optimizer.step()
         
-        self.alpha_cql_optimizer.zero_grad()
-        alpha_cql_loss.backward()
-        self.alpha_cql_optimizer.step()
-        # 更新 alpha
+        # 更新self.alpha
         self.alpha = self.log_alpha.exp()
-        self.alpha_cql = self.log_alpha_cql.exp()
         # 目标网络软更新
         for target_param, param in zip(self.target_model.parameters(), self.model.parameters()):
             target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
 
-        return total_loss.item(), q_loss.item(), q_regularization.item(), policy_loss.item(), alpha_loss.item(), self.alpha.item() ,alpha_cql_loss.item() , self.alpha_cql.item()
+        # return total_loss.item(), q_loss.item(), q_regularization.item(), policy_loss.item(), alpha_loss.item(), self.alpha.item()
+        return {
+            'total_loss':total_loss.item(),
+            'q_loss':q_loss.item(),
+            'q_regularization':q_regularization.item(),
+            'policy_loss':policy_loss.item(),
+            'alpha_loss':alpha_loss.item(),
+            'self.alpha':self.alpha.item(),
+            'entropy':entropy.item()
+        }
