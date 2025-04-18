@@ -72,16 +72,19 @@ class DiscreteSAC_CQL:
         self.critic2_optimizer = optim.Adam(self.critic2.parameters(), lr=self.lr)
         self.policy_optimizer = optim.Adam(self.policy.parameters(), lr=self.lr)
     def compute_loss(self, q1, q2, logits, policy_dist ,target_q, action):
-
-        a_Q1 = q1.gather(1, action.squeeze(0).unsqueeze(1))
-        a_Q2 = q2.gather(1, action.squeeze(0).unsqueeze(1))
+        a_Q1 = q1.gather(1, action.unsqueeze(1))
+        a_Q2 = q2.gather(1, action.unsqueeze(1))
         min_q = torch.min(q1,q2)
         critic1_loss = F.mse_loss(a_Q1 , target_q.unsqueeze(1))
         critic2_loss = F.mse_loss(a_Q2 , target_q.unsqueeze(1))
         
-        critic1_regularization = self.alpha_cql * (torch.logsumexp(q1, dim=1).mean() - q1.mean()) 
+        # critic1_regularization = self.alpha_cql * (torch.logsumexp(q1, dim=1).mean() - q1.mean()) 
                                                  
-        critic2_regularization = self.alpha_cql * (torch.logsumexp(q2, dim=1).mean() - q2.mean())
+        # critic2_regularization = self.alpha_cql * (torch.logsumexp(q2, dim=1).mean() - q2.mean())
+        
+        critic1_regularization = 0
+                                                 
+        critic2_regularization = 0
         
         policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
 
@@ -140,8 +143,8 @@ class DiscreteSAC_CQL:
             loss_dict = {
                 'critic1_loss':critic1_loss.item(),
                 'critic2_loss':critic2_loss.item(),
-                'critic1_regularization':critic1_regularization.item(),
-                'critic2_regularization':critic2_regularization.item(),
+                'critic1_regularization':critic1_regularization,
+                'critic2_regularization':critic2_regularization,
                 'policy_loss':policy_loss.item(),
                 'alpha_loss':alpha_loss.item(),
                 'alpha':self.alpha.item(),
@@ -179,13 +182,18 @@ class lambda_DiscreteSAC_CQL:
 
         a_Q1 = q1.gather(1, action.squeeze(0).unsqueeze(1))
         a_Q2 = q2.gather(1, action.squeeze(0).unsqueeze(1))
-        min_q = torch.min(q1,q2)
+        # min_q = torch.min(q1,q2)
+        min_q = torch.min(a_Q1 , a_Q2)
         critic1_loss = F.mse_loss(a_Q1 , target_q.unsqueeze(1))
         critic2_loss = F.mse_loss(a_Q2 , target_q.unsqueeze(1))
         
-        critic1_regularization = self.alpha_cql * (torch.logsumexp(q1, dim=1).mean() - q1.mean()) 
+        # critic1_regularization = self.alpha_cql * (torch.logsumexp(q1, dim=1).mean() - q1.mean()) 
                                                  
-        critic2_regularization = self.alpha_cql * (torch.logsumexp(q2, dim=1).mean() - q2.mean())
+        # critic2_regularization = self.alpha_cql * (torch.logsumexp(q2, dim=1).mean() - q2.mean())
+        
+        critic1_regularization = 0 
+                                                 
+        critic2_regularization = 0
         
         policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
 
@@ -246,8 +254,8 @@ class lambda_DiscreteSAC_CQL:
             loss_dict = {
                 'critic1_loss':critic1_loss.item(),
                 'critic2_loss':critic2_loss.item(),
-                'critic1_regularization':critic1_regularization.item(),
-                'critic2_regularization':critic2_regularization.item(),
+                'critic1_regularization':critic1_regularization,
+                'critic2_regularization':critic2_regularization,
                 'policy_loss':policy_loss.item(),
                 'alpha_loss':alpha_loss.item(),
                 'alpha':self.alpha.item(),
