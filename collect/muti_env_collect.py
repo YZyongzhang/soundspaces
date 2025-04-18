@@ -179,7 +179,7 @@ class Actor:
             while True:
                 rl_output_list = self.greedy_act(env)
                 # logging.info(rl_output_list[0]['rl_pred'])
-                if index == len(self.points) - 1 and rl_output_list[0]['rl_pred'] == 3:
+                if index != len(self.points) - 1 and rl_output_list[0]['rl_pred'] == 3:
                     break
                 all_list = [self.env.step(rl_output_list)]
                 input_d_list = [t[0] for t in all_list]  # s
@@ -201,11 +201,11 @@ class Actor:
         max_step = len(done)
         
         if max_step > 80 :
-            level = 2
+            cul_level = 2
         elif max_step > 40 and max_step < 80:
-            level = 1
+            cul_level = 1
         else:
-            level = 0
+            cul_level = 0
             
         result = [seq_list , {
             'path_point':self.path_point,
@@ -213,7 +213,7 @@ class Actor:
         } , done ,self.obs]
         self.path_point = list()
         torch.cuda.empty_cache()
-        return  result, return_, num_success , level
+        return  result, return_, num_success , cul_level
 
 def collect(env_path):
     level_episode = [0,0,0]
