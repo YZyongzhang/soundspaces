@@ -10,12 +10,13 @@ import random
 import ray
 import habitat_sim
 import pickle
+sys.path.append('/home/getuanhui/project/sound-spaces')
 from yz.config import config , agent_config
 from yz.env.v0d0 import Env
 from yz.utils.batch import *
 from yz.utils.batch import *
 from yz.utils.metrics import *
-from yz.net import AVFNet ,AVNet
+from yz.net import Critic_Actor ,AVFNet
 from yz.config import agent_config
 random.seed(config["random_seed"])
 
@@ -23,9 +24,9 @@ random.seed(config["random_seed"])
 class Actor:
     def __init__(self, config):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model_path = f'{agent_config.EXPERIMENTS_DIR}/ckpt/2025-04-15~09-35-21/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_100000.pth'
+        self.model_path = f'{agent_config.EXPERIMENTS_DIR}/ckpt/2025-04-19~08-03-26/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_320000_492.pth'
         self.avf_model_path = '/home/getuanhui/project/sound-spaces/yz/data/checkpoint/acmcheckpoint/avf_muti_env_90000.pth'
-        self.agent = AVNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
+        self.agent = Critic_Actor(action_dim=4).to(self.device)
         self.agent.load_state_dict(torch.load(self.model_path))
         self.agent.eval()
         self.avf = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
@@ -51,7 +52,7 @@ class Actor:
         audio = audio.float().to(self.device)
 
         combinencode = self.avf(audio,visual)
-        action = self.agent(combinencode)[1].max(dim = -1)[1]
+        action = self.agent(combinencode)[2].max(dim = -1)[1]
         print(action)
         return int(action)
     
@@ -133,7 +134,7 @@ def val():
     }
     seq_list = list()
     
-    for num_episodes in range(10):
+    for num_episodes in range(30):
         t_start = time.time()
         logging.info(f"Episode {num_episodes}")
         result_list = [actor.rollout()]

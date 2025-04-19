@@ -15,7 +15,6 @@ import pdb
 import sys
 import ray
 sys.path.append('/home/getuanhui/project/sound-spaces')
-# sys.path.append(('/home/kongxiangyu/sound-spaces'))
 from yz.config import agent_config , config
 
 # from yz.net import use_combinencode_level_data as Data
@@ -28,7 +27,7 @@ from yz.net.sac_cql.SAC_CQL import Critic_Actor
 
 
 
-def train(ckpt_dir):
+def train(ckpt_dir,writer):
     database_dir = agent_config.RELATIVE_DATABASE_DIR
     current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time_star = time.time()
@@ -191,21 +190,3 @@ def train(ckpt_dir):
         logging.info(f"time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
 
     torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth')
-
-if __name__ == '__main__':
-    from torch.utils.tensorboard import SummaryWriter
-    from datetime import datetime
-    base_dir = agent_config.RELATIVE_EXPERIMENTS_DIR
-    time_stamp = "{0:%Y-%m-%d~%H-%M-%S}".format(datetime.now())
-    loss_dir = base_dir +'/loss/'  + time_stamp
-    log_dir = base_dir + '/log/'
-    ckpt_dir = base_dir + '/ckpt/' + time_stamp
-    train_message = base_dir + 'train.log'
-    with open(train_message , 'a') as f:
-        f.write(f'\n{time_stamp} , message: test in lambda')
-    os.makedirs(ckpt_dir, exist_ok=True)
-    os.makedirs(log_dir, exist_ok=True)
-    os.makedirs(loss_dir, exist_ok=True)
-    writer = SummaryWriter(loss_dir)
-    logging.basicConfig(filename=f'{log_dir}/{time_stamp}.log', level=logging.INFO,filemode='a')
-    train(ckpt_dir)

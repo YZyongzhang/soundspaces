@@ -33,7 +33,7 @@ def parse_args():
         "--scene_dir",
         type=str,
         # default="../data/scene_datasets/mp3d/1LXtFkjw3qL/1LXtFkjw3qL.glb",
-        default="data/scene_datasets/mp3d/17DRP5sb8fy/17DRP5sb8fy.glb",
+        default="/home/getuanhui/project/sound-spaces/data/scene_datasets/mp3d/17DRP5sb8fy/17DRP5sb8fy.glb",
         # default='./data/scene_datasets/MP3D/v1/mp3d/1LXtFkjw3qL/1LXtFkjw3qL.glb'
         # default="./data/scene_datasets/replica/apartment_0/mesh.ply",
     )
@@ -47,7 +47,7 @@ def parse_args():
     parser.add_argument(
         "--scene_config_file",
         type=str,
-        default="data/scene_datasets/mp3d/mp3d.scene_dataset_config.json",
+        default="/home/getuanhui/project/sound-spaces/data/scene_datasets/mp3d/mp3d.scene_dataset_config.json",
     )
     parser.add_argument("--load_semantic_mesh", type=bool, default=True)
     parser.add_argument("--enable_physics", type=bool, default=False)
@@ -70,8 +70,8 @@ def parse_args():
     # 可以将这个steptime更改的比较小
     # parser.add_argument("--step_time", type=float, default=0.1)
     parser.add_argument("--success_distance", type=float, default=1.0)
-    # parser.add_argument("--audio_dir", type=str, default="../res/singing.wav")
-    parser.add_argument("--audio_dir", type=str, default="res/singing.wav")
+    parser.add_argument("--audio_dir", type=str, default="/home/getuanhui/project/sound-spaces/res/singing.wav")
+    # parser.add_argument("--audio_dir", type=str, default="res/singing.wav")
     # parser.add_argument("--forward_amount", type=float, default=0.25)
     parser.add_argument("--forward_amount", type=float, default=0.15)
 

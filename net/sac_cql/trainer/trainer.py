@@ -15,20 +15,17 @@ import pdb
 import sys
 import ray
 sys.path.append('/home/getuanhui/project/sound-spaces')
-# sys.path.append(('/home/kongxiangyu/sound-spaces'))
 from yz.config import agent_config , config
 
-# from yz.net import use_combinencode_level_data as Data
-from yz.net import use_combinencode_level_data_advance_stop as Data
+from yz.net import use_combinencode_level_data as Data
 from yz.net import use_combinencode_data as Val_Data
-# from yz.net.utils import lmdb_sampler
-from yz.net.utils import lmdb_sampler_advance_stop
+from yz.net.utils import lmdb_sampler
 from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL as SAC_CQL
 from yz.net.sac_cql.SAC_CQL import Critic_Actor
 
 
 
-def train(ckpt_dir):
+def Train(ckpt_dir,writer):
     database_dir = agent_config.RELATIVE_DATABASE_DIR
     current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time_star = time.time()
@@ -39,8 +36,6 @@ def train(ckpt_dir):
     target_model.train()
     cql = SAC_CQL(model, target_model , device)
     episode = 0
-    database_path_stop = [os.path.join(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/' , i) \
-        for i in os.listdir(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/')]
     
     database_path = [os.path.join(f'{database_dir}/new_key_shffule_mutienv_data_combinencode_level/' , i) \
         for i in os.listdir(f'{database_dir}/new_key_shffule_mutienv_data_combinencode_level/')]
@@ -49,9 +44,9 @@ def train(ckpt_dir):
         'level_1':0,
         'level_2':0,
     }
-    sampler = lmdb_sampler_advance_stop(database_path,stop_database_path=database_path_stop, shuffle=True)
+    sampler = lmdb_sampler(database_path, shuffle=True)
     sampler.sample_data(sample=init_sample_dict)
-    dataset = Data(database_path , database_path_stop)
+    dataset = Data(database_path)
     dataloader = DataLoader(dataset=dataset,\
         sampler=sampler ,batch_size=256)
     
@@ -191,21 +186,3 @@ def train(ckpt_dir):
         logging.info(f"time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
 
     torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth')
-
-if __name__ == '__main__':
-    from torch.utils.tensorboard import SummaryWriter
-    from datetime import datetime
-    base_dir = agent_config.RELATIVE_EXPERIMENTS_DIR
-    time_stamp = "{0:%Y-%m-%d~%H-%M-%S}".format(datetime.now())
-    loss_dir = base_dir +'/loss/'  + time_stamp
-    log_dir = base_dir + '/log/'
-    ckpt_dir = base_dir + '/ckpt/' + time_stamp
-    train_message = base_dir + 'train.log'
-    with open(train_message , 'a') as f:
-        f.write(f'\n{time_stamp} , message: test in lambda')
-    os.makedirs(ckpt_dir, exist_ok=True)
-    os.makedirs(log_dir, exist_ok=True)
-    os.makedirs(loss_dir, exist_ok=True)
-    writer = SummaryWriter(loss_dir)
-    logging.basicConfig(filename=f'{log_dir}/{time_stamp}.log', level=logging.INFO,filemode='a')
-    train(ckpt_dir)
