@@ -14,8 +14,8 @@ import time
 import pdb
 import sys
 import ray
-# sys.path.append('/home/getuanhui/project/sound-spaces')
-sys.path.append(('/home/kongxiangyu/sound-spaces'))
+sys.path.append('/home/getuanhui/project/sound-spaces')
+# sys.path.append(('/home/kongxiangyu/sound-spaces'))
 from yz.config import agent_config , config
 
 # from yz.net import use_combinencode_level_data as Data
@@ -23,7 +23,7 @@ from yz.net import use_combinencode_level_data_advance_stop as Data
 from yz.net import use_combinencode_data as Val_Data
 # from yz.net.utils import lmdb_sampler
 from yz.net.utils import lmdb_sampler_advance_stop
-from yz.net.sac_cql.SAC_CQL import lambda_DiscreteSAC_CQL as SAC_CQL
+from yz.net.sac_cql.SAC_CQL import CQLSAC_Improved as SAC_CQL
 from yz.net.sac_cql.SAC_CQL import Critic_Actor
 
 

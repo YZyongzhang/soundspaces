@@ -22,7 +22,8 @@ from yz.net import use_combinencode_level_data_advance_stop as Data
 from yz.net import use_combinencode_data as Val_Data
 # from yz.net.utils import lmdb_sampler
 from yz.net.utils import lmdb_sampler_advance_stop
-from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL as SAC_CQL
+# from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL as SAC_CQL
+from yz.net.sac_cql.SAC_CQL import CQLSAC_Improved as SAC_CQL
 from yz.net.sac_cql.SAC_CQL import Critic_Actor
 
 
