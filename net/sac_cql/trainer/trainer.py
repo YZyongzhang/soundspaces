@@ -94,10 +94,7 @@ def Train(ckpt_dir,writer):
             for name, item in loss_dict.items():
                 writer.add_scalar(f'loss/{name}', item, episode)
             episode += 1
-            
-            if episode % 1000 == 0 :
-                logging.info(f"Epoch {epoch} , episode : {episode} ,time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
-            if episode % 10000 == 0 and episode != 0:
+            if epoch % 25 == 0 and episode != 0:
                 torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
             
         if epoch % 2 == 0:
@@ -180,9 +177,5 @@ def Train(ckpt_dir,writer):
                 writer.add_scalar('train/actor_accuracy', train_actor_accuracy / 10, epoch)
                 writer.add_scalar('train/train_double_q_min_accuracy', train_double_q_min_accuracy / 10, epoch)
             model.train()
-                
-        now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        logging.info(f"begin time : {current_time_str} now time :{now_time}")
-        logging.info(f"time : {(time.time()  - time_star) // 60 } m {(time.time() - time_star) % 60 } s")
 
     torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth')

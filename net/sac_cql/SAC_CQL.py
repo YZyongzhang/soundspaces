@@ -75,8 +75,8 @@ class DiscreteSAC_CQL:
     def compute_loss(self, q1, q2, logits, policy_dist ,target_q, action):
         a_Q1 = q1.gather(1, action.unsqueeze(1))
         a_Q2 = q2.gather(1, action.unsqueeze(1))
-        # min_q = torch.min(q1,q2)
-        min_q = torch.min(a_Q1,a_Q2)
+        min_q = torch.min(q1,q2)
+        # min_q = torch.min(a_Q1,a_Q2)
         critic1_loss = F.mse_loss(a_Q1 , target_q.unsqueeze(1))
         critic2_loss = F.mse_loss(a_Q2 , target_q.unsqueeze(1))
         
