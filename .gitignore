@@ -13,4 +13,5 @@ experiments/
 *.pth
 log/
 database/
+env_data/
 *.sh

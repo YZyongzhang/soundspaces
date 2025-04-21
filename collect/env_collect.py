@@ -200,7 +200,7 @@ def collect(env_path , collect_name):
         os.makedirs(agent_config.BASE_PARH_COLLECT + f'{collect_name}/'+ env + "/level1" , exist_ok=True)
         os.makedirs(agent_config.BASE_PARH_COLLECT + f'{collect_name}/'+ env + "/level2" , exist_ok=True)
         actor = Actor(config)
-        for num_episodes in range(100):
+        for num_episodes in range(10):
             print(num_episodes)
             t_start = time.time()
             result_lists ,_ ,_,level = actor.greedy()
