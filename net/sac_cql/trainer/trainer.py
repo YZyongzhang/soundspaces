@@ -53,7 +53,7 @@ def Train(ckpt_dir,writer):
     val_data_base = f'{database_dir}/val_database_combinencode/'
     val_dataloader = DataLoader(dataset=Val_Data(val_data_base) , batch_size=256)
     
-    num_epochs = 500
+    num_epochs = 600
 
     for epoch in range(num_epochs):
         if epoch > 50 and epoch % 10 == 0 and epoch < 200:
@@ -94,8 +94,8 @@ def Train(ckpt_dir,writer):
             for name, item in loss_dict.items():
                 writer.add_scalar(f'loss/{name}', item, episode)
             episode += 1
-            if epoch % 25 == 0 and episode != 0:
-                torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
+        if epoch % 25 == 0 and episode != 0:
+            torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
             
         if epoch % 2 == 0:
             model.eval()

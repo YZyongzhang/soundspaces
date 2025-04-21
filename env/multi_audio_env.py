@@ -5,10 +5,12 @@ import soundspaces as ss
 import numpy as np
 import quaternion
 import copy
+from habitat_sim.nav import GreedyFollowerCodes, GreedyGeodesicFollowerImpl, PathFinder
+from habitat_sim.utils.common import quat_to_magnum
 
 from yz.utils.angles import *
 from quaternion import from_euler_angles, as_float_array
-
+import quaternion as qt
 # from utils.audio import ChunkedAudio
 from scipy.io.wavfile import write
 from scipy.signal import fftconvolve
@@ -90,7 +92,11 @@ class MultiAudioEnv(ParallelEnv):
             )
             for agent_id in range(self._num_agents)
         ]
-
+        
+        self.impl = [
+            self._greedy_follower[agent_id].impl
+            for agent_id in range(self._num_agents)
+        ]
         self._count = 0
 
         """predefined information"""
@@ -259,20 +265,20 @@ class MultiAudioEnv(ParallelEnv):
                 print(f"agent {agent_id} reseting")
                 agent = self._sim.get_agent(agent_id)
                 agent_state = habitat_sim.AgentState()
+                defualt_rotation = qt.quaternion(1, 0, 0, 0)
                 while True:
                     rand_pos = self._sim.pathfinder.get_random_navigable_point()
-                    # rand_pos = self._sim.pathfinder.get_random_navigable_point_near(self._source_poses[0] , radius = 2.0)
                     if (
                         (
                             np.linalg.norm(rand_pos - self._source_poses[0])
                             > self._success_distance + 0.2
                         )
-                        # and (
-                        #     np.linalg.norm(rand_pos - self._source_poses[0])
-                        #     < self._success_distance + 9.0
-                        # )
                         and (
-                            self.shortest_path(rand_pos, self._source_poses[0]) is not None
+                            np.linalg.norm(rand_pos - self._source_poses[0])
+                            < self._success_distance + 9.0
+                        )
+                        and (
+                            self.check_greedflower_error(defualt_rotation ,rand_pos , self.get_source_pos()[agent_id])
                         )
                         and (self._sim.pathfinder.is_navigable(rand_pos))
                     ):
@@ -519,7 +525,7 @@ class MultiAudioEnv(ParallelEnv):
                 self._sim.get_agent(agent_id).get_state().position
                 - self._source_poses[0]
             )
-            < self._success_distance
+            < self._success_distance and self._stopped_agents[agent_id]
             else False
             for agent_id in range(self._num_agents)
         ]
@@ -668,13 +674,12 @@ class MultiAudioEnv(ParallelEnv):
         for agent_id in range(self._num_agents):
             path_ = self._greedy_follower[agent_id].find_path(goal_pos)
             path.append(path_)
-
+        
         if return_length:
             return [
                 path[agent_id].count('move_forward') * self._config["forward_amount"]
                 for agent_id in range(self._num_agents)
             ]
-
         return path
 
     def get_geodesic_distance(self, agent_id):
@@ -726,19 +731,33 @@ class MultiAudioEnv(ParallelEnv):
     def get_geo_distance_list(self):
         return [self.get_geodesic_distance(i) for i in range(self._num_agents)]
 
-    def shortest_path(self, from_pos, to_pos):
-        """
-        Depreciated, using built-in shortestpath method, granularity is not enough
-        """
-        path = habitat_sim.ShortestPath()
-        path.requested_start = from_pos
-        path.requested_end = to_pos
-        found_path = self._sim.pathfinder.find_path(path)
-        path_results = (found_path, path.geodesic_distance, path.points)
-        if len(path_results[-1]) > 1:
-            return path_results[-1][1]
-        else:
-            return None
+    # def shortest_path(self, from_pos, to_pos):
+    #     """
+    #     Depreciated, using built-in shortestpath method, granularity is not enough
+    #     """
+    #     path = habitat_sim.ShortestPath()
+    #     path.requested_start = from_pos
+    #     path.requested_end = to_pos
+    #     found_path = self._sim.pathfinder.find_path(path)
+    #     path_results = (found_path, path.geodesic_distance, path.points)
+    #     if len(path_results[-1]) > 1:
+    #         return path_results[-1][1]
+    #     else:
+    #         return None
+    def check_greedflower_error(self,defualt_rotation , state_position , goal_pos):
+        # raise in habitat-smi/nav/greedflower.findpath,if len(path) = 0,this function avoid it
+        # self._greedy_follower [agentid, greedyfollower]
+        # state.rotation   qt.quaternion(1, 0, 0, 0)
+        path = [self.impl[agent_id].find_path(
+            quat_to_magnum(defualt_rotation), state_position, goal_pos
+        )
+        for agent_id in range(self._num_agents)]
+        
+        s = [False if len(path[i]) == 0 else True for i in range(self._num_agents)]
+        
+        if all(s):
+            return True
+        return False
 
     def get_num_agents(self):
         return self._num_agents

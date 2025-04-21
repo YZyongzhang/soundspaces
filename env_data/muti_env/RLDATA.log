@@ -1,0 +1,22 @@
+INFO:root:this env name is ########################################/home/getuanhui/project/sound-spaces/data/scene_datasets/mp3d//sT4fr6TAbpF/sT4fr6TAbpF.glb
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:this env name is ########################################sT4fr6TAbpF
+INFO:root:agent action: turn_right
+INFO:root:reward is [[-0.2372060543586251]]
+INFO:root:agent action: move_forward
+INFO:root:reward is [[1.4337286878637794]]
+INFO:root:agent action: turn_right
+INFO:root:reward is [[-5.999999140886592]]
+INFO:root:agent action: move_forward
+INFO:root:reward is [[0.9717484298903798]]
+INFO:root:agent action: turn_left
+INFO:root:reward is [[5.999999140886592]]
+INFO:root:agent action: turn_left
