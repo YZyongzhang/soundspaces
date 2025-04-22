@@ -13,5 +13,6 @@ experiments/
 *.pth
 log/
 database/
+soundspaces_data
 env_data/
 *.sh

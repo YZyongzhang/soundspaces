@@ -214,11 +214,14 @@ def collect(env_path , collect_name):
             logging.info(f"episode time {(time.time() - t_start) // 60} m {(time.time() - t_start) % 60} s")
             logging.info(f"now time is {current_time_str}")
 if  __name__== "__main__":
+    check_exit_env = True
     mp3d_scene_datasets = agent_config.MP3D_SCENE_DATASET
     collect_dir = agent_config.BASE_PARH_COLLECT
     train_env_split = agent_config.ENV_SPLIT['train']
     val_env_split = agent_config.ENV_SPLIT['val']
-    exit_env_advance_stop_envname = os.listdir(collect_dir + 'muti_env/')
-    collect_name = 'muti_env'
-    logging.basicConfig(filename= collect_dir + 'muti_env/RLDATA.log', level=logging.INFO)
-    collect(train_env_split , collect_name)
+    collect_name = 'val_split'
+    if check_exit_env:
+        exit_envname = os.listdir(collect_dir + f'{collect_name}')
+        val_env_split = [i for i in val_env_split if i not in exit_envname]
+    logging.basicConfig(filename= collect_dir + f'{collect_name}/RLDATA.log', level=logging.INFO)
+    collect(val_env_split , collect_name)
