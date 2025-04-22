@@ -24,7 +24,7 @@ from yz.net import use_combinencode_data as Val_Data
 from yz.net.utils import lmdb_sampler_advance_stop
 from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL as SAC_CQL
 from yz.net.sac_cql.SAC_CQL import Critic_Actor
-from yz.net.sac_cql.trainer.trainer_stop import Train as train
+from yz.net.sac_cql.trainer.muti_env_train import Train as train
 
 if __name__ == '__main__':
     from torch.utils.tensorboard import SummaryWriter
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     ckpt_dir = base_dir + '/ckpt/' + time_stamp
     train_message = base_dir + 'train.log'
     with open(train_message , 'a') as f:
-        f.write(f'\n{time_stamp} , message: write this train message')
+        f.write(f'\n{time_stamp} , message: debug the code ')
     os.makedirs(ckpt_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(loss_dir, exist_ok=True)

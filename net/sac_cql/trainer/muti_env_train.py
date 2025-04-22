@@ -18,12 +18,13 @@ sys.path.append('/home/getuanhui/project/sound-spaces')
 from yz.config import agent_config , config
 
 # from yz.net import use_combinencode_level_data as Data
-from yz.net import use_combinencode_level_data_advance_stop as Data
+# from yz.net import use_combinencode_level_data_advance_stop as Data
 from yz.net import use_combinencode_data as Val_Data
-# from yz.net.utils import lmdb_sampler
-from yz.net.utils import lmdb_sampler_advance_stop
-from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL as SAC_CQL
-from yz.net.sac_cql.SAC_CQL import Critic_Actor
+# # from yz.net.utils import lmdb_sampler
+from yz.net import use_combinencode_level_data_time_seq as Data
+from yz.net.utils import lmdb_sampler_time_seq
+from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL_GRU as SAC_CQL
+from yz.net.sac_cql.SAC_CQL import Critic_Actor_GRU as Critic_Actor
 
 
 
@@ -38,21 +39,21 @@ def Train(ckpt_dir,writer):
     target_model.train()
     cql = SAC_CQL(model, target_model , device)
     episode = 0
-    database_path_stop = [os.path.join(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/' , i) \
-        for i in os.listdir(f'{database_dir}/mutienv_data_combinencode_advance_stop_level/')]
+    database_path = ['/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
+                     '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
+                     '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode'
+                     ]
     
-    database_path = [os.path.join(f'{database_dir}/new_key_shffule_mutienv_data_combinencode_level/' , i) \
-        for i in os.listdir(f'{database_dir}/new_key_shffule_mutienv_data_combinencode_level/')]
     init_sample_dict = {
-        'level_0':1,
-        'level_1':0,
-        'level_2':0,
+        'level0':1,
+        'level1':0,
+        'level2':0,
     }
-    sampler = lmdb_sampler_advance_stop(database_path,stop_database_path=database_path_stop, shuffle=True)
+    sampler = lmdb_sampler_time_seq(database_path ,  shuffle=True)
     sampler.sample_data(sample=init_sample_dict)
-    dataset = Data(database_path , database_path_stop)
+    dataset = Data()
     dataloader = DataLoader(dataset=dataset,\
-        sampler=sampler ,batch_size=256)
+        sampler=sampler ,batch_size=1)
     
     val_data_base = f'{database_dir}/val_database_combinencode/'
     val_dataloader = DataLoader(dataset=Val_Data(val_data_base) , batch_size=256)
@@ -66,9 +67,9 @@ def Train(ckpt_dir,writer):
             else:
                 level_1_rate = 1
             sample_dict = {
-                'level_0':1,
-                'level_1':level_1_rate,
-                'level_2':0,
+                'level0':1,
+                'level1':level_1_rate,
+                'level2':0,
             }
             sampler.sample_data(sample=sample_dict)
             dataloader = DataLoader(dataset=dataset,\
@@ -80,9 +81,9 @@ def Train(ckpt_dir,writer):
             else:
                 level_2_rate = 1
             sample_dict = {
-                'level_0':1,
-                'level_1':1,
-                'level_2':level_2_rate,
+                'level0':1,
+                'level1':1,
+                'level2':level_2_rate,
             }
             sampler.sample_data(sample=sample_dict)
             dataloader = DataLoader(dataset=dataset,\
@@ -125,6 +126,9 @@ def Train(ckpt_dir,writer):
 
                     # 得到 Q 值 (或者策略分布)
                     q_1 , q_2 , action = model(batch_pre_state)  # [batch, num_actions]
+                    q_1 = q_1.squeeze(0)
+                    q_2 = q_2.squeeze(0)
+                    action = action.squeeze(0)
                     q_1_action = torch.argmax(q_1, dim=1)  # greedy action
                     q_2_action = torch.argmax(q_2, dim=1)
                     double_q_min_action = torch.argmax(torch.min(q_1,q_2),dim = 1)
@@ -155,6 +159,10 @@ def Train(ckpt_dir,writer):
 
                     # 得到 Q 值 (或者策略分布)
                     train_q_1 , train_q_2 , train_action = model(batch_pre_state)  # [batch, num_actions]
+                    train_q_1 = train_q_1.squeeze(0)
+                    train_q_2 = train_q_2.squeeze(0)
+                    train_action = train_action.squeeze(0)
+                    
                     train_q_1_action = torch.argmax(train_q_1, dim=1)  # greedy action
                     train_q_2_action = torch.argmax(train_q_2, dim=1)
                     train_double_q_min_action = torch.argmax(torch.min(train_q_1 , train_q_2) , dim=1)

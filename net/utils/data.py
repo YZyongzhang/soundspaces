@@ -447,19 +447,17 @@ class USE_LMBD_DATABASE(Dataset):
         batch_data = pickle.loads(value)
         return batch_data
 
-class USE_COMBINENCODE_LEVEL_DATA_ADVANCE_STOP_AND_RETURN_TIME_SEQU(Dataset):
-    def __init__(self, database_path , stop_database_path):
+
+class USE_COMBINENCODE_LEVEL_DATA_TIME_SEQ(Dataset):
+    def __init__(self):
+        
         self.device = torch.device("cuda" if torch.cuda.is_available() else 'cpu' )
-        self.databases = database_path
-        self.stop_database_path = stop_database_path
-        self.envs = [(lmdb.open(database , readonly = True) , database[-7:]) for database in self.databases]
-        self.envs_stop = [(lmdb.open(stop_database , readonly = True) , f'{stop_database[-7:]}_stop') for stop_database in self.stop_database_path]
         self.error = list()
         
     def __getitem__(self,idx_tuple):
-        # print(idx_tuple)
-        env_name , key = idx_tuple
-        txn = self.map(env_name)
+        # idx_tuple (path , idx)
+        env_path , key = idx_tuple
+        txn = self.map(env_path)
         value = txn.get(key)
         if value is None:
             print(f"error {key}")
@@ -473,88 +471,100 @@ class USE_COMBINENCODE_LEVEL_DATA_ADVANCE_STOP_AND_RETURN_TIME_SEQU(Dataset):
         # pdb.set_trace()
         return pre_state , next_state , done , reward,action
     def map(self,env_name):
-        # print(env_name)
-        if env_name == self.envs[0][1]:
-            return self.envs[0][0].begin()
-        elif env_name == self.envs[1][1]:
-            return self.envs[1][0].begin()
-        elif env_name == self.envs[2][1]:
-            return self.envs[2][0].begin()
-        elif env_name == self.envs_stop[0][1]:
-            return self.envs_stop[0][0].begin()
-        elif env_name == self.envs_stop[1][1]:
-            return self.envs_stop[1][0].begin()
-        elif env_name == self.envs_stop[2][1]:
-            return self.envs_stop[2][0].begin()
+        env = lmdb.open(env_name , readonly = True)
+        return env.begin()
 
-class LMDB_SAMPLER_ADVANCE_STOP_AND_RETURN_TIME_SEQU(Sampler):
+class LMDB_SAMPLER_TIME_SEQ(Sampler):
     """
-    step1 : ------> [,done = 1](,idx) , [,done=1](idx+1,idxi)-------
-    step2 : valuses [state , next_state, reward , action ,done] , step and maxstep < 200
-    step2 : split step for sque in valuses: split sque into len(i) = 20;and last [-20:-1] len is 20 also
-    step3 : and torch.stack it [state , next_state, reward , action ,done] , and len is 20
-    step4 : for value have a unique idx
-    step5 : iter(idx)
+    dababase [------/level0,level1,level2 | ------------]
     """
-    def __init__(self, database_path, stop_database_path , shuffle=False):
-        self.databases = database_path
-        self.stop_database_path = stop_database_path
+    def __init__(self, database_ , shuffle=False):
+        self.databases = database_
         
-        self.envs = [lmdb.open(database , readonly = True) for database in self.databases]
-        self.states = [env.stat() for env in self.envs]
-        self.txns = [env.begin() for env in self.envs]
+        self.pattern = re.compile(r'level(\d+)')
         
-        self.stop_envs = [lmdb.open(stop_database , readonly = True) for stop_database in self.stop_database_path]
-        self.stop_states = [env.stat() for env in self.stop_envs]
-        self.stop_txns = [env.begin() for env in self.stop_envs]
+        s_levels = self._s_levels(self.databases)
         
+        s_keys = self._s_keys(s_levels)
         
-        self.pattern = re.compile(r'level_(\d+)')
-        self.idx_data = list()
+        self.idx_data = s_keys
+        
         self.shuffle = shuffle
-        self.map_virtual_idx()
+        
+        self.shuffle_s_keys()
+        
         self.iter_idx = list()
+    def _s_levels(self,databases):
+        # match level
+        # sum files path
+        """
+        databases like :
+        ['/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
+        '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode'
+        , '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode']
+        """
+        # pdb.set_trace()
+        s_levels = list()
+        for database in databases:
+            # database [--------/~level0,level1,level2]
+            levels_p_l = [os.path.join(database ,i) for i in os.listdir(database)]
+            # levels_p_l [---------/level0 , ----------/level1, --------level2]
+            s_levels.append(sorted(levels_p_l , key=lambda x: int(''.join(filter(str.isdigit, x)))))
+            # sorted 
+        return s_levels
     
-    def map_virtual_idx(self):
-        self.idx_data = {
-            'level_0': [],
-            'level_1': [],
-            'level_2': []
+    def _s_keys(self, s_levels):
+        # s_levels 
+        """
+        [
+            '-----/level0','----level1',''
+            '','',''
+        ]
+        """
+        s_keys = {
+            'level0':[],
+            'level1':[],
+            'level2':[]
         }
-
-        for txn in self.txns:
-            cursor = txn.cursor()
-            for key, _ in tqdm(cursor ,desc='load all key'):
-                key_str = key.decode()
-                match = self.pattern.search(key_str)
-                if match:
-                    level = match.group()  # 比如 'level_0'
-                    if level in self.idx_data:
-                        self.idx_data[level].append((level, key))
+        for level_tuple in zip(*s_levels):
+            # level_tuple ('level0' ,'level0' , 'level0' ---------)
+            for elm in level_tuple:
+                # elm = '/------------/level0'
+                # pdb.set_trace()
+                env = lmdb.open(elm , readonly = True)
+                txn = env.begin()
+                cursor = txn.cursor()
+                # traverse the key in txn
+                for key , _ in tqdm(cursor , desc='load all key'):
+                    key_str = key.decode()
+                    match = self.pattern.search(key_str)
+                    if match:
+                        level = match.group()  # 比如 'level0_0''level0_1'
+                        if level in s_keys:
+                            # [(path , key)(path,key)-------]
+                            s_keys[level].append((elm, key))
+                        else:
+                            raise ValueError(f"Unrecognized level: {level}")
                     else:
-                        raise ValueError(f"Unrecognized level: {level}")
-                else:
-                    raise ValueError(f"Key pattern not matched: {key_str}")\
-                        
-        for stop_txn in self.stop_txns:
-            cursor = stop_txn.cursor()
-            for key, _ in tqdm(cursor ,desc='load all key'):
-                key_str = key.decode()
-                match = self.pattern.search(key_str)
-                if match:
-                    level = match.group()  # 比如 'level_0'
-                    if level in self.idx_data:
-                        self.idx_data[level].append((f'{level}_stop', key))
-                    else:
-                        raise ValueError(f"Unrecognized level: stop_{level}")
-                else:
-                    raise ValueError(f"Key pattern not matched: stop_{key_str}")
+                        raise ValueError(f"Key pattern not matched: {key_str}")
+                    
+        return s_keys
+      
+    
+    def shuffle_s_keys(self):
 
         if self.shuffle:
             for level in self.idx_data:
                 random.shuffle(self.idx_data[level])
             
     def sample_data(self, sample):
+        """
+        sample_dict =   {
+        'level_0':1, rate 0~1
+        'level_1':0,
+        'level_2':0,
+        }
+        """
         sampled_data = []
 
         for level, num_rate in sample.items():
