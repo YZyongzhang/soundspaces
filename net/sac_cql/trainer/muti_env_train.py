@@ -39,9 +39,11 @@ def Train(ckpt_dir,writer):
     target_model.train()
     cql = SAC_CQL(model, target_model , device)
     episode = 0
-    database_path = ['/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
-                     '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
-                     '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode'
+    database_path = [
+                    # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
+                    # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
+                    #  '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode'，
+                    '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/env_encode'
                      ]
     
     init_sample_dict = {
@@ -58,7 +60,7 @@ def Train(ckpt_dir,writer):
     val_data_base = f'{database_dir}/val_database_combinencode/'
     val_dataloader = DataLoader(dataset=Val_Data(val_data_base) , batch_size=256)
     
-    num_epochs = 500
+    num_epochs = 1000
 
     for epoch in range(num_epochs):
         if epoch > 50 and epoch % 10 == 0 and epoch < 200:
@@ -73,7 +75,7 @@ def Train(ckpt_dir,writer):
             }
             sampler.sample_data(sample=sample_dict)
             dataloader = DataLoader(dataset=dataset,\
-                    sampler=sampler ,batch_size=256)
+                    sampler=sampler ,batch_size=1)
         
         if epoch > 200 and epoch % 10 == 0 and epoch < 400:
             if 0.1 * ( (epoch - 200) / 10 ) <= 1:
@@ -87,9 +89,10 @@ def Train(ckpt_dir,writer):
             }
             sampler.sample_data(sample=sample_dict)
             dataloader = DataLoader(dataset=dataset,\
-                    sampler=sampler ,batch_size=256)
+                    sampler=sampler ,batch_size=1)
         for batch_data in dataloader:
             batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch_data
+            # pdb.set_trace()
             batch_done = batch_done.to(device)
                 
             loss_dict = cql.train_step(
@@ -100,8 +103,8 @@ def Train(ckpt_dir,writer):
                 writer.add_scalar(f'loss/{name}', item, episode)
             episode += 1
             
-            if epoch % 25 == 0 and epoch != 0:
-                torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
+        if epoch % 25 == 0 and epoch != 0:
+            torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
             
         if epoch % 2 == 0:
             model.eval()
@@ -154,14 +157,19 @@ def Train(ckpt_dir,writer):
                 writer.add_scalar('val/double_q_min_accuracy', double_q_min_accuracy / 10, epoch)
                 writer.add_scalar('val/actor_accuracy', actor_accuracy / 10, epoch)
                 num_batches = 0
+                # pdb.set_trace()
                 for batch in dataloader: 
                     batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch
 
                     # 得到 Q 值 (或者策略分布)
                     train_q_1 , train_q_2 , train_action = model(batch_pre_state)  # [batch, num_actions]
-                    train_q_1 = train_q_1.squeeze(0)
-                    train_q_2 = train_q_2.squeeze(0)
-                    train_action = train_action.squeeze(0)
+                    batchsize, time_seq ,_ = train_q_1.shape
+                    train_q_1 = train_q_1.reshape(batchsize*time_seq,-1)
+                    train_q_2 = train_q_2.reshape(batchsize*time_seq,-1)
+                    train_action = train_action.reshape(batchsize*time_seq,-1)
+                    batch_done = batch_done.reshape(batchsize*time_seq,-1)
+                    batch_reward = batch_reward.reshape(batchsize*time_seq,-1)
+                    batch_labels = batch_labels.reshape(batchsize*time_seq,-1)
                     
                     train_q_1_action = torch.argmax(train_q_1, dim=1)  # greedy action
                     train_q_2_action = torch.argmax(train_q_2, dim=1)
@@ -174,14 +182,19 @@ def Train(ckpt_dir,writer):
                     train_total_q_1_value += train_q_1_selected.mean().item()
                     train_total_q_2_value += train_q_2_selected.mean().item()
                     train_total_double_q_min_value+=train_double_q_min_selected.mean().item()
-                    train_q_1_accuracy += ((train_q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
-                    train_q_2_accuracy += ((train_q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
-                    train_double_q_min_accuracy+=((train_double_q_min_action == batch_labels).sum().item())/batch_labels.size(0)
+                    train_q_1_accuracy += ((train_q_1_action.unsqueeze(1) == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_q_2_accuracy += ((train_q_2_action.unsqueeze(1) == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_double_q_min_accuracy+=((train_double_q_min_action.unsqueeze(1) == batch_labels).sum().item())/batch_labels.size(0)
                     
-                    train_actor_accuracy += ((train_actor_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_actor_accuracy += ((train_actor_action.unsqueeze(1) == batch_labels).sum().item())/ batch_labels.size(0)
                     num_batches += 1
                     if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
                         break
+                train_actor_action_counts = torch.bincount(train_actor_action, minlength=4).float()
+                train_actor_action_probs = train_actor_action_counts / train_actor_action_counts.sum()
+                for i in range(4):
+                    writer.add_scalar(f"Actor/Action_{i}_prob", train_actor_action_probs[i].item(), epoch)
+                
                 writer.add_scalar('train/total_q_1_value', train_total_q_1_value / 10, epoch)
                 writer.add_scalar('train/total_q_2_value', train_total_q_2_value / 10, epoch)
                 writer.add_scalar('train/train_total_double_q_min_value', train_total_double_q_min_value / 10, epoch)

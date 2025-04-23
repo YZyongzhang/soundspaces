@@ -43,3 +43,5 @@ if __name__ == '__main__':
     writer = SummaryWriter(loss_dir)
     logging.basicConfig(filename=f'{log_dir}/{time_stamp}.log', level=logging.INFO,filemode='a')
     train(ckpt_dir,writer)
+    end_time_stamp = "{0:%Y-%m-%d~%H-%M-%S}".format(datetime.now())
+    logging.info(f"end train time :{end_time_stamp}")

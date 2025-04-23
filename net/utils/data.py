@@ -187,24 +187,24 @@ class TRANS_TO_DATABASE_FROM_RAWDATA:
         done  , next_audio , next_visual , action , reward = [] , [] , [] , [] , []
 
         index  = max(step)
-        # reward = reward_[:index]
-        # action = action_[:index]
+        reward = reward_[:index]
+        action = action_[:index]
 
-        # next_audio = audio_[1:index+1] 
-        # next_visual = visual_[1:index+1]
-        # pre_audio  = audio_[:index]
-        # pre_visual = visual_[:index]
-        # done = [1 if d[0] else 0 for d in current_done]
+        next_audio = audio_[1:index+1] 
+        next_visual = visual_[1:index+1]
+        pre_audio  = audio_[:index]
+        pre_visual = visual_[:index]
+        done = [1 if d[0] else 0 for d in current_done]
         
         # 收集碰撞数据得时候发现最后一个step多了出来，所以这里我就之间去除最后一个数据
-        reward = reward_[:index-1]
-        action = action_[:index-1]
+        # reward = reward_[:index-1]
+        # action = action_[:index-1]
 
-        next_audio = audio_[1:index] 
-        next_visual = visual_[1:index]
-        pre_audio  = audio_[:index-1]
-        pre_visual = visual_[:index-1]
-        done = [1 if d[0] else 0 for d in current_done[:-1]]
+        # next_audio = audio_[1:index] 
+        # next_visual = visual_[1:index]
+        # pre_audio  = audio_[:index-1]
+        # pre_visual = visual_[:index-1]
+        # done = [1 if d[0] else 0 for d in current_done[:-1]]
         
         return pre_audio,pre_visual, next_audio, next_visual,done,reward,action
     def get_data(self , data , name):
@@ -457,6 +457,7 @@ class USE_COMBINENCODE_LEVEL_DATA_TIME_SEQ(Dataset):
     def __getitem__(self,idx_tuple):
         # idx_tuple (path , idx)
         env_path , key = idx_tuple
+        # print(env_path)
         txn = self.map(env_path)
         value = txn.get(key)
         if value is None:

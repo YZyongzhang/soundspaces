@@ -174,21 +174,21 @@ class Critic_Actor_GRU(nn.Module):
 
         # Critic networks
         self.Q_net1 = nn.Sequential(
-            nn.Linear(hidden_dim, 64),
+            nn.Linear(hidden_dim, 32),
             nn.ReLU(),
-            nn.Linear(64, self.action_dim)
+            nn.Linear(32, self.action_dim)
         )
         self.Q_net2 = nn.Sequential(
-            nn.Linear(hidden_dim, 64),
+            nn.Linear(hidden_dim, 32),
             nn.ReLU(),
-            nn.Linear(64, self.action_dim)
+            nn.Linear(32, self.action_dim)
         )
 
         # Policy network
         self.policy_net = nn.Sequential(
-            nn.Linear(hidden_dim, 64),
+            nn.Linear(hidden_dim, 32),
             nn.ReLU(),
-            nn.Linear(64, self.action_dim)
+            nn.Linear(32, self.action_dim)
         )
 
     def forward(self, combinencode):

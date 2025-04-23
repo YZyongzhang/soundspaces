@@ -1,4 +1,4 @@
-from yz.net.sac_cql.SAC_CQL import Critic_Actor
+from yz.net.sac_cql.SAC_CQL import Critic_Actor_GRU as Critic_Actor
 from yz.net.avf.avf import AVFNet
 from yz.net.utils.data import USE_COMBINENCODE_LEVEL_DATA as use_combinencode_level_data
 from yz.net.utils.data import USE_COMBINENCODE_DATA as use_combinencode_data
