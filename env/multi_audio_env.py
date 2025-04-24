@@ -284,6 +284,15 @@ class MultiAudioEnv(ParallelEnv):
                     ):
                         agent_state.position = rand_pos
                         break
+                    
+                    """
+                    there have a bug that we may not sample the right point all map the conditions above
+                    to deal with it ,i think would i set a iter_limit,if in a limit episode , don't sample the
+                    correct point , we change the soundpos use _reset_audio() ,beacuse  i think soundpos is orrcced in an in correct pos
+                    """
+                    print(f"self._sim.pathfinder.is_navigable(rand_pos){self._sim.pathfinder.is_navigable(rand_pos)}")
+                    print(f"self.check_greedflower_error(defualt_rotation ,rand_pos , self.get_source_pos()[agent_id])\
+                        {self.check_greedflower_error(defualt_rotation ,rand_pos , self.get_source_pos()[agent_id])}")
                     print(f"agent {agent_id} initialization retried.")
                     print(f"agentpos is {rand_pos}")
                 print(f"agent_state.position {agent_state.position}")
@@ -457,7 +466,7 @@ class MultiAudioEnv(ParallelEnv):
         # 1 if agent reaches the goal
 
         if self._count >= self._max_episode_steps:
-            r = [0] * self._num_agents
+            r = [-50] * self._num_agents
             return r
 
         geo_dist = [
@@ -500,16 +509,55 @@ class MultiAudioEnv(ParallelEnv):
                 r[agent_id] = -50
             # if self._stopped_agents[agent_id]:
             #     r[agent_id] = 100
-
         for agent_id in range(self._num_agents):
             # if agent is crushed, return -1
             r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
             # Time
             # r[agent_id] -= 1
-            # if self._crushed_agents[agent_id]:
-            #     r[agent_id] = -5
 
         return r
+    # def _reward(self):
+    #     """
+    #     calculate reward for each agent
+    #     Return:
+    #         r: list of float, representing reward for each agent
+    #     """
+    #     # 0 if step exceeds max_episode_steps
+    #     # 1 if agent reaches the goal
+
+    #     if self._count >= self._max_episode_steps:
+    #         r = [0] * self._num_agents
+    #         return r
+
+    #     geo_dist = [
+    #         self.get_geodesic_distance(agent_id) for agent_id in range(self._num_agents)
+    #     ]
+
+    #     r = [
+    #         (self._prev_geo_dist[agent_id] - geo_dist[agent_id]) * 10
+    #         for agent_id in range(self._num_agents)
+    #     ]
+
+    #     self._prev_geo_dist = geo_dist
+
+    #     # if agent reaches the goal (< success_distance), return 1
+    #     for agent_id in range(self._num_agents):
+    #         if (
+    #             np.linalg.norm(
+    #                 self._sim.get_agent(agent_id).get_state().position
+    #                 - self._source_poses[0]
+    #             )
+    #             < self._success_distance
+    #         ):
+    #             r[agent_id] += 100
+
+    #     for agent_id in range(self._num_agents):
+    #         # if agent is crushed, return -1
+    #         r[agent_id] -= 5 if self._crushed_agents[agent_id] else 0
+    #         # Time
+    #         # r[agent_id] -= 1
+
+    #     return r
 
     def render(self):
         pass
@@ -781,20 +829,28 @@ class MultiAudioEnv(ParallelEnv):
         """process self._episode into a list of {str: array((T, *))}, so the model can train rl loss"""
         res = list()
 
+        # for i in range(self._num_agents):
+        #     out = list()
+        #     # print(self._data)
+        #     while len(self._data[i]["audio"]) > 1:  # 1 for bootstrap
+        #         seq = dict()
+        #         for k, v in self._data[i].items():
+        #             # print(k)
+        #             # print(len(v), v[0].shape)
+        #             shape, dtype = self._data_structure[k]
+        #             seq[k] = self._pad(v, shape, dtype, self._sequence_length)
+        #             self._data[i][k] = v[
+        #                 self._sequence_length - 1 :
+        #             ]  # shift, preserve 1 since bootstrap
+        #         out.append(seq)
         for i in range(self._num_agents):
             out = list()
-            # print(self._data)
-            while len(self._data[i]["audio"]) > 1:  # 1 for bootstrap
-                seq = dict()
-                for k, v in self._data[i].items():
-                    # print(k)
-                    # print(len(v), v[0].shape)
-                    shape, dtype = self._data_structure[k]
-                    seq[k] = self._pad(v, shape, dtype, self._sequence_length)
-                    self._data[i][k] = v[
-                        self._sequence_length - 1 :
-                    ]  # shift, preserve 1 since bootstrap
-                out.append(seq)
+            seq = dict()
+            for k, v in self._data[i].items():
+                # print(k)
+                # print(len(v), v[0].shape)
+                seq[k] = v
+            out.append(seq)
 
         res.append(out)
 

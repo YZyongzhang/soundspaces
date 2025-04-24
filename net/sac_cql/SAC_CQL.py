@@ -164,7 +164,7 @@ class DiscreteSAC_CQL:
         return loss_dict
  
 class Critic_Actor_GRU(nn.Module):
-    def __init__(self, action_dim, input_dim=128, hidden_dim=64, gru_layers=1):
+    def __init__(self, action_dim, input_dim=128, hidden_dim=96, gru_layers=1):
         super().__init__()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.action_dim = action_dim
@@ -174,27 +174,32 @@ class Critic_Actor_GRU(nn.Module):
 
         # Critic networks
         self.Q_net1 = nn.Sequential(
-            nn.Linear(hidden_dim, 32),
+            nn.Linear(hidden_dim, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
             nn.ReLU(),
             nn.Linear(32, self.action_dim)
         )
         self.Q_net2 = nn.Sequential(
-            nn.Linear(hidden_dim, 32),
+            nn.Linear(hidden_dim, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
             nn.ReLU(),
             nn.Linear(32, self.action_dim)
         )
 
         # Policy network
         self.policy_net = nn.Sequential(
-            nn.Linear(hidden_dim, 32),
+            nn.Linear(hidden_dim, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
             nn.ReLU(),
             nn.Linear(32, self.action_dim)
         )
 
-    def forward(self, combinencode):
+    def forward(self, combinencode , hidden = None):
         # Pass the sequence through the GRU
-        gru_out, _ = self.gru(combinencode)
-        # gru_out = gru_out[:, -1, :]  # Take the output of the last time step
+        gru_out, _ = self.gru(combinencode , hidden)
 
         # Compute Q-values and policy logits
         q1 = self.Q_net1(gru_out)
@@ -205,7 +210,7 @@ class Critic_Actor_GRU(nn.Module):
 
 
 class DiscreteSAC_CQL_GRU:
-    def __init__(self, model, target_model, device, learning_rate=1e-4, cql_alpha=0.1, tau=0.005):
+    def __init__(self, model, target_model, device, learning_rate=1e-5, cql_alpha=0.1, tau=0.01):
         self.model = model
         self.critic1 = self.model.Q_net1
         self.critic2 = self.model.Q_net2
@@ -257,16 +262,10 @@ class DiscreteSAC_CQL_GRU:
         critic1_loss = F.mse_loss(a_Q1 , target_q)
         critic2_loss = F.mse_loss(a_Q2 , target_q)
         
-        # critic1_regularization = self.alpha_cql * (torch.logsumexp(q1, dim=1).mean() - q1.mean()) 
-                                                 
-        # critic2_regularization = self.alpha_cql * (torch.logsumexp(q2, dim=1).mean() - q2.mean())
         critic1_regularization = self.alpha_cql * (torch.logsumexp(q1, dim=1).mean() - a_Q1.mean()) 
                                                  
         critic2_regularization = self.alpha_cql * (torch.logsumexp(q2, dim=1).mean() - a_Q2.mean())
         
-        # critic1_regularization = 0
-                                                 
-        # critic2_regularization = 0
         
         policy_loss = torch.mean(torch.sum(policy_dist * (self.alpha.detach() * torch.log(policy_dist + 1e-10) - min_q), dim=1))
 
@@ -311,7 +310,7 @@ class DiscreteSAC_CQL_GRU:
             next_state = gru_out_next.reshape(batchsize*gru_sqe_len , -1)
         
         q1 , q2 ,logits , target_q = self.get_value( pre_state , next_state, action, reward, done)
-        policy_dist = F.softmax(logits, dim=1)
+        policy_dist = F.softmax(logits, dim=-1)
         critic1_loss , critic2_loss ,critic1_regularization , critic2_regularization ,policy_loss = self.compute_loss(q1, q2, logits, policy_dist ,target_q , action)
         
         total_critic1_loss = critic1_loss + critic1_regularization
@@ -319,7 +318,6 @@ class DiscreteSAC_CQL_GRU:
         
         entropy = -torch.sum(policy_dist * torch.log(policy_dist + 1e-10), dim=1).mean()
         alpha_loss = torch.mean(-self.log_alpha.exp() * (entropy.detach() + self.target_entropy))
-        
         self.optimize_loss(policy_loss,total_critic1_loss,total_critic2_loss,alpha_loss)
         self.soft_update(self.critic1 , self.target_critic1)
         self.soft_update(self.critic2 , self.target_critic2)

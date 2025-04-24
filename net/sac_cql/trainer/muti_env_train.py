@@ -40,10 +40,9 @@ def Train(ckpt_dir,writer):
     cql = SAC_CQL(model, target_model , device)
     episode = 0
     database_path = [
-                    # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
-                    # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
-                    #  '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode'，
-                    '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/env_encode'
+                    '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
+                    '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
+                     '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode',
                      ]
     
     init_sample_dict = {
@@ -63,9 +62,9 @@ def Train(ckpt_dir,writer):
     num_epochs = 1000
 
     for epoch in range(num_epochs):
-        if epoch > 50 and epoch % 10 == 0 and epoch < 200:
-            if 0.1 * ( (epoch - 50) / 10 ) <= 1:
-                level_1_rate = 0.1 * ( (epoch - 50) / 10 )
+        if epoch > 50 and epoch % 10 == 0 and epoch < 150:
+            if 0.2 * ( (epoch - 50) / 10 ) <= 1:
+                level_1_rate = 0.2 * ( (epoch - 50) / 10 )
             else:
                 level_1_rate = 1
             sample_dict = {
@@ -77,9 +76,9 @@ def Train(ckpt_dir,writer):
             dataloader = DataLoader(dataset=dataset,\
                     sampler=sampler ,batch_size=1)
         
-        if epoch > 200 and epoch % 10 == 0 and epoch < 400:
-            if 0.1 * ( (epoch - 200) / 10 ) <= 1:
-                level_2_rate = 0.1 * ( (epoch - 200) / 10 )
+        if epoch > 150 and epoch % 10 == 0 and epoch < 250:
+            if 0.2 * ( (epoch - 200) / 10 ) <= 1:
+                level_2_rate = 0.2 * ( (epoch - 200) / 10 )
             else:
                 level_2_rate = 1
             sample_dict = {
