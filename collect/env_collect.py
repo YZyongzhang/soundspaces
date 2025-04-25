@@ -164,15 +164,22 @@ class Actor:
         return noised_path_list
         
     def noise_greedy(self):
-        self.env.reset()
-        self.obs = self.env._get_observations()
+        # in this self.env.reset() don't reset the self._data in env function .so 
+        # when we use self.env.get() the environment return all of data ,include last episode and far long befor
+        # this is a serise bug of memory leak. to fix this, we can use a new temp var env = self.env and use env to reset()
+        env = self.env
+        env.reset()
+        self.obs = env._get_observations()
         self._num_episodes += 1
         done = list()
         all_r_list = list()
-        env = self.env
         points = self.get_paths(env)
+        done_list = [False]
         # import pdb; pdb.set_trace()
         for idx , point in enumerate(points[1:]):
+            if all(done_list):
+                # double check all done, if env done, all cycle exit
+                break
             self.reset()
             if idx == len(points) - 2:
                 self.paths = env.get_shortest_action_list(goal_pos=point)[0]
@@ -216,6 +223,7 @@ class Actor:
         } , done ,self.obs]
         self.path_point = list()
         torch.cuda.empty_cache()
+        seq_list.clear()
         return  result, return_, num_success , cul_level
    
     def noise_greedy_advance_stop(self):
@@ -226,8 +234,12 @@ class Actor:
         all_r_list = list()
         env = self.env
         points = self.get_paths(env)
+        done_list = [False]
         # import pdb; pdb.set_trace()
         for idx , point in enumerate(points[1:]):
+            if all(done_list):
+                # double check all done, if env done, all cycle exit
+                break
             self.reset()
             if idx == len(points) - 2:
                 # remove five step before stop to avachieve the advance stop
@@ -307,8 +319,12 @@ class Actor:
             logging.info(f"reward is {r_list}")
         # get noise pathpoint to greedy nav
         points = self.get_paths(env)
+        done_list = [False]
         # import pdb; pdb.set_trace()
         for idx , point in enumerate(points[1:]):
+            if all(done_list):
+                # double check all done, if env done, all cycle exit
+                break
             self.reset()
             if idx == len(points) - 2:
                 # remove five step before stop to avachieve the advance stop
@@ -442,6 +458,7 @@ if  __name__== "__main__":
     collect_name = 'noise_advance_stop_train_split'
     # collect_name = 'noise_greedy_crashed'
     # collect_name = 'noise_train_split'
+    os.makedirs(collect_dir + f'{collect_name}/', exist_ok=True)
     if check_exit_env:
         exit_envname = os.listdir(collect_dir + f'{collect_name}')
         train_env_split = [i for i in train_env_split if i not in exit_envname]

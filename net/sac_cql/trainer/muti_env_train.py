@@ -40,8 +40,8 @@ def Train(ckpt_dir,writer):
     cql = SAC_CQL(model, target_model , device)
     episode = 0
     database_path = [
-                    '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
-                    '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
+                    # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
+                    # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
                      '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode',
                      ]
     
@@ -123,48 +123,47 @@ def Train(ckpt_dir,writer):
             train_actor_accuracy = 0
             num_batches = 0
             with torch.no_grad():
-                for val_batch in val_dataloader: 
-                    batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = val_batch
+                # for val_batch in val_dataloader: 
+                #     batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = val_batch
 
-                    # 得到 Q 值 (或者策略分布)
-                    q_1 , q_2 , action = model(batch_pre_state)  # [batch, num_actions]
-                    q_1 = q_1.squeeze(0)
-                    q_2 = q_2.squeeze(0)
-                    action = action.squeeze(0)
-                    q_1_action = torch.argmax(q_1, dim=1)  # greedy action
-                    q_2_action = torch.argmax(q_2, dim=1)
-                    double_q_min_action = torch.argmax(torch.min(q_1,q_2),dim = 1)
-                    actor_action = torch.argmax(action, dim=1)
-                    q_1_selected = q_1.gather(1, q_1_action.unsqueeze(1)).squeeze(1)
-                    q_2_selected = q_2.gather(1, q_2_action.unsqueeze(1)).squeeze(1)
-                    double_q_min_action_selected = torch.min(q_1,q_2).gather(1 , double_q_min_action.unsqueeze(1)).squeeze(1)
-                    total_q_1_value += q_1_selected.mean().item()
-                    total_q_2_value += q_2_selected.mean().item()
-                    total_double_q_min_value += double_q_min_action_selected.mean().item()
-                    q_1_accuracy += ((q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
-                    q_2_accuracy += ((q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
-                    double_q_min_accuracy += ((double_q_min_action == batch_labels).sum().item())/ batch_labels.size(0)
-                    actor_accuracy += ((actor_action == batch_labels).sum().item())/ batch_labels.size(0)
-                    num_batches += 1
-                    if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
-                        break
-                writer.add_scalar('val/total_q_1_value', total_q_1_value / 10, epoch)
-                writer.add_scalar('val/total_q_2_value', total_q_2_value / 10, epoch)
-                writer.add_scalar('val/double_q_min', total_double_q_min_value / 10, epoch)
-                writer.add_scalar('val/q_1_accuracy', q_1_accuracy / 10, epoch)
-                writer.add_scalar('val/q_2_accuracy', q_2_accuracy / 10, epoch)
-                writer.add_scalar('val/double_q_min_accuracy', double_q_min_accuracy / 10, epoch)
-                writer.add_scalar('val/actor_accuracy', actor_accuracy / 10, epoch)
-                num_batches = 0
+                #     # 得到 Q 值 (或者策略分布)
+                #     q_1 , q_2 , action = model(batch_pre_state)  # [batch, num_actions]
+                #     q_1 = q_1.squeeze(0)
+                #     q_2 = q_2.squeeze(0)
+                #     action = action.squeeze(0)
+                #     q_1_action = torch.argmax(q_1, dim=1)  # greedy action
+                #     q_2_action = torch.argmax(q_2, dim=1)
+                #     double_q_min_action = torch.argmax(torch.min(q_1,q_2),dim = 1)
+                #     actor_action = torch.argmax(action, dim=1)
+                #     q_1_selected = q_1.gather(1, q_1_action.unsqueeze(1)).squeeze(1)
+                #     q_2_selected = q_2.gather(1, q_2_action.unsqueeze(1)).squeeze(1)
+                #     double_q_min_action_selected = torch.min(q_1,q_2).gather(1 , double_q_min_action.unsqueeze(1)).squeeze(1)
+                #     total_q_1_value += q_1_selected.mean().item()
+                #     total_q_2_value += q_2_selected.mean().item()
+                #     total_double_q_min_value += double_q_min_action_selected.mean().item()
+                #     q_1_accuracy += ((q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
+                #     q_2_accuracy += ((q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
+                #     double_q_min_accuracy += ((double_q_min_action == batch_labels).sum().item())/ batch_labels.size(0)
+                #     actor_accuracy += ((actor_action == batch_labels).sum().item())/ batch_labels.size(0)
+                #     num_batches += 1
+                #     if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
+                #         break
+                # writer.add_scalar('val/total_q_1_value', total_q_1_value / 10, epoch)
+                # writer.add_scalar('val/total_q_2_value', total_q_2_value / 10, epoch)
+                # writer.add_scalar('val/double_q_min', total_double_q_min_value / 10, epoch)
+                # writer.add_scalar('val/q_1_accuracy', q_1_accuracy / 10, epoch)
+                # writer.add_scalar('val/q_2_accuracy', q_2_accuracy / 10, epoch)
+                # writer.add_scalar('val/double_q_min_accuracy', double_q_min_accuracy / 10, epoch)
+                # writer.add_scalar('val/actor_accuracy', actor_accuracy / 10, epoch)
+                # num_batches = 0
                 # pdb.set_trace()
                 for batch in dataloader: 
                     batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch
 
                     # 得到 Q 值 (或者策略分布)
+                    # pdb.set_trace()
+                    batchsize, time_seq ,_ = batch_pre_state.shape
                     train_q_1 , train_q_2 , train_action = model(batch_pre_state)  # [batch, num_actions]
-                    batchsize, time_seq ,_ = train_q_1.shape
-                    train_q_1 = train_q_1.reshape(batchsize*time_seq,-1)
-                    train_q_2 = train_q_2.reshape(batchsize*time_seq,-1)
                     train_action = train_action.reshape(batchsize*time_seq,-1)
                     batch_done = batch_done.reshape(batchsize*time_seq,-1)
                     batch_reward = batch_reward.reshape(batchsize*time_seq,-1)

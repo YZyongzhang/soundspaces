@@ -260,6 +260,7 @@ class MultiAudioEnv(ParallelEnv):
         """
         # create a queue for each agent
         self._stopped_agents = [False for _ in range(self._num_agents)]
+        sampletime_limit = 0
         if agent_pos is None: 
             for agent_id in range(self._num_agents):
                 print(f"agent {agent_id} reseting")
@@ -295,6 +296,13 @@ class MultiAudioEnv(ParallelEnv):
                         {self.check_greedflower_error(defualt_rotation ,rand_pos , self.get_source_pos()[agent_id])}")
                     print(f"agent {agent_id} initialization retried.")
                     print(f"agentpos is {rand_pos}")
+                    sampletime_limit += 1
+                    if sampletime_limit >= 200:
+                        self._reset_audio()
+                        sampletime_limit = 0
+                    
+                    #### also have a resonse that audio pos will be incorrect ,so if sample reach the limit
+                    #### we reset audio
                 print(f"agent_state.position {agent_state.position}")
 
                 # Generate random yaw angle from -180 to 180
