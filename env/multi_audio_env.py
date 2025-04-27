@@ -384,7 +384,11 @@ class MultiAudioEnv(ParallelEnv):
             s: dict, agent concatenated together
         """
         self._count = 0
-
+        
+        self._data = [
+            {k: list() for k in self._data_structure.keys()}
+            for _ in range(self._num_agents)
+        ]
         self._reset_audio(audio_pos)
         self._reset_agent(agent_pos)
 

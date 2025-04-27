@@ -2,6 +2,7 @@ import sys ,os
 sys.path.append('/home/getuanhui/project/sound-spaces/')
 from yz.net.utils import trans_to_database_from_rawdata
 from yz.net.utils import to_stateencode_database
+from yz.net.utils import _split_T
 from yz.config import agent_config
 
 
@@ -40,8 +41,22 @@ def get_encode_database():
     # T = to_stateencode_database()
     # for levelnum , data_path in enumerate(data_paths):
     #     T.gen_database(database_path=data_path,want_gen_database='muti_env_crushed_encode',level=f'level{levelnum}')
+
+def use_split_T():
+    # muti_env_data
+    T = _split_T(store_path="noise_train_split")
+    # from_path = f'{agent_config.EXIT_ENV_DATA}' + 'muti_env_data'
+    from_path = '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/env_data/noise_train_split'
+    # muti_env_data_advance_stop
+    # T = trans_to_database_from_rawdata(store_path="muti_env_advance_stop")
+    # from_path = f'{agent_config.EXIT_ENV_DATA}' + 'muti_env_advance_stop'
+    # muti_env_crused
+    # T = trans_to_database_from_rawdata(store_path="muti_env_crushed")
+    # from_path = f'{agent_config.EXIT_ENV_DATA}' + 'muti_env_crushed'
+    paths = [os.path.join(from_path , i) for i in os.listdir(from_path) if i != 'RLDATA.log']
+    T.get_trans(paths) 
     
-    
-get_lmdb_database()
-get_encode_database()
+# get_lmdb_database()
+# get_encode_database()
+use_split_T()
     

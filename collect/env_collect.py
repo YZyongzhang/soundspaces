@@ -13,6 +13,7 @@ from yz.env.v0d0 import Env
 from yz.utils.batch import *
 from quaternion import from_euler_angles, as_float_array
 import quaternion
+import tracemalloc
 import gc
 random.seed(int(time.time()))
 
@@ -167,10 +168,11 @@ class Actor:
         # in this self.env.reset() don't reset the self._data in env function .so 
         # when we use self.env.get() the environment return all of data ,include last episode and far long befor
         # this is a serise bug of memory leak. to fix this, we can use a new temp var env = self.env and use env to reset()
+        self.env.reset()
         env = self.env
-        env.reset()
         self.obs = env._get_observations()
         self._num_episodes += 1
+        # import pdb; pdb.set_trace()
         done = list()
         all_r_list = list()
         points = self.get_paths(env)
@@ -205,8 +207,8 @@ class Actor:
                     break
         return_ = sum([sum([sum(r) for r in r_list]) for r_list in all_r_list])
         num_success = sum([int(t) for info in info_list for t in info["success"]])
-
         seq_list = list()
+        # pdb.set_trace()
         seq_list += env.get()
         max_step = len(done)
         
@@ -223,7 +225,6 @@ class Actor:
         } , done ,self.obs]
         self.path_point = list()
         torch.cuda.empty_cache()
-        seq_list.clear()
         return  result, return_, num_success , cul_level
    
     def noise_greedy_advance_stop(self):
@@ -300,8 +301,8 @@ class Actor:
         return  result, return_, num_success , cul_level 
     
     def noise_greedy_crashed(self):
+        self.env.reset()
         env = self.env
-        env.reset()
         self.obs = env._get_observations()
         self._num_episodes += 1
         done = list()
@@ -433,8 +434,8 @@ def collect(env_path , collect_name):
         for num_episodes in range(10):
             print(num_episodes)
             t_start = time.time()
-            # result_lists ,_ ,_,level = actor.noise_greedy_crashed()
-            result_lists ,_ ,_,level = actor.noise_greedy_advance_stop()
+            result_lists ,_ ,_,level = actor.noise_greedy_crashed()
+            # result_lists ,_ ,_,level = actor.noise_greedy_advance_stop()
             # result_lists ,_ ,_,level = actor.noise_greedy()
             level_episode[level] += 1
             path = os.path.join(f"{agent_config.BASE_PARH_COLLECT}/{collect_name}/{env}/level{level}",  f"rl_episode_level{level}_{level_episode[level]}.pkl")
@@ -449,14 +450,15 @@ def collect(env_path , collect_name):
         torch.cuda.empty_cache()
         gc.collect()
 if  __name__== "__main__":
+    # tracemalloc.start() 
     check_exit_env = True
     mp3d_scene_datasets = agent_config.MP3D_SCENE_DATASET
     collect_dir = agent_config.BASE_PARH_COLLECT
     train_env_split = agent_config.ENV_SPLIT['train']
     val_env_split = agent_config.ENV_SPLIT['val']
     test_env_split = agent_config.ENV_SPLIT['test']
-    collect_name = 'noise_advance_stop_train_split'
-    # collect_name = 'noise_greedy_crashed'
+    # collect_name = 'noise_advance_stop_train_split'
+    collect_name = 'noise_greedy_crashed'
     # collect_name = 'noise_train_split'
     os.makedirs(collect_dir + f'{collect_name}/', exist_ok=True)
     if check_exit_env:

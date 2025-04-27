@@ -447,7 +447,6 @@ class USE_LMBD_DATABASE(Dataset):
         batch_data = pickle.loads(value)
         return batch_data
 
-
 class USE_COMBINENCODE_LEVEL_DATA_TIME_SEQ(Dataset):
     def __init__(self):
         
@@ -476,6 +475,229 @@ class USE_COMBINENCODE_LEVEL_DATA_TIME_SEQ(Dataset):
         return env.begin()
 
 class LMDB_SAMPLER_TIME_SEQ(Sampler):
+    """
+    dababase [------/level0,level1,level2 | ------------]
+    """
+    def __init__(self, database_ , shuffle=False):
+        self.databases = database_
+        
+        self.pattern = re.compile(r'level(\d+)')
+        
+        s_levels = self._s_levels(self.databases)
+        
+        s_keys = self._s_keys(s_levels)
+        
+        self.idx_data = s_keys
+        
+        self.shuffle = shuffle
+        
+        self.shuffle_s_keys()
+        
+        self.iter_idx = list()
+    def _s_levels(self,databases):
+        # match level
+        # sum files path
+        """
+        databases like :
+        ['/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
+        '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode'
+        , '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode']
+        """
+        # pdb.set_trace()
+        s_levels = list()
+        for database in databases:
+            # database [--------/~level0,level1,level2]
+            levels_p_l = [os.path.join(database ,i) for i in os.listdir(database)]
+            # levels_p_l [---------/level0 , ----------/level1, --------level2]
+            s_levels.append(sorted(levels_p_l , key=lambda x: int(''.join(filter(str.isdigit, x)))))
+            # sorted 
+        return s_levels
+    
+    def _s_keys(self, s_levels):
+        # s_levels 
+        """
+        [
+            '-----/level0','----level1',''
+            '','',''
+        ]
+        """
+        s_keys = {
+            'level0':[],
+            'level1':[],
+            'level2':[]
+        }
+        for level_tuple in zip(*s_levels):
+            # level_tuple ('level0' ,'level0' , 'level0' ---------)
+            for elm in level_tuple:
+                # elm = '/------------/level0'
+                # pdb.set_trace()
+                env = lmdb.open(elm , readonly = True)
+                txn = env.begin()
+                cursor = txn.cursor()
+                # traverse the key in txn
+                for key , _ in tqdm(cursor , desc='load all key'):
+                    key_str = key.decode()
+                    match = self.pattern.search(key_str)
+                    if match:
+                        level = match.group()  # 比如 'level0_0''level0_1'
+                        if level in s_keys:
+                            # [(path , key)(path,key)-------]
+                            s_keys[level].append((elm, key))
+                        else:
+                            raise ValueError(f"Unrecognized level: {level}")
+                    else:
+                        raise ValueError(f"Key pattern not matched: {key_str}")
+                    
+        return s_keys
+      
+    
+    def shuffle_s_keys(self):
+
+        if self.shuffle:
+            for level in self.idx_data:
+                random.shuffle(self.idx_data[level])
+            
+    def sample_data(self, sample):
+        """
+        sample_dict =   {
+        'level_0':1, rate 0~1
+        'level_1':0,
+        'level_2':0,
+        }
+        """
+        sampled_data = []
+
+        for level, num_rate in sample.items():
+            num_samples = int(len(self.idx_data[level]) * num_rate)
+            if level in self.idx_data:
+                if num_samples > len(self.idx_data[level]):
+                    raise ValueError(f"Not enough samples in {level}: requested {num_samples}, available {len(self.idx_data[level])}")
+                sampled_data.extend(self.idx_data[level][:num_samples])
+            else:
+                raise KeyError(f"Invalid level '{level}' not found in idx_data. Available levels: {list(self.idx_data.keys())}")
+        
+        if self.shuffle:
+            random.shuffle(sampled_data)
+        self.iter_idx = sampled_data
+
+    def __iter__(self):
+        if self.shuffle:
+            random.shuffle(self.iter_idx)
+        return iter(self.iter_idx)
+    def __len__(self):
+        return len(self.iter_idx)
+
+
+class _split_T():
+    def __init__(self , store_path):
+        self.data_base_path = agent_config.RELATIVE_DATABASE_DIR
+        self.database_store_path = store_path
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    def tran_to_lmdb(self , levels_data):
+        for level ,items in levels_data.items():
+            # key : level(0,1,2) , items (files)
+            env = lmdb.open(f"{self.data_base_path}/{self.database_store_path}/muti_env_data_{level}" , map_size= 1024 * 1024 * 1024 * 150)
+            txn = env.begin(write=True)
+        
+            for episode , file in enumerate(tqdm(items , desc='load data')):
+                # file_path  obsolutly path
+                with open(file , 'rb') as f:
+                    data = pickle.load(f)
+                dealed_data = self.deal_data(data)
+                key = f'{level}_{episode}'.encode()
+                value = pickle.dumps(dealed_data)
+                txn.put(key , value)
+                
+                if episode % 100 == 0:
+                    txn.commit()
+                    txn = env.begin(write=True)
+
+            txn.commit()
+            env.close()
+    def fusion_data(self , raw_datas):
+        
+        levels_data = {
+            'level0':[],
+            'level1':[],
+            'level2':[]
+        }
+        # evey path is obsolutly path like /home/getunahui/-----
+        # raw_data = [raw1 ,raw2 , raw3]
+        # [raw: level0 ,level1 ,level2]
+        
+        for raw_data in raw_datas:
+            # raw_data = path
+            levels = sorted(os.listdir(raw_data), key=lambda x: int(''.join(filter(str.isdigit, x))))
+            # listdir raw_data = [level0 , level1 ,level2]
+            # get obsolutlt path
+            levels_path = [os.path.join(raw_data , i) for i in levels]
+            # get evey levels files for levels_data
+            for level_name , level_path in zip(levels , levels_path):
+                temp = [os.path.join(level_path , i)  for i in os.listdir(level_path)]
+                levels_data[level_name].extend(temp)
+        return levels_data
+    def get_trans(self , raw_data):
+        # raw_data = [raw1 ,raw2 , raw3]
+        # [raw: level0 ,level1 ,level2]
+        levels_data = self.fusion_data(raw_data)
+        """
+        levels_data = {
+            'level0':obsolutly filepath,
+            'level1':obsolutly filepath,
+            'level2':obsolutly filepath
+        }
+        """
+        self.tran_to_lmdb(levels_data)
+    def deal_data(self,batch_data):
+        self.error = []
+        seq = batch_data[0]
+        current_done = batch_data[2]
+        frist_state = batch_data[3]
+        audio_ = self.get_data(seq,'audio')
+        action = self.get_data(seq,'rl_pred')
+        visual_ = self.get_data(seq,'camera')
+        reward = self.get_data(seq,'reward')
+        step = self.get_data(seq , 'step')
+
+
+        next_audio = audio_[1:] 
+        next_visual = visual_[1:]
+        pre_audio  = audio_[:-1]
+        pre_visual = visual_[:-1]
+        done = [1 if d[0] else 0 for d in current_done]
+        
+        
+        return pre_audio,pre_visual, next_audio, next_visual,done,reward,action
+    def get_data(self , data , name):
+        return torch.from_numpy(np.array(data[0][name]))
+class _train_split(Dataset):
+    def __init__(self):
+        
+        self.device = torch.device("cuda" if torch.cuda.is_available() else 'cpu' )
+        self.error = list()
+        
+    def __getitem__(self,idx_tuple):
+        # idx_tuple (path , idx)
+        env_path , key = idx_tuple
+        # print(env_path)
+        txn = self.map(env_path)
+        value = txn.get(key)
+        if value is None:
+            print(f"error {key}")
+            self.error.append(key)
+            return None 
+        batch_data = pickle.loads(value)
+        return self.deal_data(batch_data)
+    
+    def deal_data(self,batch_data):
+        pre_state , next_state , done , reward , action = batch_data.values()
+        # pdb.set_trace()
+        return pre_state , next_state , done , reward,action
+    def map(self,env_name):
+        env = lmdb.open(env_name , readonly = True)
+        return env.begin()
+    
+class _split_sampler(Sampler):
     """
     dababase [------/level0,level1,level2 | ------------]
     """

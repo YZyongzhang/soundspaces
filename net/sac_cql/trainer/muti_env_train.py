@@ -21,9 +21,9 @@ from yz.config import agent_config , config
 # from yz.net import use_combinencode_level_data_advance_stop as Data
 from yz.net import use_combinencode_data as Val_Data
 # # from yz.net.utils import lmdb_sampler
-from yz.net import use_combinencode_level_data_time_seq as Data
-from yz.net.utils import lmdb_sampler_time_seq
-from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL_GRU as SAC_CQL
+from yz.net import use_combinencode_level_data as Data
+from yz.net.utils import lmdb_sampler
+from yz.net.sac_cql.SAC_CQL import CQLSAC as SAC_CQL
 from yz.net.sac_cql.SAC_CQL import Critic_Actor_GRU as Critic_Actor
 
 
@@ -33,80 +33,79 @@ def Train(ckpt_dir,writer):
     current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time_star = time.time()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Critic_Actor(action_dim=4).to(device)
-    model.train()
-    target_model = Critic_Actor(action_dim=4).to(device)
-    target_model.train()
-    cql = SAC_CQL(model, target_model , device)
+    cql = SAC_CQL(state_size=128,action_size=4,gru_inputsize=128,gru_hidden_size=64,device=device)
     episode = 0
     database_path = [
                     # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
                     # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_crushed_encode',
-                     '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode',
+                    #  '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_encode',
+                    '/home/getuanhui/project/sound-spaces/yz/database/new_key_shffule_mutienv_data_combinencode_level/combinencode_level_0',
+                    '/home/getuanhui/project/sound-spaces/yz/database/new_key_shffule_mutienv_data_combinencode_level/combinencode_level_1',
+                    '/home/getuanhui/project/sound-spaces/yz/database/new_key_shffule_mutienv_data_combinencode_level/combinencode_level_2',
                      ]
     
     init_sample_dict = {
-        'level0':1,
-        'level1':0,
-        'level2':0,
+        'level_0':1,
+        'level_1':0.8,
+        'level_2':0.5,
     }
-    sampler = lmdb_sampler_time_seq(database_path ,  shuffle=True)
+    sampler = lmdb_sampler(database_path ,  shuffle=True)
     sampler.sample_data(sample=init_sample_dict)
-    dataset = Data()
+    dataset = Data(database_path)
     dataloader = DataLoader(dataset=dataset,\
-        sampler=sampler ,batch_size=1)
+        sampler=sampler ,batch_size=256)
     
     val_data_base = f'{database_dir}/val_database_combinencode/'
     val_dataloader = DataLoader(dataset=Val_Data(val_data_base) , batch_size=256)
     
-    num_epochs = 1000
+    num_epochs = 2000
 
     for epoch in range(num_epochs):
-        if epoch > 50 and epoch % 10 == 0 and epoch < 150:
-            if 0.2 * ( (epoch - 50) / 10 ) <= 1:
-                level_1_rate = 0.2 * ( (epoch - 50) / 10 )
-            else:
-                level_1_rate = 1
-            sample_dict = {
-                'level0':1,
-                'level1':level_1_rate,
-                'level2':0,
-            }
-            sampler.sample_data(sample=sample_dict)
-            dataloader = DataLoader(dataset=dataset,\
-                    sampler=sampler ,batch_size=1)
+        # if epoch > 50 and epoch % 10 == 0 and epoch < 150:
+        #     if 0.2 * ( (epoch - 50) / 10 ) <= 1:
+        #         level_1_rate = 0.2 * ( (epoch - 50) / 10 )
+        #     else:
+        #         level_1_rate = 1
+        #     sample_dict = {
+        #         'level_0':1,
+        #         'level_1':level_1_rate,
+        #         'level_2':0,
+        #     }
+        #     sampler.sample_data(sample=sample_dict)
+        #     dataloader = DataLoader(dataset=dataset,\
+        #             sampler=sampler ,batch_size=256)
         
-        if epoch > 150 and epoch % 10 == 0 and epoch < 250:
-            if 0.2 * ( (epoch - 200) / 10 ) <= 1:
-                level_2_rate = 0.2 * ( (epoch - 200) / 10 )
-            else:
-                level_2_rate = 1
-            sample_dict = {
-                'level0':1,
-                'level1':1,
-                'level2':level_2_rate,
-            }
-            sampler.sample_data(sample=sample_dict)
-            dataloader = DataLoader(dataset=dataset,\
-                    sampler=sampler ,batch_size=1)
+        # if epoch > 150 and epoch % 10 == 0 and epoch < 250:
+        #     if 0.2 * ( (epoch - 200) / 10 ) <= 1:
+        #         level_2_rate = 0.2 * ( (epoch - 200) / 10 )
+        #     else:
+        #         level_2_rate = 1
+        #     sample_dict = {
+        #         'level_0':1,
+        #         'level_1':1,
+        #         'level_2':level_2_rate,
+        #     }
+        #     sampler.sample_data(sample=sample_dict)
+        #     dataloader = DataLoader(dataset=dataset,\
+        #             sampler=sampler ,batch_size=256)
         for batch_data in dataloader:
             batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch_data
             # pdb.set_trace()
             batch_done = batch_done.to(device)
                 
-            loss_dict = cql.train_step(
-                batch_pre_state ,batch_next_state, batch_labels, batch_reward, batch_done
+            loss_dict = cql.learn(
+                (batch_pre_state ,batch_next_state, batch_labels, batch_reward, batch_done),epoch
             )
             print(f'epoch:{epoch} , episode {episode}' + ",".join([f"{k}: {v}" for k, v in loss_dict.items()]))
             for name, item in loss_dict.items():
                 writer.add_scalar(f'loss/{name}', item, episode)
             episode += 1
             
-        if epoch % 25 == 0 and epoch != 0:
-            torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
+        if epoch % 100 == 0 and epoch != 0:
+            torch.save(cql.state_dict(), f'{ckpt_dir}/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_{episode}_{epoch}.pth')
             
-        if epoch % 2 == 0:
-            model.eval()
+        if epoch % 5 == 0:
+            cql.eval()
             total_q_1_value = 0
             total_q_2_value = 0
             total_double_q_min_value = 0
@@ -162,12 +161,16 @@ def Train(ckpt_dir,writer):
 
                     # 得到 Q 值 (或者策略分布)
                     # pdb.set_trace()
-                    batchsize, time_seq ,_ = batch_pre_state.shape
-                    train_q_1 , train_q_2 , train_action = model(batch_pre_state)  # [batch, num_actions]
-                    train_action = train_action.reshape(batchsize*time_seq,-1)
-                    batch_done = batch_done.reshape(batchsize*time_seq,-1)
-                    batch_reward = batch_reward.reshape(batchsize*time_seq,-1)
-                    batch_labels = batch_labels.reshape(batchsize*time_seq,-1)
+                    # batchsize, time_seq ,_ = batch_pre_state.shape
+                    # batch_pre_state,_ = cql.gru(batch_pre_state)
+                    # batch_pre_state=batch_pre_state.reshape(batchsize*time_seq,-1)
+                    train_q_1 =cql.critic1(batch_pre_state)
+                    train_q_2 =cql.critic2(batch_pre_state)
+                    train_action = cql.actor_local(batch_pre_state)  # [batch, num_actions]
+                    
+                    # batch_done = batch_done.reshape(batchsize*time_seq,-1)
+                    # batch_reward = batch_reward.reshape(batchsize*time_seq,-1)
+                    # batch_labels = batch_labels.reshape(batchsize*time_seq,-1)
                     
                     train_q_1_action = torch.argmax(train_q_1, dim=1)  # greedy action
                     train_q_2_action = torch.argmax(train_q_2, dim=1)
@@ -176,15 +179,15 @@ def Train(ckpt_dir,writer):
                     train_q_1_selected = train_q_1.gather(1, train_q_1_action.unsqueeze(1)).squeeze(1)
                     train_q_2_selected = train_q_2.gather(1, train_q_2_action.unsqueeze(1)).squeeze(1)
                     train_double_q_min_selected = torch.min(train_q_1,train_q_2).gather(1 , train_double_q_min_action.unsqueeze(1)).squeeze(1)
-                    
+                    # pdb.set_trace()
                     train_total_q_1_value += train_q_1_selected.mean().item()
                     train_total_q_2_value += train_q_2_selected.mean().item()
                     train_total_double_q_min_value+=train_double_q_min_selected.mean().item()
-                    train_q_1_accuracy += ((train_q_1_action.unsqueeze(1) == batch_labels).sum().item())/ batch_labels.size(0)
-                    train_q_2_accuracy += ((train_q_2_action.unsqueeze(1) == batch_labels).sum().item())/ batch_labels.size(0)
-                    train_double_q_min_accuracy+=((train_double_q_min_action.unsqueeze(1) == batch_labels).sum().item())/batch_labels.size(0)
+                    train_q_1_accuracy += ((train_q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_q_2_accuracy += ((train_q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_double_q_min_accuracy+=((train_double_q_min_action == batch_labels).sum().item())/batch_labels.size(0)
                     
-                    train_actor_accuracy += ((train_actor_action.unsqueeze(1) == batch_labels).sum().item())/ batch_labels.size(0)
+                    train_actor_accuracy += ((train_actor_action == batch_labels).sum().item())/ batch_labels.size(0)
                     num_batches += 1
                     if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
                         break
@@ -200,6 +203,6 @@ def Train(ckpt_dir,writer):
                 writer.add_scalar('train/q_2_accuracy', train_q_2_accuracy / 10, epoch)
                 writer.add_scalar('train/actor_accuracy', train_actor_accuracy / 10, epoch)
                 writer.add_scalar('train/train_double_q_min_accuracy', train_double_q_min_accuracy / 10, epoch)
-            model.train()
+            cql.train()
 
-    torch.save(model.state_dict(), f'{ckpt_dir}/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth')
+    torch.save(cql.state_dict(), f'{ckpt_dir}/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth')
