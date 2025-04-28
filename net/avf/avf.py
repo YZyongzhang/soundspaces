@@ -64,26 +64,20 @@ class AVFNet(nn.Module):
         #     nn.ReLU(),
         #     nn.Linear(128,128),
         # )
-        # self.mask = nn.Sequential(
-        #     nn.Linear(self.mask_dim,512),
-        #     nn.ReLU(),
-        #     nn.Linear(512,256),
-        #     nn.ReLU(),
-        #     nn.Linear(256,128),
-        #     nn.ReLU()
-        # )
-        self.encode = nn.Sequential(
+        self.mask = nn.Sequential(
             nn.Linear(self.mask_dim,512),
             nn.ReLU(),
             nn.Linear(512,256),
             nn.ReLU(),
-            nn.Linear(256,128)
+            nn.Linear(256,128),
+            nn.ReLU()
         )
-        # self.action_net = nn.Sequential(
-        #     nn.Linear(128,64),
-        #     nn.ReLU(),
-        #     nn.Linear(64,self.out_put)
-        # )
+        
+        self.action_net = nn.Sequential(
+            nn.Linear(128,64),
+            nn.ReLU(),
+            nn.Linear(64,self.out_put)
+        )
     # def forward(self,audio,visual):
     #     # pdb.set_trace()
     #     visual = visual.squeeze(0)
@@ -111,7 +105,7 @@ class AVFNet(nn.Module):
         visual_fea = self.visual(visual)
         visual_fea = visual_fea.view(b , -1)
         self.mask_input_dim = visual_fea.size(-1) + audio_fea.size(-1)
-        combinencode = self.encode(torch.cat((audio_fea , visual_fea) , 1))
+        combinencode = self.mask(torch.cat((audio_fea , visual_fea) , 1))
         return combinencode
     def deal_audio(self,audio):
         mel_features = []

@@ -21,12 +21,12 @@ def get_lmdb_database():
     T.get_trans(paths)
     
 def get_encode_database():
-    from_path = f'{agent_config.RELATIVE_DATABASE_DIR}'+'env'
+    from_path = f'{agent_config.RELATIVE_DATABASE_DIR}'+'noise_train_split'
     data_paths = [os.path.join(from_path , i) for i in os.listdir(from_path)]
     data_paths = sorted(data_paths, key=lambda x: int(''.join(filter(str.isdigit, x))))
     T = to_stateencode_database()
     for levelnum , data_path in enumerate(data_paths):
-        T.gen_database(database_path=data_path,want_gen_database='env_encode',level=f'level{levelnum}')
+        T.gen_database(database_path=data_path,want_gen_database='noise_train_split_encode',level=f'level{levelnum}')
     #################################################################
     # from_path = f'{agent_config.RELATIVE_DATABASE_DIR}'+'muti_env_advance_stop'
     # data_paths = [os.path.join(from_path , i) for i in os.listdir(from_path)]
@@ -58,5 +58,6 @@ def use_split_T():
     
 # get_lmdb_database()
 # get_encode_database()
-use_split_T()
+# use_split_T()
+get_encode_database()
     

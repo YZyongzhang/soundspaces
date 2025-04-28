@@ -91,6 +91,7 @@ class TO_STATEENCODE_DATABASE:
         keyid = 0
         for idx in tqdm(range(mydata.__len__()) , desc= 'load data'):
             pre_audio,pre_visual, next_audio, next_visual,done,reward,action = mydata.__getitem__(level , idx)
+            # pdb.set_trace()
             pre_state_combinencode = self.model(pre_audio , pre_visual)
             next_state_combinencode = self.model(next_audio , next_visual)
             if pre_state_combinencode.shape[0] == next_state_combinencode.shape[0]:
@@ -658,7 +659,7 @@ class _split_T():
         visual_ = self.get_data(seq,'camera')
         reward = self.get_data(seq,'reward')
         step = self.get_data(seq , 'step')
-
+        # pdb.set_trace()
 
         next_audio = audio_[1:] 
         next_visual = visual_[1:]
@@ -669,7 +670,7 @@ class _split_T():
         
         return pre_audio,pre_visual, next_audio, next_visual,done,reward,action
     def get_data(self , data , name):
-        return torch.from_numpy(np.array(data[0][name]))
+        return torch.from_numpy(np.array(data[0][name])).to(self.device)
 class _train_split(Dataset):
     def __init__(self):
         

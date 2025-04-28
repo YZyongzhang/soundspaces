@@ -511,9 +511,10 @@ class CQLSAC(nn.Module):
     def __init__(self,
                         state_size,
                         action_size,
-                        gru_inputsize,
-                        gru_hidden_size,
-                        device
+                        device,
+                        gru_inputsize=0,
+                        gru_hidden_size=0,
+                       
                 ):
         """Initialize an Agent object.
         
@@ -768,15 +769,17 @@ class DiscreteSAC_CQL_old(nn.Module):
 
     def compute_loss(self, q1, q2, logits, target_q, labels):
         """ 计算离散 SAC + CQL 损失 """
-
+        # pdb.set_trace()
         # 选取执行的动作 Q 值
-        a_Q1 = q1.gather(1, labels.squeeze(0).unsqueeze(1))
-        a_Q2 = q2.gather(1, labels.squeeze(0).unsqueeze(1))
-        min_q = torch.min(a_Q1, a_Q2)  # 双 Q 学习
-
+        a_Q1 = q1.gather(1, labels.unsqueeze(-1))
+        a_Q2 = q2.gather(1, labels.unsqueeze(-1))
+        min_aq = torch.min(a_Q1, a_Q2)  # 双 Q 学习
+        
+        min_q = torch.min(q1,q2)
+        
         # Q-learning 目标
         # pdb.set_trace()
-        q_loss = 0.5*F.mse_loss(min_q, target_q.unsqueeze(1))
+        q_loss = 0.5*F.mse_loss(min_aq, target_q.unsqueeze(1))
 
         # CQL 额外约束
         q_regularization = (torch.logsumexp(q1, dim=1).mean() - a_Q1.mean()) + \
@@ -790,14 +793,17 @@ class DiscreteSAC_CQL_old(nn.Module):
         return total_loss, q_loss, q_regularization, policy_loss 
 
     def train_step(self, pre_state , next_state, labels, reward, done):
-
-
+        pre_state = pre_state.squeeze(0)
+        next_state = next_state.squeeze(0)
+        labels = labels.squeeze(0)
+        reward = reward.squeeze(0)
+        done = done.squeeze(0)
         q1, q2, logits = self.model(pre_state)
         with torch.no_grad():
             next_q1, next_q2, next_logits = self.target_model(next_state)
             next_min_q = torch.min(next_q1, next_q2)
             next_policy = F.softmax(next_logits, dim=1)
-            next_value = (next_policy * (next_min_q - self.alpha.detach() * torch.log(next_policy + 1e-10))).sum(dim=1)
+            next_value = (next_policy * (next_min_q - self.alpha.detach() * torch.log(next_policy + 1e-10))).sum(dim=-1)
             # pdb.set_trace()
             target_q = reward + (1 - done) * 0.99 * next_value
         total_loss, q_loss, q_regularization, policy_loss = self.compute_loss(q1, q2, logits, target_q, labels)
