@@ -23,7 +23,7 @@ from yz.net import use_combinencode_data as Val_Data
 # # from yz.net.utils import lmdb_sampler
 from yz.net import use_combinencode_level_data as Data
 from yz.net.utils import lmdb_sampler
-from yz.net.sac_cql.SAC_CQL import CQLSAC as SAC_CQL
+from yz.net.sac_cql.SAC_CQL import DiscreteSAC_CQL_old as SAC_CQL
 from yz.net.sac_cql.SAC_CQL import Critic_Actor_GRU as Critic_Actor
 
 
@@ -33,7 +33,8 @@ def Train(ckpt_dir,writer):
     current_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time_star = time.time()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    cql = SAC_CQL(state_size=128,action_size=4,gru_inputsize=128,gru_hidden_size=64,device=device)
+    # cql = SAC_CQL(state_size=128,action_size=4,gru_inputsize=128,gru_hidden_size=64,device=device)
+    cql = SAC_CQL(device=device)
     episode = 0
     database_path = [
                     # '/home/getuanhui/project/sound-spaces/yz/soundspaces_data/database/muti_env_advance_stop_encode',
@@ -93,8 +94,8 @@ def Train(ckpt_dir,writer):
             # pdb.set_trace()
             batch_done = batch_done.to(device)
                 
-            loss_dict = cql.learn(
-                (batch_pre_state ,batch_next_state, batch_labels, batch_reward, batch_done),epoch
+            loss_dict = cql.train_step(
+                batch_pre_state ,batch_next_state, batch_labels, batch_reward, batch_done
             )
             print(f'epoch:{epoch} , episode {episode}' + ",".join([f"{k}: {v}" for k, v in loss_dict.items()]))
             for name, item in loss_dict.items():
@@ -122,39 +123,39 @@ def Train(ckpt_dir,writer):
             train_actor_accuracy = 0
             num_batches = 0
             with torch.no_grad():
-                # for val_batch in val_dataloader: 
-                #     batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = val_batch
+                for val_batch in val_dataloader: 
+                    batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = val_batch
 
-                #     # 得到 Q 值 (或者策略分布)
-                #     q_1 , q_2 , action = model(batch_pre_state)  # [batch, num_actions]
-                #     q_1 = q_1.squeeze(0)
-                #     q_2 = q_2.squeeze(0)
-                #     action = action.squeeze(0)
-                #     q_1_action = torch.argmax(q_1, dim=1)  # greedy action
-                #     q_2_action = torch.argmax(q_2, dim=1)
-                #     double_q_min_action = torch.argmax(torch.min(q_1,q_2),dim = 1)
-                #     actor_action = torch.argmax(action, dim=1)
-                #     q_1_selected = q_1.gather(1, q_1_action.unsqueeze(1)).squeeze(1)
-                #     q_2_selected = q_2.gather(1, q_2_action.unsqueeze(1)).squeeze(1)
-                #     double_q_min_action_selected = torch.min(q_1,q_2).gather(1 , double_q_min_action.unsqueeze(1)).squeeze(1)
-                #     total_q_1_value += q_1_selected.mean().item()
-                #     total_q_2_value += q_2_selected.mean().item()
-                #     total_double_q_min_value += double_q_min_action_selected.mean().item()
-                #     q_1_accuracy += ((q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
-                #     q_2_accuracy += ((q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
-                #     double_q_min_accuracy += ((double_q_min_action == batch_labels).sum().item())/ batch_labels.size(0)
-                #     actor_accuracy += ((actor_action == batch_labels).sum().item())/ batch_labels.size(0)
-                #     num_batches += 1
-                #     if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
-                #         break
-                # writer.add_scalar('val/total_q_1_value', total_q_1_value / 10, epoch)
-                # writer.add_scalar('val/total_q_2_value', total_q_2_value / 10, epoch)
-                # writer.add_scalar('val/double_q_min', total_double_q_min_value / 10, epoch)
-                # writer.add_scalar('val/q_1_accuracy', q_1_accuracy / 10, epoch)
-                # writer.add_scalar('val/q_2_accuracy', q_2_accuracy / 10, epoch)
-                # writer.add_scalar('val/double_q_min_accuracy', double_q_min_accuracy / 10, epoch)
-                # writer.add_scalar('val/actor_accuracy', actor_accuracy / 10, epoch)
-                # num_batches = 0
+                    # 得到 Q 值 (或者策略分布)
+                    q_1 , q_2 , action = cql.model(batch_pre_state)  # [batch, num_actions]
+                    q_1 = q_1.squeeze(0)
+                    q_2 = q_2.squeeze(0)
+                    action = action.squeeze(0)
+                    q_1_action = torch.argmax(q_1, dim=1)  # greedy action
+                    q_2_action = torch.argmax(q_2, dim=1)
+                    double_q_min_action = torch.argmax(torch.min(q_1,q_2),dim = 1)
+                    actor_action = torch.argmax(action, dim=1)
+                    q_1_selected = q_1.gather(1, q_1_action.unsqueeze(1)).squeeze(1)
+                    q_2_selected = q_2.gather(1, q_2_action.unsqueeze(1)).squeeze(1)
+                    double_q_min_action_selected = torch.min(q_1,q_2).gather(1 , double_q_min_action.unsqueeze(1)).squeeze(1)
+                    total_q_1_value += q_1_selected.mean().item()
+                    total_q_2_value += q_2_selected.mean().item()
+                    total_double_q_min_value += double_q_min_action_selected.mean().item()
+                    q_1_accuracy += ((q_1_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    q_2_accuracy += ((q_2_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    double_q_min_accuracy += ((double_q_min_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    actor_accuracy += ((actor_action == batch_labels).sum().item())/ batch_labels.size(0)
+                    num_batches += 1
+                    if num_batches >= 10:  # 只验证10个 batch 就够了，别太频繁
+                        break
+                writer.add_scalar('val/total_q_1_value', total_q_1_value / 10, epoch)
+                writer.add_scalar('val/total_q_2_value', total_q_2_value / 10, epoch)
+                writer.add_scalar('val/double_q_min', total_double_q_min_value / 10, epoch)
+                writer.add_scalar('val/q_1_accuracy', q_1_accuracy / 10, epoch)
+                writer.add_scalar('val/q_2_accuracy', q_2_accuracy / 10, epoch)
+                writer.add_scalar('val/double_q_min_accuracy', double_q_min_accuracy / 10, epoch)
+                writer.add_scalar('val/actor_accuracy', actor_accuracy / 10, epoch)
+                num_batches = 0
                 # pdb.set_trace()
                 for batch in dataloader: 
                     batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch
@@ -164,14 +165,17 @@ def Train(ckpt_dir,writer):
                     # batchsize, time_seq ,_ = batch_pre_state.shape
                     # batch_pre_state,_ = cql.gru(batch_pre_state)
                     # batch_pre_state=batch_pre_state.reshape(batchsize*time_seq,-1)
-                    train_q_1 =cql.critic1(batch_pre_state)
-                    train_q_2 =cql.critic2(batch_pre_state)
-                    train_action = cql.actor_local(batch_pre_state)  # [batch, num_actions]
+                    # train_q_1 =cql.critic1(batch_pre_state)
+                    # train_q_2 =cql.critic2(batch_pre_state)
+                    # train_action = cql.actor_local(batch_pre_state)  # [batch, num_actions]
                     
                     # batch_done = batch_done.reshape(batchsize*time_seq,-1)
                     # batch_reward = batch_reward.reshape(batchsize*time_seq,-1)
                     # batch_labels = batch_labels.reshape(batchsize*time_seq,-1)
-                    
+                    train_q_1,train_q_2 , train_action = cql.model(batch_pre_state)
+                    train_q_1 = train_q_1.squeeze(0)
+                    train_q_2 = train_q_2.squeeze(0)
+                    train_action = train_action.squeeze(0)
                     train_q_1_action = torch.argmax(train_q_1, dim=1)  # greedy action
                     train_q_2_action = torch.argmax(train_q_2, dim=1)
                     train_double_q_min_action = torch.argmax(torch.min(train_q_1 , train_q_2) , dim=1)

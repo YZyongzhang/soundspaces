@@ -5,6 +5,7 @@ import librosa
 import pdb
 import matplotlib.pyplot as plt
 import random
+import math
 class VisualEmbed(nn.Module):
     def __init__(self,img_chanel , img_size , embed_dim):
         super().__init__()
@@ -83,91 +84,142 @@ class AudioEmbed(nn.Module):
                     break
         return _mel
 
+class PositionalEncoding(nn.Module):
+    def __init__(self, dim, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.dim = dim
+        
+        # Create the positional encodings once and store them as a buffer
+        pe = torch.zeros(max_len, dim)
+        position = torch.arange(0, max_len).float().unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, dim, 2).float() * -(math.log(10000.0) / dim))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
+        
+        self.register_buffer('pe', pe)
 
-class AudioVisualEncoder(nn.Module):
-    def __init__(self, visual_token_dim, audio_token_dim, hidden_dim, num_heads, num_layers, num_channels=2, num_mels=128, max_length=1024):
-        super(self).__init__()
+    def forward(self, x, max_len=None):
+        if max_len is None:
+            max_len = x.size(1)
+        return x + self.pe[:, :max_len].to(x.device)
+
+class TransformerModelEncode(nn.Module):
+    def __init__(self, num_heads, num_layers, hidden_dim, max_len=5000):
+        super(TransformerModelEncode, self).__init__()
         
-        self.visual_token_dim = visual_token_dim
-        self.audio_token_dim = audio_token_dim
-        self.hidden_dim = hidden_dim
-        self.num_heads = num_heads
-        self.num_layers = num_layers
-        self.num_channels = num_channels
-        self.num_mels = num_mels
-        self.max_length = max_length
         
-        # Linear layers for token encoding
-        self.visual_linear = nn.Linear(visual_token_dim, hidden_dim)
-        self.audio_linear = nn.Linear(audio_token_dim, hidden_dim)
-        
-        # Positional embeddings for visual and audio
-        self.visual_positional_encoding = nn.Parameter(torch.randn(max_length, hidden_dim))  # sin/cos embedding
-        self.audio_positional_encoding = nn.Parameter(torch.randn(max_length, hidden_dim))  # sin/cos embedding
+        # Positional encoding for both visual and audio
+        self.visual_positional_encoding = PositionalEncoding(hidden_dim, max_len)
+        self.audio_positional_encoding = PositionalEncoding(hidden_dim, max_len)
         
         # Learnable channel embedding for audio
-        self.channel_embedding = nn.Embedding(num_channels, hidden_dim)  # Embedding for left and right channels
+        self.channel_embedding = nn.Embedding(2, hidden_dim)  # For left and right channels
         
-        # Transformer Encoder Layers for Visual and Audio
+        # Transformer encoders for visual and audio features
         self.visual_transformer = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads), 
+            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim),
             num_layers=num_layers
         )
         
         self.audio_transformer = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads), 
+            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim),
             num_layers=num_layers
         )
-    
-    def sinusoidal_positional_encoding(self, length, dim):
-        position = torch.arange(0, length).unsqueeze(1).float()
-        div_term = torch.exp(torch.arange(0, dim, 2).float() * -(math.log(10000.0) / dim))
-        pos_embedding = torch.zeros(length, dim)
-        pos_embedding[:, 0::2] = torch.sin(position * div_term)
-        pos_embedding[:, 1::2] = torch.cos(position * div_term)
-        return pos_embedding
-    
-    def forward(self, visual_tokens, audio_tokens, audio_channels):
-        # 1. Visual Tokens Encoding
-        visual_features = self.visual_linear(visual_tokens)  # 使用线性层编码视觉特征
-        visual_features = visual_features + self.visual_positional_encoding[:visual_tokens.size(0), :]  # 添加位置编码
         
-        # 2. Audio Tokens Encoding
-        audio_features = self.audio_linear(audio_tokens)  # 使用线性层编码音频特征
-        audio_features = audio_features + self.audio_positional_encoding[:audio_tokens.size(0), :]  # 添加位置编码
+        self.shared_transformer = nn.TransformerEncoder(
+            nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=num_heads, dim_feedforward=hidden_dim),
+            num_layers=num_layers
+        )
+
+    def forward(self, visual_features, audio_features, audio_channel):
         
-        # 添加音频通道嵌入
-        audio_features = audio_features + self.channel_embedding(audio_channels).unsqueeze(0)
+        # Add channel embedding to audio features
+        channel_embeddings = self.channel_embedding(audio_channel)
+        audio_features = audio_features + channel_embeddings
         
-        # 3. Pass through Transformer Encoder
-        visual_encoded = self.visual_transformer(visual_features)  # 通过transformer编码视觉特征
-        audio_encoded = self.audio_transformer(audio_features)    # 通过transformer编码音频特征
+        # Pass through separate transformer encoders
+        visual_features = self.visual_transformer(visual_features)
+        audio_features = self.audio_transformer(audio_features)
         
-        return visual_encoded, audio_encoded
+        # You can combine the visual and audio features here, e.g., concatenation
+        eAV = torch.cat((visual_features, audio_features), dim=1)
+        
+        fAV = self.shared_transformer(eAV)
+        
+        return fAV
+class TransformerModelDecoder(nn.Module):
+    def __init__(self, hidden_dim, masked_dim, num_heads, num_layers, output_dim):
+        super(TransformerModelDecoder, self).__init__()
+        
+        # Projection layer to reduce the dimensionality of fAV
+        self.projection = nn.Linear(hidden_dim, hidden_dim // 2)
+        
+        # Learnable embedding for masked audio tokens
+        self.masked_embedding = nn.Parameter(torch.randn(masked_dim))
+        
+        # Shared audio-visual transformer decoder
+        self.transformer_decoder = nn.TransformerDecoder(
+            nn.TransformerDecoderLayer(d_model=hidden_dim // 2, nhead=num_heads, dim_feedforward=hidden_dim),
+            num_layers=num_layers
+        )
+        
+        # Second transformer decoder for refinement
+        self.refinement_decoder = nn.TransformerDecoder(
+            nn.TransformerDecoderLayer(d_model=hidden_dim // 2, nhead=num_heads, dim_feedforward=hidden_dim),
+            num_layers=num_layers
+        )
+        
+        # Final output layer to predict masked binaural audio tokens
+        self.fc_out = nn.Linear(hidden_dim // 2, output_dim)
+
+    def forward(self, fAV, masked_tokens):
+        # Project the input features to a lower dimension
+        gAV = self.projection(fAV)
+        
+        # Append learnable masked embedding to the projected features
+        gAV = torch.cat((gAV, self.masked_embedding.expand(masked_tokens, -1)), dim=1)
+        
+        # Pass through the shared transformer decoder
+        decoder_output = self.transformer_decoder(gAV)
+        
+        # Refinement through second transformer decoder
+        refined_output = self.refinement_decoder(decoder_output)
+        
+        # Predict the missing binaural audio tokens
+        pma = refined_output
+        
+        return pma
+
 def test():
     ## test audio
-    """
+    # """
     Audio = AudioEmbed(audio_chanel=2)
     audio = torch.rand((256,2,18000)) # batch_size , channel , rate
-    embed = Audio(audio)
-    print(embed.shape) # batch_size , channel , patches , feature (batchsize , 2,64,128)
+    audioembed = Audio(audio)
+    print(audioembed.shape) # batch_size , channel , patches , feature (batchsize , 2,64,128)
     # pdb.set_trace()
-    cmap = plt.colormaps['hot']   
-    cmap = cmap(np.arange(cmap.N))  
-    cmap[0, :] = [0, 0, 0, 1]  
-    cmap[1:, :] = [1, 1, 0, 1]
-    new_cmap = plt.cm.colors.ListedColormap(cmap)
-    plt.imshow(embed[0][0], cmap=new_cmap, interpolation='nearest', origin='lower')
-    plt.title('Masked Mel-Spectrogram')
-    plt.savefig('./masked_mel_spectrogram.png')
-    """
+    # cmap = plt.colormaps['hot']   
+    # cmap = cmap(np.arange(cmap.N))  
+    # cmap[0, :] = [0, 0, 0, 1]  
+    # cmap[1:, :] = [1, 1, 0, 1]
+    # new_cmap = plt.cm.colors.ListedColormap(cmap)
+    # plt.imshow(embed[0][0], cmap=new_cmap, interpolation='nearest', origin='lower')
+    # plt.title('Masked Mel-Spectrogram')
+    # plt.savefig('./masked_mel_spectrogram.png')
+    # """
     
     ## test visual
-    """
+    # """
     Visual = VisualEmbed(img_chanel=4 , img_size=256 , embed_dim=128)
     visual = torch.rand((256,256,256,4)) # batchsize , rgba
-    embed = Visual(visual)
-    print(embed.shape) # batch_size, patches , feature (batchsize ,64,128)
+    visualembed = Visual(visual)
+    print(visualembed.shape) # batch_size, patches , feature (batchsize ,64,128)
+    # """
+    
+    ## test transformerencode
     """
+    """
+    encoder = TransformerModelEncode()
 test()
     
