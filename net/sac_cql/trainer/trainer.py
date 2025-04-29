@@ -147,7 +147,6 @@ def Train(ckpt_dir,writer):
                 num_batches = 0
                 for batch in dataloader: 
                     batch_pre_state , batch_next_state, batch_done, batch_reward, batch_labels = batch
-
                     # 得到 Q 值 (或者策略分布)
                     train_q_1 , train_q_2 , train_action = model(batch_pre_state)  # [batch, num_actions]
                     train_q_1_action = torch.argmax(train_q_1, dim=1)  # greedy action
