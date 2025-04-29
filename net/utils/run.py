@@ -59,5 +59,5 @@ def use_split_T():
 # get_lmdb_database()
 # get_encode_database()
 # use_split_T()
-get_encode_database()
+# get_encode_database()
     

@@ -178,25 +178,19 @@ class Critic_Actor_GRU(nn.Module):
         self.Q_net1 = nn.Sequential(
             nn.Linear(hidden_dim, 64),
             nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, self.action_dim)
+            nn.Linear(64, self.action_dim)
         )
         self.Q_net2 = nn.Sequential(
             nn.Linear(hidden_dim, 64),
             nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, self.action_dim)
+            nn.Linear(64, self.action_dim)
         )
 
         # Policy network
         self.policy_net = nn.Sequential(
             nn.Linear(hidden_dim, 64),
             nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, self.action_dim)
+            nn.Linear(64, self.action_dim)
         )
         self.softmax = nn.Softmax(dim=-1)
 
@@ -551,8 +545,8 @@ class CQLSAC(nn.Module):
         self.cql_alpha_optimizer = optim.Adam(params=[self.cql_log_alpha], lr=learning_rate) 
         
         # GRU Network
-        # self.gru = nn.GRU(input_size=gru_inputsize, hidden_size=gru_hidden_size, num_layers=1, batch_first=True).to(device)
-        # self.gru_optimizer = optim.Adam(self.gru.parameters(), lr=learning_rate)
+        self.gru = nn.GRU(input_size=gru_inputsize, hidden_size=gru_hidden_size, num_layers=2, batch_first=True).to(device)
+        self.gru_optimizer = optim.Adam(self.gru.parameters(), lr=learning_rate)
         # Actor Network 
 
         self.actor_local = Actor(state_size, action_size, hidden_size).to(device)
@@ -590,7 +584,9 @@ class CQLSAC(nn.Module):
         q1 = self.critic1(states)   
         q2 = self.critic2(states)
         min_Q = torch.min(q1,q2)
+        # pdb.set_trace()
         actor_loss = (action_probs * (alpha.to(self.device) * log_pis - min_Q )).sum(1).mean()
+        
         log_action_pi = torch.sum(log_pis * action_probs, dim=1)
         return actor_loss, log_action_pi
     
@@ -608,23 +604,24 @@ class CQLSAC(nn.Module):
             gamma (float): discount factor
         """
         states, next_states ,actions, rewards, dones = experiences
-        # batch_size , gru_time_seq , _ = states.shape
-        # actions = actions.reshape(batch_size*gru_time_seq,-1)
-        # rewards = rewards.reshape(batch_size*gru_time_seq,-1)
-        # dones   = dones.reshape(batch_size*gru_time_seq , -1)
-        # input self.gru
-        # states,_ = self.gru(states)
-        # states = states.reshape(batch_size*gru_time_seq,-1)
-        # with torch.no_grad():
-        #     next_states,_ = self.gru(next_states)
-        #     next_states = next_states.reshape(batch_size*gru_time_seq,-1)
+        # pdb.set_trace()
+        batch_size , gru_time_seq , _ = states.shape
+        actions = actions.reshape(batch_size*gru_time_seq,-1)
+        rewards = rewards.reshape(batch_size*gru_time_seq,-1)
+        dones   = dones.reshape(batch_size*gru_time_seq , -1)
+        states,_ = self.gru(states)
+        states = states.reshape(batch_size*gru_time_seq,-1)
+        with torch.no_grad():
+            next_states,_ = self.gru(next_states)
+            next_states = next_states.reshape(batch_size*gru_time_seq,-1)
         # ---------------------------- update actor ---------------------------- #
         current_alpha = copy.deepcopy(self.alpha)
         actor_loss, log_pis = self.calc_policy_loss(states, current_alpha)
         self.actor_optimizer.zero_grad()
         actor_loss.backward(retain_graph=True)
         self.actor_optimizer.step()
-        
+        # pdb.set_trace()
+        entropy = -log_pis.mean()
         alpha_loss = - (self.log_alpha.exp() * (log_pis.cpu() + self.target_entropy).detach().cpu()).mean()
         # Compute alpha loss
         
@@ -642,19 +639,19 @@ class CQLSAC(nn.Module):
             Q_target_next = action_probs * (torch.min(Q_target1_next, Q_target2_next) - self.alpha.to(self.device) * log_pis)
             # pdb.set_trace()
             # Compute Q targets for current states (y_i)
-            Q_targets = rewards.unsqueeze(-1) + (self.gamma * (1 - dones.unsqueeze(-1)) * Q_target_next.sum(dim=1).unsqueeze(-1)) 
+            Q_targets = rewards + (self.gamma * (1 - dones) * Q_target_next.sum(dim=1).unsqueeze(1)) 
 
 
         # Compute critic loss
         q1 = self.critic1(states)
         q2 = self.critic2(states)
         # pdb.set_trace()
-        q1_ = q1.gather(1, actions.long().unsqueeze(1))
-        q2_ = q2.gather(1, actions.long().unsqueeze(1))
+        q1_ = q1.gather(1, actions.long())
+        q2_ = q2.gather(1, actions.long())
         
-        critic1_loss = 0.5 * F.mse_loss(q1_, Q_targets)
-        critic2_loss = 0.5 * F.mse_loss(q2_, Q_targets)
-        
+        critic1_loss = F.mse_loss(q1_, Q_targets)
+        critic2_loss = F.mse_loss(q2_, Q_targets)
+        # pdb.set_trace()
         cql1_scaled_loss = torch.logsumexp(q1, dim=1).mean() - q1.mean()
         cql2_scaled_loss = torch.logsumexp(q2, dim=1).mean() - q2.mean()
         
@@ -681,12 +678,12 @@ class CQLSAC(nn.Module):
         clip_grad_norm_(self.critic1.parameters(), self.clip_grad_param)
         self.critic1_optimizer.step()
         # critic 2
-        # self.gru_optimizer.zero_grad()
+        self.gru_optimizer.zero_grad()
         self.critic2_optimizer.zero_grad()
         total_c2_loss.backward()
         clip_grad_norm_(self.critic2.parameters(), self.clip_grad_param)
         self.critic2_optimizer.step()
-        # self.gru_optimizer.step()
+        self.gru_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
         self.soft_update(self.critic1, self.critic1_target)
@@ -702,6 +699,7 @@ class CQLSAC(nn.Module):
             "current_alpha": current_alpha.item(),
             "cql_alpha_loss": cql_alpha_loss.item(),
             "cql_alpha": cql_alpha.item(),
+            "entropy":entropy.item()
         }
 
     def soft_update(self, local_model , target_model):
@@ -752,9 +750,9 @@ class AVNet(nn.Module):
 class DiscreteSAC_CQL_old(nn.Module):
     def __init__(self, device, learning_rate=1e-5, alpha=0.1, tau=0.005):
         super().__init__()
-        self.model = AVNet(128, 4, 128, 36).to(device)
+        self.model = Critic_Actor_GRU(action_dim=4).to(device)
         self.target_entropy = -4  # 目标熵（离散 SAC）
-        self.target_model = AVNet(128, 4, 128, 36).to(device)
+        self.target_model = Critic_Actor_GRU(action_dim=4).to(device)
         self.target_model.load_state_dict(self.model.state_dict())
         self.device = device
         self.lr = learning_rate
@@ -771,15 +769,16 @@ class DiscreteSAC_CQL_old(nn.Module):
         """ 计算离散 SAC + CQL 损失 """
         # pdb.set_trace()
         # 选取执行的动作 Q 值
-        a_Q1 = q1.gather(1, labels.unsqueeze(-1))
-        a_Q2 = q2.gather(1, labels.unsqueeze(-1))
+        # pdb.set_trace()
+        a_Q1 = q1.gather(1, labels)
+        a_Q2 = q2.gather(1, labels)
         min_aq = torch.min(a_Q1, a_Q2)  # 双 Q 学习
         
         min_q = torch.min(q1,q2)
         
         # Q-learning 目标
         # pdb.set_trace()
-        q_loss = 0.5*F.mse_loss(min_aq, target_q.unsqueeze(1))
+        q_loss = 0.5*F.mse_loss(min_aq, target_q)
 
         # CQL 额外约束
         q_regularization = (torch.logsumexp(q1, dim=1).mean() - a_Q1.mean()) + \
@@ -793,11 +792,16 @@ class DiscreteSAC_CQL_old(nn.Module):
         return total_loss, q_loss, q_regularization, policy_loss 
 
     def train_step(self, pre_state , next_state, labels, reward, done):
-        pre_state = pre_state.squeeze(0)
-        next_state = next_state.squeeze(0)
-        labels = labels.squeeze(0)
-        reward = reward.squeeze(0)
-        done = done.squeeze(0)
+        # input size (batch,timeseq,-1)
+        batchsize , gru_sqe_len , _ = pre_state.shape
+        reward = reward.reshape(batchsize*gru_sqe_len,-1)
+        done = done.reshape(batchsize*gru_sqe_len,-1)
+        labels = labels.reshape(batchsize*gru_sqe_len,-1)
+        # pre_state = pre_state.squeeze(0)
+        # next_state = next_state.squeeze(0)
+        # labels = labels.squeeze(0)
+        # reward = reward.squeeze(0)
+        # done = done.squeeze(0)
         q1, q2, logits = self.model(pre_state)
         with torch.no_grad():
             next_q1, next_q2, next_logits = self.target_model(next_state)
@@ -805,7 +809,7 @@ class DiscreteSAC_CQL_old(nn.Module):
             next_policy = F.softmax(next_logits, dim=1)
             next_value = (next_policy * (next_min_q - self.alpha.detach() * torch.log(next_policy + 1e-10))).sum(dim=-1)
             # pdb.set_trace()
-            target_q = reward + (1 - done) * 0.99 * next_value
+            target_q = reward + (1 - done) * 0.99 * next_value.unsqueeze(1)
         total_loss, q_loss, q_regularization, policy_loss = self.compute_loss(q1, q2, logits, target_q, labels)
         
         # _,_, alp_logits = self.model(pre_audio, pre_visual)

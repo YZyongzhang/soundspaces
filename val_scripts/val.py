@@ -21,9 +21,9 @@ random.seed(config["random_seed"])
 class Actor:
     def __init__(self, config):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model_path = f'{agent_config.EXPERIMENTS_DIR}/ckpt/2025-04-26~12-27-14/shuffle_muti_env_cql_dn_combinencode_level_0_and_1_2_211359_500.pth'
+        self.model_path = f'{agent_config.EXPERIMENTS_DIR}/ckpt/2025-04-28~22-07-16/shuffle_mutienv_cql_dn_combinencode_level_0_and_1_2.pth'
         self.avf_model_path = '/home/getuanhui/project/sound-spaces/yz/data/checkpoint/acmcheckpoint/avf_muti_env_90000.pth'
-        self.agent = Critic_Actor(state_size=128,action_size=4,gru_inputsize=128,gru_hidden_size=64,device=self.device)
+        self.agent = Critic_Actor(state_size=64,action_size=4,gru_inputsize=128,gru_hidden_size=64,device=self.device)
         self.agent.load_state_dict(torch.load(self.model_path))
         self.agent.eval()
         self.avf = AVFNet(hid_dim=128 , out_put=4 ,width_dim=128 , height_dim=36).to(self.device)
@@ -42,6 +42,7 @@ class Actor:
             'sound_pos':[],
             'path_point':[]
         }
+        self.hidden = None
     def get_action(self , visual , audio):
         # pdb.set_trace()
         visual = torch.from_numpy(visual)
@@ -54,8 +55,17 @@ class Actor:
 
         combinencode = self.avf(audio,visual)
         # avf model
-        action = self.agent.actor_local(combinencode).max(dim = -1)[1]
+        if self.hidden == None:
+            combinencode,h = self.agent.gru(combinencode)
+            self.hidden == h
+        else:
+            combinencode,h = self.agent.gru(combinencode,self.hidden)
+            self.hidden = h
+        pdb.set_trace()
+        action = self.agent.critic2(combinencode).max(dim = -1)[1]
         # pdb.set_trace()
+        if action == 3:
+            self.hidden = None
         print(action)
         return int(action)
     
