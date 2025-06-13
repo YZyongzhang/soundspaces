@@ -151,12 +151,12 @@ def generate_event_data(event_id, agent, object, image_path, S_prev):
     }
 
 
-def collect_experience(agent, fan, tv, folder_path):
+def collect_experience(agent, fun, tv, folder_path):
     audio_folder = os.path.join(folder_path, 'audio')
     os.makedirs(audio_folder, exist_ok=True)
     visual_folder = os.path.join(folder_path, 'visual')
     os.makedirs(visual_folder, exist_ok=True)
-    prev_surprise_fan = SURPRISE_INIT
+    prev_surprise_fun = SURPRISE_INIT
     prev_surprise_tv = SURPRISE_INIT
     experience = []
 
@@ -173,8 +173,8 @@ def collect_experience(agent, fan, tv, folder_path):
         image_path = os.path.join(visual_folder, f'image_{step}.png')
         collect_camera_data(agent, image_path)
 
-        event_fan = generate_event_data('fan', agent, fan, image_path, prev_surprise_fan)
-        prev_surprise_fan = event_fan['surprise']
+        event_fan = generate_event_data('fun', agent, fun, image_path, prev_surprise_fun)
+        prev_surprise_fun = event_fan['surprise']
         
         event_tv = generate_event_data('tv', agent, tv, image_path, prev_surprise_tv)
         prev_surprise_tv = event_tv['surprise']
